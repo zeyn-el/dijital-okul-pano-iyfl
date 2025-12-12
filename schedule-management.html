@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ders Programı Yönetimi - Okul Dijital Pano</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Material+Symbols+Outlined:wght@100..700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Lexend', sans-serif;
+        }
+
+        .card-admin {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e5e7eb;
+        }
+
+        .input-field {
+            width: 100%;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #2b8cee;
+            box-shadow: 0 0 0 3px rgba(43, 140, 238, 0.1);
+        }
+
+        .btn-save {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #2b8cee 0%, #1e6bb8 100%);
+            color: white;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(43, 140, 238, 0.4);
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 min-h-screen">
+
+    <!-- Giriş Kontrolü -->
+    <script>
+        (function () {
+            const session = sessionStorage.getItem('adminSession');
+            if (!session) {
+                window.location.href = 'login.html';
+            }
+        })();
+
+        function loadData() {
+            const raw = localStorage.getItem("panoData");
+            return raw ? JSON.parse(raw) : { cards: { schedule: { items: [] } } };
+        }
+
+        function saveData(x) {
+            localStorage.setItem("panoData", JSON.stringify(x));
+        }
+
+        let data = loadData();
+        let scheduleList = (data.cards && data.cards.schedule && data.cards.schedule.items) ? data.cards.schedule.items : [];
+    </script>
+
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+
+        <!-- Header -->
+        <header class="mb-10 text-center">
+            <div
+                class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl mb-4 shadow-lg">
+                <span class="material-symbols-outlined text-white text-5xl">calendar_month</span>
+            </div>
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Ders Programı Yönetimi</h1>
+            <p class="text-gray-600">Sınıfların ders programlarını düzenleyin</p>
+
+            <div class="mt-6">
+                <a href="admin.html"
+                    class="inline-flex items-center gap-2 bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors shadow-sm font-semibold">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    Admin Paneline Dön
+                </a>
+            </div>
+        </header>
+
+        <!-- Manuel Ders Ekleme -->
+        <div class="card-admin">
+            <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-3xl">add_circle</span>
+                Yeni Ders Ekle
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Gün</label>
+                    <select id="newDay" class="input-field bg-white">
+                        <option value="Pazartesi">Pazartesi</option>
+                        <option value="Salı">Salı</option>
+                        <option value="Çarşamba">Çarşamba</option>
+                        <option value="Perşembe">Perşembe</option>
+                        <option value="Cuma">Cuma</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Sınıf</label>
+                    <input type="text" id="newClass" class="input-field" placeholder="Örn: 9-A">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Ders Adı</label>
+                    <input type="text" id="newTitle" class="input-field" placeholder="Örn: Matematik">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Öğretmen</label>
+                    <input type="text" id="newTeacher" class="input-field" placeholder="Örn: Ahmet Yılmaz">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Saat (Başlangıç-Bitiş)</label>
+                    <input type="text" id="newTime" class="input-field" placeholder="Örn: 08:30-09:20">
+                    <p class="text-xs text-gray-500 mt-1">Format: SS:DD-SS:DD</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Derslik (Opsiyonel)</label>
+                    <input type="text" id="newRoom" class="input-field" placeholder="Örn: A-101">
+                </div>
+            </div>
+
+            <button onclick="addSchedule()" class="btn-save">
+                <span class="material-symbols-outlined text-sm align-middle mr-1">add</span>
+                Ders Ekle
+            </button>
+        </div>
+
+        <!-- Ders Listesi -->
+        <div class="card-admin">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary text-3xl">list</span>
+                    Ders Programı Listesi
+                    <span id="scheduleCount" class="text-sm font-normal text-gray-500">(0 kayıt)</span>
+                </h2>
+                <button onclick="clearAllSchedules()"
+                    class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-bold">
+                    <span class="material-symbols-outlined text-sm mr-1">delete_sweep</span>
+                    Tümünü Temizle
+                </button>
+            </div>
+
+            <!-- Filtreler -->
+            <div class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="material-symbols-outlined text-blue-600">filter_list</span>
+                    <h3 class="font-bold text-gray-800">Filtreler</h3>
+                    <button onclick="clearFilters()"
+                        class="ml-auto text-sm text-blue-600 hover:text-blue-800 font-medium">
+                        Filtreleri Temizle
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Gün</label>
+                        <select id="filterDay" onchange="applyFilters()" class="input-field p-2 text-sm bg-white">
+                            <option value="">Tüm Günler</option>
+                            <option value="Pazartesi">Pazartesi</option>
+                            <option value="Salı">Salı</option>
+                            <option value="Çarşamba">Çarşamba</option>
+                            <option value="Perşembe">Perşembe</option>
+                            <option value="Cuma">Cuma</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Sınıf</label>
+                        <select id="filterClass" onchange="applyFilters()" class="input-field p-2 text-sm bg-white">
+                            <option value="">Tüm Sınıflar</option>
+                            <!-- JS ile doldurulacak -->
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Ders Adı</label>
+                        <select id="filterLesson" onchange="applyFilters()" class="input-field p-2 text-sm bg-white">
+                            <option value="">Tüm Dersler</option>
+                            <!-- JS ile doldurulacak -->
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Saat</label>
+                        <select id="filterTime" onchange="applyFilters()" class="input-field p-2 text-sm bg-white">
+                            <option value="">Tüm Saatler</option>
+                            <!-- JS ile doldurulacak -->
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mt-3 text-xs text-gray-600">
+                    <span id="filterStatus">Tüm dersler gösteriliyor</span>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto rounded-lg border border-slate-200">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-600 uppercase tracking-wider">
+                            <th class="p-3 border-b border-slate-200">#</th>
+                            <th class="p-3 border-b border-slate-200">Gün</th>
+                            <th class="p-3 border-b border-slate-200">Sınıf</th>
+                            <th class="p-3 border-b border-slate-200">Ders</th>
+                            <th class="p-3 border-b border-slate-200">Öğretmen</th>
+                            <th class="p-3 border-b border-slate-200">Saat</th>
+                            <th class="p-3 border-b border-slate-200">Derslik</th>
+                            <th class="p-3 border-b border-slate-200 text-right">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scheduleTableBody">
+                        <!-- JS ile doldurulacak -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="emptyScheduleMsg" class="hidden p-8 text-center text-slate-400 italic">
+                Henüz ders kaydı bulunmuyor.
+            </div>
+        </div>
+
+        <!-- Kaydet Butonu -->
+        <div class="flex justify-end gap-3">
+            <button onclick="saveScheduleData()" class="btn-save text-lg px-8 py-4">
+                💾 Tüm Değişiklikleri Kaydet
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // Filtre değişkenleri
+        let currentFilters = {
+            day: '',
+            class: '',
+            lesson: '',
+            time: ''
+        };
+
+        function populateFilterOptions() {
+            // Benzersiz değerleri topla
+            const classes = [...new Set(scheduleList.map(s => s.cls).filter(Boolean))].sort();
+            const lessons = [...new Set(scheduleList.map(s => s.title).filter(Boolean))].sort();
+            const times = [...new Set(scheduleList.map(s => s.time).filter(Boolean))].sort();
+
+            // Sınıf filtresi
+            const filterClass = document.getElementById('filterClass');
+            filterClass.innerHTML = '<option value="">Tüm Sınıflar</option>';
+            classes.forEach(cls => {
+                filterClass.innerHTML += `<option value="${cls}">${cls}</option>`;
+            });
+
+            // Ders filtresi
+            const filterLesson = document.getElementById('filterLesson');
+            filterLesson.innerHTML = '<option value="">Tüm Dersler</option>';
+            lessons.forEach(lesson => {
+                filterLesson.innerHTML += `<option value="${lesson}">${lesson}</option>`;
+            });
+
+            // Saat filtresi
+            const filterTime = document.getElementById('filterTime');
+            filterTime.innerHTML = '<option value="">Tüm Saatler</option>';
+            times.forEach(time => {
+                filterTime.innerHTML += `<option value="${time}">${time}</option>`;
+            });
+
+            // Mevcut filtre değerlerini koru
+            document.getElementById('filterDay').value = currentFilters.day;
+            document.getElementById('filterClass').value = currentFilters.class;
+            document.getElementById('filterLesson').value = currentFilters.lesson;
+            document.getElementById('filterTime').value = currentFilters.time;
+        }
+
+        function applyFilters() {
+            currentFilters = {
+                day: document.getElementById('filterDay').value,
+                class: document.getElementById('filterClass').value,
+                lesson: document.getElementById('filterLesson').value,
+                time: document.getElementById('filterTime').value
+            };
+
+            renderScheduleTable();
+        }
+
+        function clearFilters() {
+            currentFilters = { day: '', class: '', lesson: '', time: '' };
+            document.getElementById('filterDay').value = '';
+            document.getElementById('filterClass').value = '';
+            document.getElementById('filterLesson').value = '';
+            document.getElementById('filterTime').value = '';
+            renderScheduleTable();
+        }
+
+        function getFilteredSchedules() {
+            return scheduleList.filter(schedule => {
+                if (currentFilters.day && schedule.day !== currentFilters.day) return false;
+                if (currentFilters.class && schedule.cls !== currentFilters.class) return false;
+                if (currentFilters.lesson && schedule.title !== currentFilters.lesson) return false;
+                if (currentFilters.time && schedule.time !== currentFilters.time) return false;
+                return true;
+            });
+        }
+
+        function updateFilterStatus(filteredCount, totalCount) {
+            const filterStatus = document.getElementById('filterStatus');
+            const activeFilters = [];
+
+            if (currentFilters.day) activeFilters.push(`Gün: ${currentFilters.day}`);
+            if (currentFilters.class) activeFilters.push(`Sınıf: ${currentFilters.class}`);
+            if (currentFilters.lesson) activeFilters.push(`Ders: ${currentFilters.lesson}`);
+            if (currentFilters.time) activeFilters.push(`Saat: ${currentFilters.time}`);
+
+            if (activeFilters.length === 0) {
+                filterStatus.textContent = `Tüm dersler gösteriliyor (${totalCount} kayıt)`;
+            } else {
+                filterStatus.textContent = `${filteredCount} / ${totalCount} ders gösteriliyor - Filtreler: ${activeFilters.join(', ')}`;
+            }
+        }
+
+        function renderScheduleTable() {
+            const tbody = document.getElementById('scheduleTableBody');
+            const emptyMsg = document.getElementById('emptyScheduleMsg');
+            const scheduleCount = document.getElementById('scheduleCount');
+
+            // Filtre seçeneklerini güncelle
+            populateFilterOptions();
+
+            // Filtrelenmiş listeyi al
+            const filteredList = getFilteredSchedules();
+
+            tbody.innerHTML = '';
+            scheduleCount.textContent = `(${scheduleList.length} kayıt)`;
+
+            // Filtre durumunu güncelle
+            updateFilterStatus(filteredList.length, scheduleList.length);
+
+            if (filteredList.length === 0) {
+                emptyMsg.classList.remove('hidden');
+                if (scheduleList.length > 0) {
+                    emptyMsg.textContent = 'Filtrelere uygun ders bulunamadı.';
+                } else {
+                    emptyMsg.textContent = 'Henüz ders kaydı bulunmuyor.';
+                }
+                return;
+            }
+
+            emptyMsg.classList.add('hidden');
+
+            // Günlere ve saatlere göre sırala
+            const dayOrder = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma'];
+            filteredList.sort((a, b) => {
+                const dayDiff = dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day);
+                if (dayDiff !== 0) return dayDiff;
+
+                // Aynı gün ise saate göre sırala
+                if (a.time && b.time) {
+                    const aTime = a.time.split('-')[0];
+                    const bTime = b.time.split('-')[0];
+                    return aTime.localeCompare(bTime);
+                }
+                return 0;
+            });
+
+            filteredList.forEach((schedule, displayIndex) => {
+                // Orijinal index'i bul
+                const originalIndex = scheduleList.indexOf(schedule);
+
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-slate-100 hover:bg-slate-50 transition-colors';
+                tr.id = `schedule-row-${originalIndex}`;
+
+                tr.innerHTML = `
+          <td class="p-3 font-semibold text-slate-700">${displayIndex + 1}</td>
+          <td class="p-3 text-slate-800" id="schedule-day-${originalIndex}">${schedule.day || '-'}</td>
+          <td class="p-3 text-slate-800 font-bold" id="schedule-cls-${originalIndex}">${schedule.cls || '-'}</td>
+          <td class="p-3 text-slate-600" id="schedule-title-${originalIndex}">${schedule.title || '-'}</td>
+          <td class="p-3 text-slate-600" id="schedule-teacher-${originalIndex}">${schedule.teacher || '-'}</td>
+          <td class="p-3 text-slate-500 font-mono text-xs" id="schedule-time-${originalIndex}">${schedule.time || '-'}</td>
+          <td class="p-3 text-slate-500 text-xs" id="schedule-room-${originalIndex}">${schedule.room || '-'}</td>
+          <td class="p-3 text-right">
+            <button onclick="editSchedule(${originalIndex})" class="text-blue-500 hover:bg-blue-50 p-2 rounded transition-colors mr-1" title="Düzenle">
+              <span class="material-symbols-outlined text-lg">edit</span>
+            </button>
+            <button onclick="removeSchedule(${originalIndex})" class="text-red-500 hover:bg-red-50 p-2 rounded transition-colors" title="Sil">
+              <span class="material-symbols-outlined text-lg">delete</span>
+            </button>
+          </td>
+        `;
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        function addSchedule() {
+            const day = document.getElementById('newDay').value;
+            const cls = document.getElementById('newClass').value.trim();
+            const title = document.getElementById('newTitle').value.trim();
+            const teacher = document.getElementById('newTeacher').value.trim();
+            const time = document.getElementById('newTime').value.trim();
+            const room = document.getElementById('newRoom').value.trim();
+
+            if (!cls || !title || !teacher || !time) {
+                alert('⚠️ Lütfen zorunlu alanları doldurun! (Sınıf, Ders, Öğretmen, Saat)');
+                return;
+            }
+
+            scheduleList.push({ day, cls, title, teacher, time, room });
+
+            // Formu temizle
+            document.getElementById('newClass').value = '';
+            document.getElementById('newTitle').value = '';
+            document.getElementById('newTeacher').value = '';
+            document.getElementById('newTime').value = '';
+            document.getElementById('newRoom').value = '';
+
+            renderScheduleTable();
+            alert('✅ Ders listeye eklendi! Değişiklikleri kaydetmeyi unutmayın.');
+        }
+
+        function editSchedule(index) {
+            const schedule = scheduleList[index];
+            const row = document.getElementById(`schedule-row-${index}`);
+
+            // Replace row with editable inputs
+            row.innerHTML = `
+        <td class="p-3 font-semibold text-slate-700">${index + 1}</td>
+        <td class="p-3">
+          <select id="edit-schedule-day-${index}" class="input-field p-2 text-sm w-full bg-white">
+            <option value="Pazartesi" ${schedule.day === 'Pazartesi' ? 'selected' : ''}>Pazartesi</option>
+            <option value="Salı" ${schedule.day === 'Salı' ? 'selected' : ''}>Salı</option>
+            <option value="Çarşamba" ${schedule.day === 'Çarşamba' ? 'selected' : ''}>Çarşamba</option>
+            <option value="Perşembe" ${schedule.day === 'Perşembe' ? 'selected' : ''}>Perşembe</option>
+            <option value="Cuma" ${schedule.day === 'Cuma' ? 'selected' : ''}>Cuma</option>
+          </select>
+        </td>
+        <td class="p-3">
+          <input type="text" id="edit-schedule-cls-${index}" value="${schedule.cls || ''}" class="input-field p-2 text-sm w-full">
+        </td>
+        <td class="p-3">
+          <input type="text" id="edit-schedule-title-${index}" value="${schedule.title || ''}" class="input-field p-2 text-sm w-full">
+        </td>
+        <td class="p-3">
+          <input type="text" id="edit-schedule-teacher-${index}" value="${schedule.teacher || ''}" class="input-field p-2 text-sm w-full">
+        </td>
+        <td class="p-3">
+          <input type="text" id="edit-schedule-time-${index}" value="${schedule.time || ''}" class="input-field p-2 text-sm w-full">
+        </td>
+        <td class="p-3">
+          <input type="text" id="edit-schedule-room-${index}" value="${schedule.room || ''}" class="input-field p-2 text-sm w-full">
+        </td>
+        <td class="p-3 text-right">
+          <button onclick="saveEditSchedule(${index})" class="text-green-500 hover:bg-green-50 p-2 rounded transition-colors mr-1" title="Kaydet">
+            <span class="material-symbols-outlined text-lg">check</span>
+          </button>
+          <button onclick="renderScheduleTable()" class="text-gray-500 hover:bg-gray-50 p-2 rounded transition-colors" title="İptal">
+            <span class="material-symbols-outlined text-lg">close</span>
+          </button>
+        </td>
+      `;
+        }
+
+        function saveEditSchedule(index) {
+            const day = document.getElementById(`edit-schedule-day-${index}`).value;
+            const cls = document.getElementById(`edit-schedule-cls-${index}`).value.trim();
+            const title = document.getElementById(`edit-schedule-title-${index}`).value.trim();
+            const teacher = document.getElementById(`edit-schedule-teacher-${index}`).value.trim();
+            const time = document.getElementById(`edit-schedule-time-${index}`).value.trim();
+            const room = document.getElementById(`edit-schedule-room-${index}`).value.trim();
+
+            if (!cls || !title || !teacher || !time) {
+                alert('⚠️ Lütfen zorunlu alanları doldurun!');
+                return;
+            }
+
+            scheduleList[index] = { day, cls, title, teacher, time, room };
+            renderScheduleTable();
+            alert('✅ Ders güncellendi! Değişiklikleri kaydetmeyi unutmayın.');
+        }
+
+        function removeSchedule(index) {
+            if (confirm('Bu dersi silmek istediğinizden emin misiniz?')) {
+                scheduleList.splice(index, 1);
+                renderScheduleTable();
+                alert('✅ Ders silindi! Değişiklikleri kaydetmeyi unutmayın.');
+            }
+        }
+
+        function clearAllSchedules() {
+            if (confirm('⚠️ TÜM ders kayıtlarını silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz!')) {
+                if (confirm('Son kez soruyoruz: Tüm kayıtlar silinecek, emin misiniz?')) {
+                    scheduleList = [];
+                    renderScheduleTable();
+                    alert('✅ Tüm kayıtlar silindi! Değişiklikleri kaydetmeyi unutmayın.');
+                }
+            }
+        }
+
+        function saveScheduleData() {
+            data.cards.schedule = {
+                items: scheduleList
+            };
+
+            saveData(data);
+            alert(`✅ Ders programı kaydedildi!\n\nToplam ${scheduleList.length} ders kaydı bulunuyor.`);
+        }
+
+        // Sayfa yüklendiğinde tabloyu doldur
+        window.addEventListener('DOMContentLoaded', () => {
+            renderScheduleTable();
+        });
+    </script>
+
+</body>
+
+</html>

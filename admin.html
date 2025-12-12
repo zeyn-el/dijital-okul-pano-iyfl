@@ -1,0 +1,2986 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Okul Dijital Pano</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Material+Symbols+Outlined:wght@100..700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#2b8cee",
+            "primary-dark": "#1e6bb8",
+          },
+          fontFamily: {
+            "display": ["Lexend", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Lexend', sans-serif;
+    }
+
+    .card-admin {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid #e5e7eb;
+      transition: all 0.3s ease;
+    }
+
+    .card-admin:hover {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      transform: translateY(-2px);
+    }
+
+    .card-admin h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: #1f2937;
+      border-bottom: 2px solid #2b8cee;
+      padding-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .input-label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 0.5rem;
+    }
+
+    .input-field {
+      width: 100%;
+      border: 2px solid #e5e7eb;
+      border-radius: 0.5rem;
+      padding: 0.75rem;
+      font-size: 0.875rem;
+      transition: all 0.2s ease;
+      font-family: 'Lexend', sans-serif;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: #2b8cee;
+      box-shadow: 0 0 0 3px rgba(43, 140, 238, 0.1);
+    }
+
+    .input-field::placeholder {
+      color: #9ca3af;
+    }
+
+    .btn-save {
+      margin-top: 1rem;
+      padding: 0.75rem 1.5rem;
+      background: linear-gradient(135deg, #2b8cee 0%, #1e6bb8 100%);
+      color: white;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px -1px rgba(43, 140, 238, 0.3);
+    }
+
+    .btn-save:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(43, 140, 238, 0.4);
+    }
+
+    .btn-save:active {
+      transform: translateY(0);
+    }
+
+    .btn-back {
+      padding: 0.75rem 2rem;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-back:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.4);
+    }
+
+    .helper-text {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 0.25rem;
+      font-style: italic;
+    }
+
+    .tab-button {
+      padding: 0.75rem 1.5rem;
+      border-bottom: 3px solid transparent;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: #6b7280;
+      white-space: nowrap;
+    }
+
+    .tab-button.active {
+      color: #2b8cee;
+      border-bottom-color: #2b8cee;
+    }
+
+    .tab-button:hover {
+      color: #2b8cee;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .schedule-entry {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    /* Media Center Styles */
+    .media-type-btn {
+      text-align: center;
+      border-color: #e5e7eb;
+      background: white;
+    }
+
+    .media-type-btn:hover {
+      border-color: #2b8cee;
+      background: #f0f7ff;
+    }
+
+    .media-type-btn.active {
+      border-color: #2b8cee;
+      background: #e7f3ff;
+      color: #2b8cee;
+    }
+
+    .media-settings {
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+  <script>
+    function loadData() {
+      const raw = localStorage.getItem("panoData");
+      return raw ? JSON.parse(raw) : {};
+    }
+    function saveData(x) { localStorage.setItem("panoData", JSON.stringify(x)); }
+
+    let data = loadData();
+
+    // Eğer veri hiç yoksa veya bozuksa varsayılan yapıyı oluştur
+    if (!data.cards) {
+      data = {
+        schoolName: "OKUL ADI GİRİNİZ",
+        cards: {
+          birthday: { title: "Doğum Günü", list: [] },
+          duty: { list: [] },
+          dutyByDate: { items: [] },
+          yks: { date: "" },
+          mainMedia: { image: "", tag: "DUYURU", title: "Başlık", desc: "Açıklama" },
+          quote: { text: "", author: "" },
+          ticker: { text: "", speed: 20 },
+          schedule: { items: [] },
+          timePlan: { items: [] }
+        }
+      };
+      // Varsayılanı kaydetmeyelim, kullanıcı 'Kaydet'e basınca oluşsun ama panel açılsın.
+    }
+
+    // Tab switching
+    function showTab(tabName) {
+      const tabs = document.querySelectorAll('.tab-content');
+      const buttons = document.querySelectorAll('.tab-button');
+
+      tabs.forEach(tab => tab.classList.remove('active'));
+      buttons.forEach(btn => btn.classList.remove('active'));
+
+      document.getElementById(tabName).classList.add('active');
+      // event.target might be undefined if called manually, so check it
+      if (event && event.target) {
+        event.target.classList.add('active');
+      } else {
+        // If called manually, find the button that calls this tab
+        const activeBtn = Array.from(buttons).find(b => b.getAttribute('onclick').includes(tabName));
+        if (activeBtn) activeBtn.classList.add('active');
+      }
+    }
+  </script>
+</head>
+
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 min-h-screen">
+
+  <!-- Giriş Kontrolü -->
+  <script>
+    // Sayfa yüklendiğinde giriş kontrolü yap
+    (function () {
+      const session = sessionStorage.getItem('adminSession');
+      if (!session) {
+        // Giriş yapılmamış, login sayfasına yönlendir
+        window.location.href = 'login.html';
+      }
+    })();
+
+    // Çıkış fonksiyonu
+    function logout() {
+      if (confirm('Çıkış yapmak istediğinizden emin misiniz?')) {
+        sessionStorage.removeItem('adminSession');
+        window.location.href = 'login.html';
+      }
+    }
+
+    // Kullanıcı bilgilerini göster
+    function displayUserInfo() {
+      const session = sessionStorage.getItem('adminSession');
+      if (session) {
+        const user = JSON.parse(session);
+        const userInfoElement = document.getElementById('userInfo');
+        if (userInfoElement) {
+          userInfoElement.textContent = `${user.username} (${user.role})`;
+        }
+      }
+    }
+  </script>
+
+  <div class="container mx-auto px-4 py-8 max-w-6xl">
+
+    <!-- Header -->
+    <header class="mb-10 text-center">
+      <div
+        class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary to-primary-dark rounded-2xl mb-4 shadow-lg">
+        <span class="material-symbols-outlined text-white text-5xl">settings</span>
+      </div>
+      <h1 class="text-5xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">Admin
+        Panel</h1>
+      <p class="text-gray-600 text-lg">Dijital Pano İçeriklerini Yönetin</p>
+
+      <!-- Kullanıcı Bilgisi ve Çıkış -->
+      <div class="mt-4 flex items-center justify-center gap-4">
+        <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200">
+          <span class="material-symbols-outlined text-primary">person</span>
+          <span id="userInfo" class="font-semibold text-gray-700">Kullanıcı</span>
+        </div>
+        <button onclick="logout()"
+          class="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors shadow-sm">
+          <span class="material-symbols-outlined">logout</span>
+          Çıkış Yap
+        </button>
+      </div>
+
+      <div class="mt-6 flex justify-center gap-4">
+        <a href="index.html" class="btn-back">
+          <span class="material-symbols-outlined">arrow_back</span>
+          Pano'ya Dön
+        </a>
+        <a href="user-management.html"
+          class="inline-flex items-center gap-2 bg-purple-500 text-white px-6 py-3 rounded-lg hover:bg-purple-600 transition-colors shadow-sm font-semibold">
+          <span class="material-symbols-outlined">manage_accounts</span>
+          Kullanıcı Yönetimi
+        </a>
+      </div>
+    </header>
+
+    <!-- Tabs -->
+    <div class="bg-white rounded-t-2xl shadow-md border-b border-gray-200 flex flex-wrap gap-2 px-4 py-2">
+      <button class="tab-button active" onclick="showTab('tab-general')">🏫 Genel</button>
+      <button class="tab-button" onclick="showTab('tab-cards')">⏳ YKS Sayaç</button>
+      <button class="tab-button" onclick="showTab('tab-info')">🏆 Bilgi</button>
+      <button class="tab-button" onclick="showTab('tab-duty')">👮 Nöbetçi Öğretmenler</button>
+      <button class="tab-button" onclick="showTab('tab-birthdays')">🎂 Doğum Günleri</button>
+      <button class="tab-button" onclick="showTab('tab-quotes')">💬 Günün Sözü</button>
+      <button class="tab-button" onclick="showTab('tab-media')">🎬 Medya Merkezi</button>
+      <a href="schedule-management.html" class="tab-button flex items-center gap-1">
+        📚 Ders Programı
+        <span class="material-symbols-outlined text-sm">open_in_new</span>
+      </a>
+    </div>
+
+    <!-- Tab Contents -->
+    <div class="bg-white rounded-b-2xl shadow-md p-6 mb-6">
+
+      <!-- TAB: GENEL -->
+      <div id="tab-general" class="tab-content active">
+
+        <!-- OKUL ADI -->
+        <div class="card-admin">
+          <h2>🏫 Okul Adı</h2>
+          <div class="mb-4">
+            <label class="input-label">Okul Adı</label>
+            <input id="schoolName" type="text" class="input-field" placeholder="Örn: İsmet Yılmaz Fen Lisesi">
+          </div>
+          <button onclick="saveSchoolName()" class="btn-save">💾 Kaydet</button>
+        </div>
+
+        <!-- KAYAN YAZI (TICKER) -->
+        <div class="card-admin">
+          <h2>📢 Alt Kayan Yazı</h2>
+          <div class="mb-4">
+            <label class="input-label">Duyuru Metni</label>
+            <textarea id="tText" rows="4" class="input-field"
+              placeholder="📢 Toplantı ertelendi. • 🏆 Voleybol takımı finale çıktı."></textarea>
+            <p class="helper-text">Birden fazla duyuru için • işareti kullanın</p>
+          </div>
+          <div class="mb-4">
+            <label class="input-label">Kayan Yazı Hızı</label>
+            <div class="flex items-center gap-4">
+              <span class="text-sm text-gray-600 font-medium">Hızlı</span>
+              <input id="tSpeed" type="range" min="5" max="60" value="20" step="1"
+                class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
+                oninput="updateTickerSpeedLabel()">
+              <span class="text-sm text-gray-600 font-medium">Yavaş</span>
+            </div>
+            <p class="helper-text mt-2">
+              Süre: <span id="tSpeedLabel" class="font-bold text-primary">20</span> saniye
+              <span class="text-xs text-gray-400">(Düşük değer = Hızlı, Yüksek değer = Yavaş)</span>
+            </p>
+          </div>
+          <button onclick="saveTicker()" class="btn-save">💾 Kaydet</button>
+        </div>
+
+        <!-- HAM VERİ GÖRÜNTÜLEME VE DÜZENLEME -->
+        <div class="card-admin border-l-4 border-l-purple-500">
+          <h2>🛠️ Gelişmiş Veri Yönetimi (Yedek/JSON)</h2>
+          <p class="text-gray-600 text-sm mb-4">
+            Buradan tüm verileri JSON formatında görüntüleyebilir, düzenleyebilir veya bir yedeği yapıştırıp geri
+            yükleyebilirsiniz.
+            <br><span class="text-red-500 font-bold">DİKKAT:</span> Hatalı JSON formatı girerseniz verileriniz
+            bozulabilir.
+          </p>
+          <div class="mb-4">
+            <label class="input-label">Ham Veri (JSON)</label>
+            <textarea id="rawDataOutput" rows="12"
+              class="input-field font-mono text-xs bg-slate-900 text-green-400"></textarea>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="showRawData()" class="btn-save bg-slate-600 hover:bg-slate-700">📝 Verileri Getir</button>
+            <button onclick="importRawData()" class="btn-save bg-purple-600 hover:bg-purple-700">💾 JSON Verisini İçe
+              Aktar / Kaydet</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TAB: YKS SAYAÇ -->
+      <div id="tab-cards" class="tab-content">
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+          <!-- YKS GERİ SAYIM -->
+          <div class="card-admin">
+            <h2>⏳ YKS Geri Sayım</h2>
+
+            <!-- Görünürlük Ayarı -->
+            <div class="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="yksEnabled" class="w-5 h-5 accent-primary cursor-pointer">
+                <span class="font-medium">YKS sayaç kartını ana panoda göster</span>
+              </label>
+              <p class="helper-text mt-2">Bu seçenek işaretli değilse kart gizlenir.</p>
+            </div>
+
+            <!-- Başlık Düzenleme -->
+            <div class="mb-4">
+              <label class="input-label">Kart Başlığı</label>
+              <input id="yksTitle" type="text" class="input-field"
+                placeholder="Örn: YKS'ye Kalan, TYT'ye Kalan, AYT'ye Kalan">
+              <p class="helper-text">Sınav adı değişirse buradan güncelleyebilirsiniz</p>
+            </div>
+
+            <div class="mb-4">
+              <label class="input-label">Sınav Tarihi</label>
+              <input id="yksDate" type="date" class="input-field">
+            </div>
+            <button onclick="saveYKS()" class="btn-save">💾 Kaydet</button>
+          </div>
+
+
+
+        </div>
+
+
+      </div>
+
+      <!-- TAB: BİLGİ KARTI -->
+      <div id="tab-info" class="tab-content">
+
+        <div class="card-admin">
+          <h2 class="flex items-center gap-2 mb-6">
+            <span class="material-symbols-outlined text-3xl text-green-600">emoji_events</span>
+            🏆 Bilgi Kartı Yönetimi
+          </h2>
+
+          <p class="text-gray-600 mb-6">
+            Teşvik edici bilgiler ekleyin. Haftanın enleri, gelişme gösterenler gibi başarıları paylaşın.
+          </p>
+
+          <!-- Görünürlük Ayarı -->
+          <div class="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" id="infoEnabled" class="w-5 h-5 accent-primary cursor-pointer">
+              <span class="font-medium">Bilgi kartını ana panoda göster</span>
+            </label>
+            <p class="helper-text mt-2">Bu seçenek işaretli değilse kart gizlenir.</p>
+          </div>
+
+          <!-- Manuel Bilgi Ekleme -->
+          <div class="mb-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
+            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary">add_circle</span>
+              Yeni Bilgi Ekle
+            </h3>
+
+            <div id="infoEntriesContainer" class="space-y-4">
+              <!-- İlk form JS ile eklenecek -->
+            </div>
+
+            <button onclick="addInfoEntryRow()"
+              class="mt-4 w-full py-2 border-2 border-dashed border-green-500/30 text-green-600 font-bold rounded-lg hover:bg-green-50 transition-colors flex items-center justify-center gap-1">
+              <span class="material-symbols-outlined">add</span>
+              + Yeni Bilgi Ekle
+            </button>
+          </div>
+
+          <!-- Slayt Ayarları -->
+          <div class="mb-6 p-4 bg-purple-50 rounded-xl border border-purple-200">
+            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-purple-600">settings</span>
+              Slayt Ayarları
+            </h3>
+
+            <div class="mb-4">
+              <label class="input-label text-sm">Slayt Geçiş Hızı (saniye)</label>
+              <input id="infoSliderSpeed" type="number" min="3" max="30" value="5"
+                class="input-field p-2 text-sm w-full">
+              <p class="helper-text text-xs">Birden fazla bilgi varsa slaytlar arası geçiş süresi</p>
+            </div>
+          </div>
+
+          <!-- Bilgi Listesi Tablosu -->
+          <div class="mb-6">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-bold text-lg flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">list</span>
+                Bilgi Listesi
+                <span id="infoCount" class="text-sm font-normal text-gray-500">(0 kayıt)</span>
+              </h3>
+              <button onclick="clearAllInfos()"
+                class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-bold">
+                <span class="material-symbols-outlined text-sm mr-1">delete_sweep</span>
+                Tümünü Temizle
+              </button>
+            </div>
+
+            <div class="overflow-x-auto rounded-lg border border-slate-200">
+              <table class="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr class="bg-slate-50 text-slate-600 uppercase tracking-wider">
+                    <th class="p-3 border-b border-slate-200">#</th>
+                    <th class="p-3 border-b border-slate-200">Başlık</th>
+                    <th class="p-3 border-b border-slate-200">Detay</th>
+                    <th class="p-3 border-b border-slate-200">Not</th>
+                    <th class="p-3 border-b border-slate-200 text-right">İşlem</th>
+                  </tr>
+                </thead>
+                <tbody id="infoTableBody">
+                  <!-- JS ile doldurulacak -->
+                </tbody>
+              </table>
+            </div>
+
+            <div id="emptyInfoMsg" class="hidden p-8 text-center text-slate-400 italic">
+              Henüz bilgi kaydı bulunmuyor.
+            </div>
+          </div>
+
+          <!-- Kaydet Butonu -->
+          <div class="flex justify-end gap-3">
+            <button onclick="saveInfoData()" class="btn-save">
+              💾 Tüm Değişiklikleri Kaydet
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- TAB: NÖBETÇİ ÖĞRETMENLER -->
+      <div id="tab-duty" class="tab-content">
+
+        <div class="card-admin">
+          <h2 class="flex items-center gap-2 mb-6">
+            <span class="material-symbols-outlined text-3xl text-blue-500">badge</span>
+            👮 Nöbetçi Öğretmen Yönetimi
+          </h2>
+
+          <p class="text-gray-600 mb-6">
+            Nöbetçi öğretmenleri yönetin. Her tarih için birden fazla yer ve öğretmen ekleyebilirsiniz.
+          </p>
+
+          <!-- Manuel Nöbetçi Ekleme -->
+          <div class="mb-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
+            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary">add_circle</span>
+              Manuel Nöbetçi Ekle
+            </h3>
+
+            <div id="dutyEntriesContainer" class="space-y-4">
+              <!-- İlk satır JS ile eklenecek -->
+            </div>
+
+            <button onclick="addDutyEntryRow()"
+              class="mt-4 w-full py-2 border-2 border-dashed border-primary/30 text-primary font-bold rounded-lg hover:bg-primary/5 transition-colors flex items-center justify-center gap-1">
+              <span class="material-symbols-outlined">add</span>
+              + Yeni Kayıt
+            </button>
+          </div>
+
+          <!-- Toplu İçe Aktarma -->
+          <div class="mb-6 p-4 bg-green-50 rounded-xl border border-green-200">
+            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-green-600">upload_file</span>
+              Toplu Nöbetçi İçe Aktarma
+            </h3>
+
+            <div class="mb-4">
+              <label class="input-label text-sm">Toplu Nöbetçi Verisi (CSV Format)</label>
+              <textarea id="bulkDutyData" rows="8" class="input-field p-3 text-sm font-mono" placeholder="Tarih,Gün,YerAdı,ÖğretmenAdı
+2025-12-15,Pazar,Zemin Kat,Ahmet Yılmaz
+2025-12-15,Pazar,1. Kat,Ayşe Demir
+2025-12-16,Pazartesi,Bahçe,Mehmet Kaya
+2025-12-16,Pazartesi,2. Kat,Zeynep Çelik"></textarea>
+              <p class="helper-text">
+                💡 Format: Tarih,Gün,YerAdı,ÖğretmenAdı<br>
+                Excel'den veya metin dosyasından kopyala-yapıştır yapabilirsiniz.<br>
+                İlk satır başlık olmalı. Tarih formatı: YYYY-MM-DD (Örn: 2025-12-15)<br>
+                <span class="text-amber-600 font-semibold">Not:</span> Gün alanı opsiyoneldir, boş bırakılırsa otomatik
+                hesaplanır.
+              </p>
+            </div>
+
+            <button onclick="importBulkDuties()" class="btn-save bg-green-600 hover:bg-green-700">
+              <span class="material-symbols-outlined text-sm mr-1">cloud_upload</span>
+              Toplu İçe Aktar
+            </button>
+          </div>
+
+          <!-- Nöbetçi Listesi Tablosu -->
+          <div class="mb-6">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-bold text-lg flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">list</span>
+                Nöbetçi Listesi
+                <span id="dutyCount" class="text-sm font-normal text-gray-500">(0 kayıt)</span>
+              </h3>
+              <button onclick="clearAllDuties()"
+                class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-bold">
+                <span class="material-symbols-outlined text-sm mr-1">delete_sweep</span>
+                Tümünü Temizle
+              </button>
+            </div>
+
+            <div class="overflow-x-auto rounded-lg border border-slate-200">
+              <table class="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr class="bg-slate-50 text-slate-600 uppercase tracking-wider">
+                    <th class="p-3 border-b border-slate-200">#</th>
+                    <th class="p-3 border-b border-slate-200">Tarih</th>
+                    <th class="p-3 border-b border-slate-200">Gün</th>
+                    <th class="p-3 border-b border-slate-200">Yer</th>
+                    <th class="p-3 border-b border-slate-200">Öğretmen Adı</th>
+                    <th class="p-3 border-b border-slate-200 text-right">İşlem</th>
+                  </tr>
+                </thead>
+                <tbody id="dutyTableBody">
+                  <!-- JS ile doldurulacak -->
+                </tbody>
+              </table>
+            </div>
+
+            <div id="emptyDutyMsg" class="hidden p-8 text-center text-slate-400 italic">
+              Henüz nöbetçi kaydı bulunmuyor.
+            </div>
+          </div>
+
+          <!-- Kaydet Butonu -->
+          <div class="flex justify-end gap-3">
+            <button onclick="saveDutyData()" class="btn-save">
+              💾 Tüm Değişiklikleri Kaydet
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- TAB: DOĞUM GÜNLERİ -->
+      <div id="tab-birthdays" class="tab-content">
+
+        <div class="card-admin">
+          <h2 class="flex items-center gap-2 mb-6">
+            <span class="material-symbols-outlined text-3xl text-pink-500">cake</span>
+            🎂 Doğum Günü Yönetimi
+          </h2>
+
+          <p class="text-gray-600 mb-6">
+            Öğrenci doğum günlerini yönetin. Manuel olarak ekleyebilir veya Excel'den toplu olarak içe aktarabilirsiniz.
+          </p>
+
+          <!-- Görünürlük Ayarı -->
+          <div class="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" id="birthdayEnabled" class="w-5 h-5 accent-primary cursor-pointer">
+              <span class="font-medium">Doğum günü kartını ana panoda göster</span>
+            </label>
+            <p class="helper-text mt-2">Bu seçenek işaretli değilse kart gizlenir.</p>
+          </div>
+
+          <!-- Kart Başlığı -->
+          <div class="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <label class="input-label">Kart Başlığı</label>
+            <input id="bTitle" type="text" class="input-field" placeholder="Örn: İyi ki doğdun!">
+            <p class="helper-text">Ana panoda gösterilecek başlık</p>
+          </div>
+
+          <!-- Manuel Giriş Bölümü -->
+          <div class="mb-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
+            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary">person_add</span>
+              Manuel Öğrenci Ekle
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+              <div>
+                <label class="input-label text-sm">Ad</label>
+                <input id="manualName" type="text" class="input-field p-2 text-sm" placeholder="Örn: Ahmet">
+              </div>
+              <div>
+                <label class="input-label text-sm">Soyad</label>
+                <input id="manualSurname" type="text" class="input-field p-2 text-sm" placeholder="Örn: Yılmaz">
+              </div>
+              <div>
+                <label class="input-label text-sm">Cinsiyet</label>
+                <select id="manualGender" class="input-field p-2 text-sm bg-white">
+                  <option value="E">Erkek</option>
+                  <option value="K">Kız</option>
+                </select>
+              </div>
+              <div>
+                <label class="input-label text-sm">Doğum Tarihi</label>
+                <input id="manualBirthdate" type="date" class="input-field p-2 text-sm">
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="input-label text-sm">Not (Opsiyonel)</label>
+              <input id="manualNote" type="text" class="input-field p-2 text-sm" placeholder="Örn: 9-A sınıfı">
+            </div>
+
+            <button onclick="addManualBirthday()" class="btn-save">
+              <span class="material-symbols-outlined text-sm mr-1">add</span>
+              Öğrenci Ekle
+            </button>
+          </div>
+
+          <!-- Excel İçe Aktarma -->
+          <div class="mb-6 p-4 bg-green-50 rounded-xl border border-green-200">
+            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-green-600">upload_file</span>
+              Excel'den Toplu İçe Aktar
+            </h3>
+
+            <div class="mb-4">
+              <label class="input-label text-sm">Excel Verisi (CSV Format)</label>
+              <textarea id="excelData" rows="6" class="input-field p-3 text-sm font-mono" placeholder="Ad,Soyad,Cinsiyet,DoğumTarihi,Not
+Ahmet,Yılmaz,E,2010-05-15,9-A
+Ayşe,Demir,K,2010-08-22,9-B
+Mehmet,Kaya,E,2009-12-10,10-A"></textarea>
+              <p class="helper-text">
+                💡 Format: Ad,Soyad,Cinsiyet(E/K),DoğumTarihi(YYYY-MM-DD),Not<br>
+                Excel'den kopyala-yapıştır yapabilirsiniz. İlk satır başlık olmalı.
+              </p>
+            </div>
+
+            <button onclick="importFromExcel()" class="btn-save bg-green-600 hover:bg-green-700">
+              <span class="material-symbols-outlined text-sm mr-1">cloud_upload</span>
+              Excel Verisini İçe Aktar
+            </button>
+          </div>
+
+          <!-- Filtreleme ve Görüntüleme Seçenekleri -->
+          <div class="mb-6 p-4 bg-purple-50 rounded-xl border border-purple-200">
+            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-purple-600">filter_list</span>
+              Görüntüleme Seçenekleri
+            </h3>
+
+            <div class="flex items-center gap-4">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="showAllBirthdays" class="w-5 h-5 accent-primary cursor-pointer"
+                  onchange="toggleBirthdayFilter()">
+                <span class="font-medium">Tüm öğrencileri göster (tarihe göre sıralı)</span>
+              </label>
+              <span class="text-sm text-gray-500">
+                (İşaretli değilse sadece bugün doğum günü olanlar gösterilir)
+              </span>
+            </div>
+          </div>
+
+          <!-- Öğrenci Listesi Tablosu -->
+          <div class="mb-6">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-bold text-lg flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">list</span>
+                Öğrenci Listesi
+                <span id="studentCount" class="text-sm font-normal text-gray-500">(0 öğrenci)</span>
+              </h3>
+              <button onclick="clearAllBirthdays()"
+                class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-bold">
+                <span class="material-symbols-outlined text-sm mr-1">delete_sweep</span>
+                Tümünü Temizle
+              </button>
+            </div>
+
+            <div class="overflow-x-auto rounded-lg border border-slate-200">
+              <table class="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr class="bg-slate-50 text-slate-600 uppercase tracking-wider">
+                    <th class="p-3 border-b border-slate-200">#</th>
+                    <th class="p-3 border-b border-slate-200">Ad Soyad</th>
+                    <th class="p-3 border-b border-slate-200">Cinsiyet</th>
+                    <th class="p-3 border-b border-slate-200">Doğum Tarihi</th>
+                    <th class="p-3 border-b border-slate-200">Yaş</th>
+                    <th class="p-3 border-b border-slate-200">Not</th>
+                    <th class="p-3 border-b border-slate-200 text-right">İşlem</th>
+                  </tr>
+                </thead>
+                <tbody id="birthdayTableBody">
+                  <!-- JS ile doldurulacak -->
+                </tbody>
+              </table>
+            </div>
+
+            <div id="emptyBirthdayMsg" class="hidden p-8 text-center text-slate-400 italic">
+              Henüz öğrenci kaydı bulunmuyor.
+            </div>
+          </div>
+
+          <!-- Kaydet Butonu -->
+          <div class="flex justify-end gap-3">
+            <button onclick="saveBirthdayData()" class="btn-save">
+              💾 Tüm Değişiklikleri Kaydet
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- TAB: GÜNÜN SÖZÜ -->
+      <div id="tab-quotes" class="tab-content">
+
+        <div class="card-admin">
+          <h2 class="flex items-center gap-2 mb-6">
+            <span class="material-symbols-outlined text-3xl text-indigo-500">format_quote</span>
+            💬 Günün Sözü Yönetimi
+          </h2>
+
+          <p class="text-gray-600 mb-6">
+            Sözleri yönetin. Manuel olarak ekleyebilir veya toplu olarak içe aktarabilirsiniz. Tarihe göre veya rastgele
+            gösterim yapabilirsiniz.
+          </p>
+
+          <!-- Kart Başlığı -->
+          <div class="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <label class="input-label">Kart Başlığı</label>
+            <input id="quoteCardTitle" type="text" class="input-field"
+              placeholder="Örn: Günün Sözü, Günün Ayeti, Özdeyiş">
+            <p class="helper-text">Ana panoda gösterilecek başlık (Günün Sözü, Günün Ayeti vb.)</p>
+          </div>
+
+          <!-- Manuel Söz Ekleme -->
+          <div class="mb-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
+            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary">add_circle</span>
+              Manuel Söz Ekle
+            </h3>
+
+            <div class="grid grid-cols-1 gap-4 mb-4">
+              <div>
+                <label class="input-label text-sm">Söz/Alıntı</label>
+                <textarea id="manualQuoteText" rows="3" class="input-field p-3 text-sm"
+                  placeholder="Örn: Hayatta en hakiki mürşit ilimdir."></textarea>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="input-label text-sm">Yazar/Kaynak</label>
+                  <input id="manualQuoteAuthor" type="text" class="input-field p-2 text-sm"
+                    placeholder="Örn: M. Kemal Atatürk">
+                </div>
+                <div>
+                  <label class="input-label text-sm">Tarih (Opsiyonel)</label>
+                  <input id="manualQuoteDate" type="date" class="input-field p-2 text-sm">
+                  <p class="helper-text text-xs">Belirli bir tarihte gösterilsin mi?</p>
+                </div>
+              </div>
+            </div>
+
+            <button onclick="addManualQuote()" class="btn-save">
+              <span class="material-symbols-outlined text-sm mr-1">add</span>
+              Söz Ekle
+            </button>
+          </div>
+
+          <!-- Toplu İçe Aktarma -->
+          <div class="mb-6 p-4 bg-green-50 rounded-xl border border-green-200">
+            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-green-600">upload_file</span>
+              Toplu Söz İçe Aktarma
+            </h3>
+
+            <div class="mb-4">
+              <label class="input-label text-sm">Toplu Söz Verisi</label>
+              <textarea id="bulkQuoteData" rows="8" class="input-field p-3 text-sm font-mono" placeholder="Söz|Yazar|Tarih
+Hayatta en hakiki mürşit ilimdir.|M. Kemal Atatürk|2025-01-15
+Bilgi güçtür.|Francis Bacon|
+Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
+              <p class="helper-text">
+                💡 Format: Söz|Yazar|Tarih(YYYY-MM-DD, opsiyonel)<br>
+                Her satıra bir söz. Tarih belirtilmezse rastgele gösterilir.<br>
+                İlk satır başlık olmalı.
+              </p>
+            </div>
+
+            <button onclick="importBulkQuotes()" class="btn-save bg-green-600 hover:bg-green-700">
+              <span class="material-symbols-outlined text-sm mr-1">cloud_upload</span>
+              Toplu İçe Aktar
+            </button>
+          </div>
+
+          <!-- Görüntüleme Seçenekleri -->
+          <div class="mb-6 p-4 bg-purple-50 rounded-xl border border-purple-200">
+            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-purple-600">settings</span>
+              Görüntüleme Ayarları
+            </h3>
+
+            <div class="space-y-3">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="enableQuoteSlider" class="w-5 h-5 accent-primary cursor-pointer"
+                  onchange="toggleQuoteSliderSettings()">
+                <span class="font-medium">Slayt modunu etkinleştir (Birden fazla söz göster)</span>
+              </label>
+
+              <div id="quoteSliderSettings" class="ml-7 space-y-3 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="input-label text-sm">Slayt Geçiş Hızı (saniye)</label>
+                    <input id="quoteSliderSpeed" type="number" min="3" max="30" value="8"
+                      class="input-field p-2 text-sm w-full">
+                  </div>
+                  <div>
+                    <label class="input-label text-sm">Max. Gösterilecek Slayt Sayısı</label>
+                    <input id="quoteMaxSlides" type="number" min="1" max="100" value="5"
+                      class="input-field p-2 text-sm w-full" placeholder="Örn: 5">
+                    <p class="helper-text text-xs">Havuzdan rastgele kaç söz seçileceğini belirler.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Söz Listesi Tablosu -->
+          <div class="mb-6">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-bold text-lg flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">list</span>
+                Söz Listesi
+                <span id="quoteCount" class="text-sm font-normal text-gray-500">(0 söz)</span>
+              </h3>
+              <button onclick="clearAllQuotes()"
+                class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-bold">
+                <span class="material-symbols-outlined text-sm mr-1">delete_sweep</span>
+                Tümünü Temizle
+              </button>
+            </div>
+
+            <div class="overflow-x-auto rounded-lg border border-slate-200">
+              <table class="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr class="bg-slate-50 text-slate-600 uppercase tracking-wider">
+                    <th class="p-3 border-b border-slate-200">#</th>
+                    <th class="p-3 border-b border-slate-200">Söz</th>
+                    <th class="p-3 border-b border-slate-200">Yazar</th>
+                    <th class="p-3 border-b border-slate-200">Tarih</th>
+                    <th class="p-3 border-b border-slate-200 text-right">İşlem</th>
+                  </tr>
+                </thead>
+                <tbody id="quoteTableBody">
+                  <!-- JS ile doldurulacak -->
+                </tbody>
+              </table>
+            </div>
+
+            <div id="emptyQuoteMsg" class="hidden p-8 text-center text-slate-400 italic">
+              Henüz söz kaydı bulunmuyor.
+            </div>
+          </div>
+
+          <!-- Kaydet Butonu -->
+          <div class="flex justify-end gap-3">
+            <button onclick="saveQuoteData()" class="btn-save">
+              💾 Tüm Değişiklikleri Kaydet
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- TAB: MEDYA MERKEZİ -->
+      <div id="tab-media" class="tab-content">
+
+        <div class="card-admin">
+          <h2 class="flex items-center gap-2 mb-6">
+            <span class="material-symbols-outlined text-3xl text-primary">movie</span>
+            🎬 Medya Merkezi - Ana Görsel Yönetimi
+          </h2>
+
+          <p class="text-gray-600 mb-6">
+            Ana ekrandaki merkez kartı için medya türünü seçin ve ayarlayın. Resim slaytı, video veya web sayfası
+            gösterebilirsiniz.
+          </p>
+
+          <!-- Medya Türü Seçimi -->
+          <div class="mb-6">
+            <label class="input-label">Medya Türü</label>
+            <div class="flex gap-3">
+              <button onclick="setMediaType('slideshow')" id="btn-media-slideshow"
+                class="media-type-btn flex-1 py-3 px-4 rounded-lg border-2 transition-all">
+                <span class="material-symbols-outlined text-2xl mb-1">photo_library</span>
+                <div class="font-bold">Resim Slaytı</div>
+                <div class="text-xs opacity-75">Birden fazla resim göster</div>
+              </button>
+              <button onclick="setMediaType('video')" id="btn-media-video"
+                class="media-type-btn flex-1 py-3 px-4 rounded-lg border-2 transition-all">
+                <span class="material-symbols-outlined text-2xl mb-1">play_circle</span>
+                <div class="font-bold">Video</div>
+                <div class="text-xs opacity-75">YouTube, Vimeo vb.</div>
+              </button>
+              <button onclick="setMediaType('webpage')" id="btn-media-webpage"
+                class="media-type-btn flex-1 py-3 px-4 rounded-lg border-2 transition-all">
+                <span class="material-symbols-outlined text-2xl mb-1">web</span>
+                <div class="font-bold">Web Sayfası</div>
+                <div class="text-xs opacity-75">İframe ile gömme</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Tam Ekran Seçeneği -->
+          <div class="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <label class="flex items-center gap-3 cursor-pointer">
+              <input type="checkbox" id="mediaFullscreen" class="w-5 h-5 accent-primary cursor-pointer">
+              <div>
+                <div class="font-bold text-gray-800">Tam Ekran Modu</div>
+                <div class="text-sm text-gray-600">Medya içeriği tüm ekranı kaplasın (yan kartlar gizlenir)</div>
+              </div>
+            </label>
+          </div>
+
+          <!-- SLIDESHOW SETTINGS -->
+          <div id="media-slideshow-settings" class="media-settings hidden">
+            <div class="border-t pt-6 mt-6">
+              <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">photo_library</span>
+                Resim Slaytı Ayarları
+              </h3>
+
+              <!-- Image List -->
+              <div class="mb-4">
+                <label class="input-label">Slayt Resimleri</label>
+                <div id="slideshow-images-container" class="space-y-3 mb-3">
+                  <!-- JS ile doldurulacak -->
+                </div>
+                <button onclick="addSlideshowImage()"
+                  class="w-full py-2 border-2 border-dashed border-primary/30 text-primary font-bold rounded-lg hover:bg-primary/5 transition-colors">
+                  + Resim Ekle
+                </button>
+                <p class="helper-text mt-2">
+                  💡 İpucu: <code>images/</code> klasöründen seçim yapabilir veya tam URL girebilirsiniz.
+                </p>
+              </div>
+
+              <!-- Slideshow Speed -->
+              <div class="mb-4">
+                <label class="input-label">Slayt Geçiş Hızı</label>
+                <div class="flex items-center gap-4">
+                  <span class="text-sm text-gray-600 font-medium">Hızlı</span>
+                  <input id="slideshowSpeed" type="range" min="2" max="15" value="5" step="1"
+                    class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
+                    oninput="updateSlideshowSpeedLabel()">
+                  <span class="text-sm text-gray-600 font-medium">Yavaş</span>
+                </div>
+                <p class="helper-text mt-2">
+                  Süre: <span id="slideshowSpeedLabel" class="font-bold text-primary">5</span> saniye
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- VIDEO SETTINGS -->
+          <div id="media-video-settings" class="media-settings hidden">
+            <div class="border-t pt-6 mt-6">
+              <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">play_circle</span>
+                Video Ayarları
+              </h3>
+
+              <div class="mb-4">
+                <label class="input-label">Video URL</label>
+                <input id="videoUrl" type="url" class="input-field"
+                  placeholder="https://www.youtube.com/watch?v=... veya https://vimeo.com/...">
+                <p class="helper-text">
+                  YouTube, Vimeo, veya doğrudan video dosyası URL'si girebilirsiniz.
+                </p>
+              </div>
+
+              <div class="mb-4">
+                <label class="flex items-center gap-2">
+                  <input type="checkbox" id="videoAutoplay" class="accent-primary">
+                  <span class="font-medium">Otomatik Oynat</span>
+                </label>
+              </div>
+
+              <div class="mb-4">
+                <label class="flex items-center gap-2">
+                  <input type="checkbox" id="videoLoop" class="accent-primary">
+                  <span class="font-medium">Döngü (Tekrar Oynat)</span>
+                </label>
+              </div>
+
+              <div class="mb-4">
+                <label class="flex items-center gap-2">
+                  <input type="checkbox" id="videoMuted" class="accent-primary">
+                  <span class="font-medium">Sessiz Başlat</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- WEBPAGE SETTINGS -->
+          <div id="media-webpage-settings" class="media-settings hidden">
+            <div class="border-t pt-6 mt-6">
+              <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">web</span>
+                Web Sayfası Gömme Ayarları
+              </h3>
+
+              <div class="mb-4">
+                <label class="input-label">Web Sayfası URL</label>
+                <input id="webpageUrl" type="url" class="input-field" placeholder="https://example.com">
+                <p class="helper-text">
+                  Gömmek istediğiniz web sayfasının tam URL'sini girin.
+                </p>
+              </div>
+
+              <div class="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div class="flex gap-2">
+                  <span class="material-symbols-outlined text-yellow-600">warning</span>
+                  <div class="text-sm text-yellow-800">
+                    <strong>Not:</strong> Bazı web siteleri güvenlik nedeniyle iframe içinde gösterilmeye izin vermez.
+                    Bu durumda sayfa görüntülenemeyebilir.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Save Button -->
+          <div class="mt-6 pt-6 border-t">
+            <button onclick="saveMediaCenter()" class="btn-save w-full">
+              💾 Medya Ayarlarını Kaydet
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- TAB: DERS PROGRAMI -->
+      <div id="tab-schedule" class="tab-content">
+
+        <div class="card-admin">
+          <h2>📚 Ders Programı Yönetimi</h2>
+
+          <!-- YENİ DERS EKLEME FORMU -->
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6 shadow-sm">
+            <h3 class="font-bold text-text-dark mb-3 flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary">add_circle</span> Yeni Ders Ekle
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+
+              <!-- Gün ve Sınıf -->
+              <div class="space-y-3">
+                <div>
+                  <label class="input-label">Gün</label>
+                  <select id="schDay" class="input-field bg-white">
+                    <option value="Pazartesi">Pazartesi</option>
+                    <option value="Salı">Salı</option>
+                    <option value="Çarşamba">Çarşamba</option>
+                    <option value="Perşembe">Perşembe</option>
+                    <option value="Cuma">Cuma</option>
+                    <option value="Cumartesi">Cumartesi</option>
+                    <option value="Pazar">Pazar</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="input-label">Sınıf</label>
+                  <input id="schClass" type="text" class="input-field" placeholder="9-A">
+                </div>
+              </div>
+
+              <!-- Ders ve Öğretmen -->
+              <div class="space-y-3">
+                <div>
+                  <label class="input-label">Ders Adı</label>
+                  <input id="schTitle" type="text" class="input-field" placeholder="Matematik">
+                </div>
+                <div>
+                  <label class="input-label">Öğretmen</label>
+                  <input id="schTeacher" type="text" class="input-field" placeholder="Ad Soyad">
+                </div>
+              </div>
+
+              <!-- Zamanlama -->
+              <div class="col-span-1 md:col-span-2 lg:col-span-2 space-y-3">
+                <label class="input-label">Ders Saati (Başlangıç - Bitiş)</label>
+                <div class="flex items-center gap-2 bg-white p-2 rounded border border-slate-200">
+                  <!-- Başlangıç -->
+                  <select id="startHour" class="bg-transparent font-mono outline-none"></select>
+                  <span class="font-bold">:</span>
+                  <select id="startMin" class="bg-transparent font-mono outline-none"></select>
+
+                  <span class="text-slate-400 mx-2">➞</span>
+
+                  <!-- Bitiş -->
+                  <select id="endHour" class="bg-transparent font-mono outline-none"></select>
+                  <span class="font-bold">:</span>
+                  <select id="endMin" class="bg-transparent font-mono outline-none"></select>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">Örn: 08:30 - 09:10</p>
+              </div>
+
+            </div>
+
+            <button onclick="addNewSchedule()"
+              class="w-full py-2.5 bg-primary text-white font-bold rounded-lg hover:bg-primary-dark transition-colors shadow-sm flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined">save</span> Ders Programına Ekle
+            </button>
+          </div>
+
+          <!-- GÜN SEKMELERİ -->
+          <div class="flex flex-wrap gap-2 border-b border-gray-200 mb-4 pb-1">
+            <button onclick="setScheduleDay('Pazartesi')"
+              class="sch-day-btn px-4 py-2 rounded-t-lg font-medium text-sm transition-colors border border-transparent hover:bg-slate-50"
+              data-day="Pazartesi">Pazartesi</button>
+            <button onclick="setScheduleDay('Salı')"
+              class="sch-day-btn px-4 py-2 rounded-t-lg font-medium text-sm transition-colors border border-transparent hover:bg-slate-50"
+              data-day="Salı">Salı</button>
+            <button onclick="setScheduleDay('Çarşamba')"
+              class="sch-day-btn px-4 py-2 rounded-t-lg font-medium text-sm transition-colors border border-transparent hover:bg-slate-50"
+              data-day="Çarşamba">Çarşamba</button>
+            <button onclick="setScheduleDay('Perşembe')"
+              class="sch-day-btn px-4 py-2 rounded-t-lg font-medium text-sm transition-colors border border-transparent hover:bg-slate-50"
+              data-day="Perşembe">Perşembe</button>
+            <button onclick="setScheduleDay('Cuma')"
+              class="sch-day-btn px-4 py-2 rounded-t-lg font-medium text-sm transition-colors border border-transparent hover:bg-slate-50"
+              data-day="Cuma">Cuma</button>
+            <button onclick="setScheduleDay('Cumartesi')"
+              class="sch-day-btn px-4 py-2 rounded-t-lg font-medium text-sm transition-colors border border-transparent hover:bg-slate-50"
+              data-day="Cumartesi">Cumartesi</button>
+            <button onclick="setScheduleDay('Pazar')"
+              class="sch-day-btn px-4 py-2 rounded-t-lg font-medium text-sm transition-colors border border-transparent hover:bg-slate-50"
+              data-day="Pazar">Pazar</button>
+          </div>
+
+          <!-- DERS LİSTESİ TABLOSU -->
+          <div class="overflow-x-auto rounded-lg border border-slate-200">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50 text-slate-600 text-sm uppercase tracking-wider">
+                  <th class="p-3 border-b border-slate-200">Sınıf</th>
+                  <th class="p-3 border-b border-slate-200">Ders</th>
+                  <th class="p-3 border-b border-slate-200">Öğretmen</th>
+                  <th class="p-3 border-b border-slate-200">Saat</th>
+                  <th class="p-3 border-b border-slate-200 text-right">İşlem</th>
+                </tr>
+              </thead>
+              <tbody id="scheduleTableBody" class="text-sm">
+                <!-- JS ile doldurulacak -->
+              </tbody>
+            </table>
+          </div>
+
+          <div id="emptyScheduleMsg" class="hidden p-8 text-center text-slate-400 italic">
+            Bu güne ait ders kaydı bulunamadı.
+          </div>
+
+          <div class="mt-4 flex justify-end">
+            <button onclick="saveAllSchedules()" class="btn-save ml-2 flex items-center gap-2">
+              <span class="material-symbols-outlined">cloud_upload</span> Değişiklikleri Kaydet
+            </button>
+          </div>
+        </div>
+
+        <!-- DERS & TENEFFÜS SAATLERİ -->
+        <div class="card-admin mt-6">
+          <h2>⏱ Ders ve Teneffüs Saatleri</h2>
+
+          <div class="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <div>
+              <label class="input-label">Gün</label>
+              <select id="tpDay" class="input-field bg-white" onchange="setTimePlanDay(this.value)">
+                <option value="Pazartesi">Pazartesi</option>
+                <option value="Salı">Salı</option>
+                <option value="Çarşamba">Çarşamba</option>
+                <option value="Perşembe">Perşembe</option>
+                <option value="Cuma">Cuma</option>
+                <option value="Cumartesi">Cumartesi</option>
+                <option value="Pazar">Pazar</option>
+              </select>
+              <p class="helper-text">Her gün için ders ve teneffüs zamanlarını ayrı ayrı girin.</p>
+            </div>
+            <div class="md:col-span-2 flex md:justify-end mt-4 md:mt-0">
+              <button onclick="addTimePlanRow()"
+                class="w-full md:w-auto py-2 border-2 border-dashed border-primary/30 text-primary font-bold rounded-lg hover:bg-primary/5 transition-colors flex items-center justify-center gap-1">
+                <span class="material-symbols-outlined">add</span>
+                Satır Ekle
+              </button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto rounded-lg border border-slate-200">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="bg-slate-50 text-slate-600 uppercase tracking-wider">
+                  <th class="p-3 border-b border-slate-200">Tip</th>
+                  <th class="p-3 border-b border-slate-200">Ad (1. Ders / Teneffüs 1)</th>
+                  <th class="p-3 border-b border-slate-200">Başlangıç</th>
+                  <th class="p-3 border-b border-slate-200">Bitiş</th>
+                  <th class="p-3 border-b border-slate-200 text-right">İşlem</th>
+                </tr>
+              </thead>
+              <tbody id="timePlanTableBody">
+                <!-- JS ile doldurulacak -->
+              </tbody>
+            </table>
+          </div>
+
+          <p id="emptyTimePlanMsg" class="p-4 text-center text-slate-400 italic hidden">
+            Bu güne ait saat bilgisi girilmemiş.
+          </p>
+
+          <div class="mt-4 flex justify-end">
+            <button onclick="saveTimePlan()" class="btn-save ml-2 flex items-center gap-2">
+              <span class="material-symbols-outlined">schedule</span> Ders & Teneffüs Saatlerini Kaydet
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- JS Helper for this section -->
+      <script>
+        // Populate Time Comboboxes
+        const hours = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24];
+        const minutes = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
+
+        function fillTimeSelects() {
+          const selects = ['startHour', 'endHour'];
+          const minSelects = ['startMin', 'endMin'];
+
+          selects.forEach(id => {
+            const el = document.getElementById(id);
+            hours.forEach(h => {
+              const opt = document.createElement('option');
+              opt.value = h.toString().padStart(2, '0');
+              opt.text = h.toString().padStart(2, '0');
+              el.appendChild(opt);
+            });
+          });
+
+          minSelects.forEach(id => {
+            const el = document.getElementById(id);
+            minutes.forEach(m => {
+              const opt = document.createElement('option');
+              opt.value = m.toString().padStart(2, '0');
+              opt.text = m.toString().padStart(2, '0');
+              el.appendChild(opt);
+            });
+          });
+
+          // Set defaults
+          document.getElementById('startHour').value = '08';
+          document.getElementById('startMin').value = '30';
+          document.getElementById('endHour').value = '09';
+          document.getElementById('endMin').value = '10';
+        }
+        fillTimeSelects();
+      </script>
+
+    </div>
+
+    <!-- Back Button -->
+    <div class="text-center mt-10">
+      <a href="index.html" class="btn-back">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Pano'ya Dön
+      </a>
+    </div>
+
+  </div>
+
+  <script>
+    // Populate fields
+    document.getElementById("schoolName").value = data.schoolName || "";
+
+    // Birthday Management - New System
+    let birthdayStudents = [];
+    let showAllBirthdays = false;
+
+    function initBirthdayData() {
+      // Initialize birthday data structure
+      if (!data.cards.birthdays) {
+        data.cards.birthdays = {
+          title: "İyi ki doğdun!",
+          students: []
+        };
+      }
+
+      // Migration from old system
+      if (data.cards.birthday && data.cards.birthday.list) {
+        // Migrate old data if exists
+        data.cards.birthdays.title = data.cards.birthday.title || "İyi ki doğdun!";
+        // Old system didn't have full data, so we skip migration
+        delete data.cards.birthday;
+      }
+
+      birthdayStudents = data.cards.birthdays.students || [];
+      document.getElementById("bTitle").value = data.cards.birthdays.title || "İyi ki doğdun!";
+
+      renderBirthdayTable();
+    }
+
+    function addManualBirthday() {
+      const name = document.getElementById("manualName").value.trim();
+      const surname = document.getElementById("manualSurname").value.trim();
+      const gender = document.getElementById("manualGender").value;
+      const birthdate = document.getElementById("manualBirthdate").value;
+      const note = document.getElementById("manualNote").value.trim();
+
+      if (!name || !surname || !birthdate) {
+        alert("⚠️ Lütfen en azından Ad, Soyad ve Doğum Tarihi alanlarını doldurun!");
+        return;
+      }
+
+      birthdayStudents.push({
+        name,
+        surname,
+        gender,
+        birthdate,
+        note
+      });
+
+      // Clear form
+      document.getElementById("manualName").value = "";
+      document.getElementById("manualSurname").value = "";
+      document.getElementById("manualGender").value = "E";
+      document.getElementById("manualBirthdate").value = "";
+      document.getElementById("manualNote").value = "";
+
+      renderBirthdayTable();
+      alert("✅ Öğrenci eklendi! Değişiklikleri kaydetmeyi unutmayın.");
+    }
+
+    function importFromExcel() {
+      const excelData = document.getElementById("excelData").value.trim();
+
+      if (!excelData) {
+        alert("⚠️ Lütfen Excel verisini yapıştırın!");
+        return;
+      }
+
+      const lines = excelData.split('\n').map(line => line.trim()).filter(line => line);
+
+      if (lines.length < 2) {
+        alert("⚠️ En az bir başlık satırı ve bir veri satırı olmalı!");
+        return;
+      }
+
+      let imported = 0;
+      let errors = 0;
+
+      // Skip header line (index 0)
+      for (let i = 1; i < lines.length; i++) {
+        const parts = lines[i].split(',').map(p => p.trim());
+
+        if (parts.length < 4) {
+          errors++;
+          continue;
+        }
+
+        const [name, surname, gender, birthdate, note = ""] = parts;
+
+        if (!name || !surname || !birthdate) {
+          errors++;
+          continue;
+        }
+
+        birthdayStudents.push({
+          name,
+          surname,
+          gender: gender.toUpperCase(),
+          birthdate,
+          note
+        });
+
+        imported++;
+      }
+
+      document.getElementById("excelData").value = "";
+      renderBirthdayTable();
+
+      alert(`✅ ${imported} öğrenci içe aktarıldı!${errors > 0 ? `\n⚠️ ${errors} satır hatalı olduğu için atlandı.` : ''}\n\nDeğişiklikleri kaydetmeyi unutmayın.`);
+    }
+
+    function calculateAge(birthdate) {
+      const today = new Date();
+      const birth = new Date(birthdate);
+      let age = today.getFullYear() - birth.getFullYear();
+      const monthDiff = today.getMonth() - birth.getMonth();
+
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+        age--;
+      }
+
+      return age;
+    }
+
+    function isBirthdayToday(birthdate) {
+      const today = new Date();
+      const birth = new Date(birthdate);
+
+      return today.getMonth() === birth.getMonth() && today.getDate() === birth.getDate();
+    }
+
+    function toggleBirthdayFilter() {
+      showAllBirthdays = document.getElementById("showAllBirthdays").checked;
+      renderBirthdayTable();
+    }
+
+    function renderBirthdayTable() {
+      const tbody = document.getElementById("birthdayTableBody");
+      const emptyMsg = document.getElementById("emptyBirthdayMsg");
+      const studentCount = document.getElementById("studentCount");
+
+      tbody.innerHTML = "";
+
+      let filteredStudents = birthdayStudents;
+
+      // Filter by today's birthdays if checkbox is not checked
+      if (!showAllBirthdays) {
+        filteredStudents = birthdayStudents.filter(student => isBirthdayToday(student.birthdate));
+      } else {
+        // Sort by month and day
+        filteredStudents = [...birthdayStudents].sort((a, b) => {
+          const dateA = new Date(a.birthdate);
+          const dateB = new Date(b.birthdate);
+
+          if (dateA.getMonth() !== dateB.getMonth()) {
+            return dateA.getMonth() - dateB.getMonth();
+          }
+          return dateA.getDate() - dateB.getDate();
+        });
+      }
+
+      studentCount.textContent = `(${filteredStudents.length} öğrenci)`;
+
+      if (filteredStudents.length === 0) {
+        emptyMsg.classList.remove("hidden");
+        return;
+      }
+
+      emptyMsg.classList.add("hidden");
+
+      filteredStudents.forEach((student, index) => {
+        const originalIndex = birthdayStudents.indexOf(student);
+        const tr = document.createElement("tr");
+        tr.className = "border-b border-slate-100 hover:bg-slate-50 transition-colors";
+        tr.id = `birthday-row-${originalIndex}`;
+
+        const genderIcon = student.gender === "K" ? "👧" : "👦";
+        const genderText = student.gender === "K" ? "Kız" : "Erkek";
+        const isTodayBirthday = isBirthdayToday(student.birthdate);
+        const rowClass = isTodayBirthday ? "bg-pink-50" : "";
+
+        tr.className += ` ${rowClass}`;
+
+        tr.innerHTML = `
+          <td class="p-3 font-semibold text-slate-700">${index + 1}</td>
+          <td class="p-3 text-slate-800 font-medium">
+            ${student.name} ${student.surname}
+            ${isTodayBirthday ? '<span class="ml-2 text-pink-500">🎂</span>' : ''}
+          </td>
+          <td class="p-3 text-slate-600">${genderIcon} ${genderText}</td>
+          <td class="p-3 font-mono text-sm text-slate-500">${student.birthdate}</td>
+          <td class="p-3 text-slate-600">${calculateAge(student.birthdate)}</td>
+          <td class="p-3 text-slate-600 text-sm">${student.note || '-'}</td>
+          <td class="p-3 text-right">
+            <button onclick="editBirthdayStudent(${originalIndex})" 
+              class="text-blue-500 hover:bg-blue-50 p-2 rounded transition-colors mr-1" title="Düzenle">
+              <span class="material-symbols-outlined text-lg">edit</span>
+            </button>
+            <button onclick="removeBirthdayStudent(${originalIndex})" 
+              class="text-red-500 hover:bg-red-50 p-2 rounded transition-colors" title="Sil">
+              <span class="material-symbols-outlined text-lg">delete</span>
+            </button>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function editBirthdayStudent(index) {
+      const student = birthdayStudents[index];
+      const row = document.getElementById(`birthday-row-${index}`);
+
+      row.innerHTML = `
+        <td class="p-3 font-semibold text-slate-700">${birthdayStudents.indexOf(student) + 1}</td>
+        <td class="p-3" colspan="2">
+          <div class="grid grid-cols-3 gap-2">
+            <input type="text" id="edit-birthday-name-${index}" value="${student.name}" 
+              class="input-field p-2 text-sm" placeholder="Ad">
+            <input type="text" id="edit-birthday-surname-${index}" value="${student.surname}" 
+              class="input-field p-2 text-sm" placeholder="Soyad">
+            <select id="edit-birthday-gender-${index}" class="input-field p-2 text-sm bg-white">
+              <option value="E" ${student.gender === 'E' ? 'selected' : ''}>Erkek</option>
+              <option value="K" ${student.gender === 'K' ? 'selected' : ''}>Kız</option>
+            </select>
+          </div>
+        </td>
+        <td class="p-3">
+          <input type="date" id="edit-birthday-date-${index}" value="${student.birthdate}" 
+            class="input-field p-2 text-sm w-full">
+        </td>
+        <td class="p-3">
+          <span class="text-slate-400 text-sm">Otomatik</span>
+        </td>
+        <td class="p-3">
+          <input type="text" id="edit-birthday-note-${index}" value="${student.note || ''}" 
+            class="input-field p-2 text-sm w-full" placeholder="Not">
+        </td>
+        <td class="p-3 text-right">
+          <button onclick="saveEditBirthdayStudent(${index})" 
+            class="text-green-500 hover:bg-green-50 p-2 rounded transition-colors mr-1" title="Kaydet">
+            <span class="material-symbols-outlined text-lg">check</span>
+          </button>
+          <button onclick="renderBirthdayTable()" 
+            class="text-gray-500 hover:bg-gray-50 p-2 rounded transition-colors" title="İptal">
+            <span class="material-symbols-outlined text-lg">close</span>
+          </button>
+        </td>
+      `;
+    }
+
+    function saveEditBirthdayStudent(index) {
+      const name = document.getElementById(`edit-birthday-name-${index}`).value.trim();
+      const surname = document.getElementById(`edit-birthday-surname-${index}`).value.trim();
+      const gender = document.getElementById(`edit-birthday-gender-${index}`).value;
+      const birthdate = document.getElementById(`edit-birthday-date-${index}`).value;
+      const note = document.getElementById(`edit-birthday-note-${index}`).value.trim();
+
+      if (!name || !surname || !birthdate) {
+        alert("⚠️ Lütfen Ad, Soyad ve Doğum Tarihi alanlarını doldurun!");
+        return;
+      }
+
+      birthdayStudents[index] = { name, surname, gender, birthdate, note };
+      renderBirthdayTable();
+      alert("✅ Öğrenci bilgileri güncellendi! Değişiklikleri kaydetmeyi unutmayın.");
+    }
+
+    function removeBirthdayStudent(index) {
+      if (confirm("Bu öğrenciyi silmek istediğinizden emin misiniz?")) {
+        birthdayStudents.splice(index, 1);
+        renderBirthdayTable();
+        alert("✅ Öğrenci silindi! Değişiklikleri kaydetmeyi unutmayın.");
+      }
+    }
+
+    function clearAllBirthdays() {
+      if (confirm("⚠️ TÜM öğrenci kayıtlarını silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz!")) {
+        if (confirm("Son kez soruyoruz: Tüm kayıtlar silinecek, emin misiniz?")) {
+          birthdayStudents = [];
+          renderBirthdayTable();
+          alert("✅ Tüm kayıtlar silindi! Değişiklikleri kaydetmeyi unutmayın.");
+        }
+      }
+    }
+
+    function saveBirthdayData() {
+      data.cards.birthdays = {
+        title: document.getElementById("bTitle").value,
+        students: birthdayStudents
+      };
+
+      saveData(data);
+      alert(`✅ Doğum günü verileri kaydedildi!\n\nToplam ${birthdayStudents.length} öğrenci kaydı bulunuyor.`);
+    }
+
+    // Initialize birthday data on page load
+    initBirthdayData();
+
+    // ===== DUTY TEACHER MANAGEMENT =====
+    let dutyEntries = [];
+    let dutyEntryCounter = 0;
+
+    function initDutyData() {
+      // Initialize duty data structure
+      if (!data.cards.dutyByDate) {
+        data.cards.dutyByDate = { items: [] };
+      }
+
+      dutyEntries = data.cards.dutyByDate.items || [];
+      renderDutyTable();
+
+      // Add initial entry row
+      if (dutyEntryCounter === 0) {
+        addDutyEntryRow();
+      }
+    }
+
+    function getTurkishDayName(dateStr) {
+      if (!dateStr) return "";
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return "";
+      const days = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
+      return days[d.getDay()];
+    }
+
+    function addDutyEntryRow() {
+      const container = document.getElementById('dutyEntriesContainer');
+      const rowId = dutyEntryCounter++;
+
+      const rowDiv = document.createElement('div');
+      rowDiv.className = 'grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-white rounded-lg border border-slate-200';
+      rowDiv.id = `duty-entry-${rowId}`;
+
+      rowDiv.innerHTML = `
+        <div>
+          <label class="input-label text-sm">Tarih</label>
+          <input type="date" id="dutyEntryDate-${rowId}" class="input-field p-2 text-sm">
+        </div>
+        <div>
+          <label class="input-label text-sm">Yer Adı</label>
+          <input type="text" id="dutyEntryPlace-${rowId}" class="input-field p-2 text-sm" placeholder="Örn: Zemin Kat, Bahçe">
+        </div>
+        <div>
+          <label class="input-label text-sm">Öğretmen Adı</label>
+          <div class="flex gap-2">
+            <input type="text" id="dutyEntryTeacher-${rowId}" class="input-field p-2 text-sm flex-1" placeholder="Örn: Ahmet Yılmaz">
+            <button onclick="addDutyFromRow(${rowId})" 
+              class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm font-bold">
+              Ekle
+            </button>
+          </div>
+        </div>
+      `;
+
+      container.appendChild(rowDiv);
+    }
+
+    function addDutyFromRow(rowId) {
+      const dateInput = document.getElementById(`dutyEntryDate-${rowId}`);
+      const placeInput = document.getElementById(`dutyEntryPlace-${rowId}`);
+      const teacherInput = document.getElementById(`dutyEntryTeacher-${rowId}`);
+
+      const date = dateInput.value.trim();
+      const place = placeInput.value.trim();
+      const teacher = teacherInput.value.trim();
+
+      if (!date || !place || !teacher) {
+        alert("⚠️ Lütfen Tarih, Yer Adı ve Öğretmen Adı alanlarını doldurun!");
+        return;
+      }
+
+      const dayName = getTurkishDayName(date);
+
+      dutyEntries.push({
+        date,
+        day: dayName,
+        place,
+        teacher
+      });
+
+      // Clear inputs
+      dateInput.value = "";
+      placeInput.value = "";
+      teacherInput.value = "";
+
+      renderDutyTable();
+      alert("✅ Nöbetçi eklendi! Değişiklikleri kaydetmeyi unutmayın.");
+    }
+
+    function renderDutyTable() {
+      const tbody = document.getElementById("dutyTableBody");
+      const emptyMsg = document.getElementById("emptyDutyMsg");
+      const dutyCount = document.getElementById("dutyCount");
+
+      tbody.innerHTML = "";
+
+      // Sort by date
+      const sortedEntries = [...dutyEntries].sort((a, b) => {
+        return new Date(a.date) - new Date(b.date);
+      });
+
+      dutyCount.textContent = `(${sortedEntries.length} kayıt)`;
+
+      if (sortedEntries.length === 0) {
+        emptyMsg.classList.remove("hidden");
+        return;
+      }
+
+      emptyMsg.classList.add("hidden");
+
+      sortedEntries.forEach((duty, index) => {
+        const originalIndex = dutyEntries.indexOf(duty);
+        const tr = document.createElement("tr");
+        tr.className = "border-b border-slate-100 hover:bg-slate-50 transition-colors";
+
+        // Check if this duty is for today
+        const today = new Date().toISOString().split('T')[0];
+        const isToday = duty.date === today;
+        const rowClass = isToday ? "bg-blue-50" : "";
+
+        tr.className += ` ${rowClass}`;
+
+        tr.innerHTML = `
+          <td class="p-3 font-semibold text-slate-700">${index + 1}</td>
+          <td class="p-3 font-mono text-sm text-slate-500">
+            ${duty.date}
+            ${isToday ? '<span class="ml-2 text-blue-500">📅 Bugün</span>' : ''}
+          </td>
+          <td class="p-3 text-slate-600">${duty.day || '-'}</td>
+          <td class="p-3 text-slate-800 font-medium">${duty.place}</td>
+          <td class="p-3 text-slate-800">${duty.teacher}</td>
+          <td class="p-3 text-right">
+            <button onclick="removeDutyEntry(${originalIndex})" 
+              class="text-red-500 hover:bg-red-50 p-2 rounded transition-colors" title="Sil">
+              <span class="material-symbols-outlined text-lg">delete</span>
+            </button>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function removeDutyEntry(index) {
+      if (confirm("Bu nöbetçi kaydını silmek istediğinizden emin misiniz?")) {
+        dutyEntries.splice(index, 1);
+        renderDutyTable();
+        alert("✅ Nöbetçi kaydı silindi! Değişiklikleri kaydetmeyi unutmayın.");
+      }
+    }
+
+    function clearAllDuties() {
+      if (confirm("⚠️ TÜM nöbetçi kayıtlarını silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz!")) {
+        if (confirm("Son kez soruyoruz: Tüm kayıtlar silinecek, emin misiniz?")) {
+          dutyEntries = [];
+          renderDutyTable();
+          alert("✅ Tüm kayıtlar silindi! Değişiklikleri kaydetmeyi unutmayın.");
+        }
+      }
+    }
+
+    function importBulkDuties() {
+      const bulkData = document.getElementById("bulkDutyData").value.trim();
+
+      if (!bulkData) {
+        alert("⚠️ Lütfen toplu nöbetçi verisini yapıştırın!");
+        return;
+      }
+
+      const lines = bulkData.split('\n').map(line => line.trim()).filter(line => line);
+
+      if (lines.length < 2) {
+        alert("⚠️ En az bir başlık satırı ve bir veri satırı olmalı!");
+        return;
+      }
+
+      let imported = 0;
+      let errors = 0;
+
+      // Skip header line (index 0)
+      for (let i = 1; i < lines.length; i++) {
+        const parts = lines[i].split(',').map(p => p.trim());
+
+        if (parts.length < 3) {
+          errors++;
+          continue;
+        }
+
+        const [date, dayInput = "", place, teacher] = parts;
+
+        if (!date || !place || !teacher) {
+          errors++;
+          continue;
+        }
+
+        // Validate date format
+        const dateObj = new Date(date);
+        if (isNaN(dateObj.getTime())) {
+          errors++;
+          continue;
+        }
+
+        // Use provided day name or calculate it
+        const day = dayInput || getTurkishDayName(date);
+
+        dutyEntries.push({
+          date,
+          day,
+          place,
+          teacher
+        });
+
+        imported++;
+      }
+
+      document.getElementById("bulkDutyData").value = "";
+      renderDutyTable();
+
+      alert(`✅ ${imported} nöbetçi kaydı içe aktarıldı!${errors > 0 ? `\n⚠️ ${errors} satır hatalı olduğu için atlandı.` : ''}\n\nDeğişiklikleri kaydetmeyi unutmayın.`);
+    }
+
+    function saveDutyData() {
+      data.cards.dutyByDate = {
+        items: dutyEntries
+      };
+
+      saveData(data);
+      alert(`✅ Nöbetçi öğretmen verileri kaydedildi!\n\nToplam ${dutyEntries.length} kayıt bulunuyor.`);
+    }
+
+    // Initialize duty data on page load
+    initDutyData();
+
+    if (!data.cards.dutyByDate) {
+      data.cards.dutyByDate = { items: [] }
+        ;
+    }
+
+    document.getElementById("yksDate").value = data.cards.yks.date || "";
+
+    // Media Center variables (global scope)
+    var slideshowImages = [];
+    var currentMediaType = 'slideshow';
+
+
+
+    document.getElementById("tText").value = data.cards.ticker.text || "";
+
+    // Initialize ticker speed
+    const tickerSpeed = data.cards.ticker.speed || 20;
+    document.getElementById("tSpeed").value = tickerSpeed;
+    document.getElementById("tSpeedLabel").textContent = tickerSpeed;
+
+
+    // Schedule Management
+    let scheduleEntries = [];
+    let currentScheduleDay = 'Pazartesi';
+
+    // TimePlan Management (ders ve teneffüs saatleri)
+    if (!data.cards.timePlan) {
+      data.cards.timePlan = { items: [] };
+    }
+    let timePlanEntries = data.cards.timePlan.items || [];
+    let currentTimePlanDay = 'Pazartesi';
+
+    function loadScheduleEntries() {
+      if (!data.cards.schedule) {
+        data.cards.schedule = { items: [] };
+      }
+      scheduleEntries = data.cards.schedule.items || [];
+
+      // Migration: Add 'day' if missing for old data
+      let modified = false;
+      scheduleEntries.forEach(item => {
+        if (!item.day) {
+          item.day = 'Pazartesi';
+          modified = true;
+        }
+      });
+      if (modified) saveData(data);
+
+      renderScheduleTable();
+      updateDayButtons();
+    }
+
+    function setScheduleDay(day) {
+      currentScheduleDay = day;
+      updateDayButtons();
+      renderScheduleTable();
+    }
+
+    function updateDayButtons() {
+      document.querySelectorAll('.sch-day-btn').forEach(btn => {
+        if (btn.dataset.day === currentScheduleDay) {
+          btn.classList.add('bg-primary/10', 'text-primary', 'border-primary/20');
+          btn.classList.remove('border-transparent');
+        } else {
+          btn.classList.remove('bg-primary/10', 'text-primary', 'border-primary/20');
+          btn.classList.add('border-transparent');
+        }
+      });
+    }
+
+    function renderScheduleTable() {
+      const tbody = document.getElementById("scheduleTableBody");
+      const emptyMsg = document.getElementById("emptyScheduleMsg");
+      tbody.innerHTML = "";
+
+      // Filter entries by current selected day
+      // Map to keep original index for deletion logic
+      const filtered = scheduleEntries.map((item, index) => ({ ...item, originalIndex: index }))
+        .filter(item => item.day === currentScheduleDay);
+
+      if (filtered.length === 0) {
+        emptyMsg.classList.remove('hidden');
+      } else {
+        emptyMsg.classList.add('hidden');
+        filtered.forEach(entry => {
+          const tr = document.createElement('tr');
+          tr.className = "border-b border-slate-100 hover:bg-slate-50 transition-colors";
+          tr.innerHTML = `
+                <td class="p-3 font-semibold text-slate-700">${entry.cls || '-'}</td>
+                <td class="p-3 text-slate-800">${entry.title || '-'}</td>
+                <td class="p-3 text-slate-600">${entry.teacher || '-'}</td>
+                <td class="p-3 font-mono text-sm text-slate-500">${entry.time || '-'}</td>
+                <td class="p-3 text-right">
+                    <button onclick="removeScheduleEntry(${entry.originalIndex})" class="text-red-500 hover:bg-red-50 p-2 rounded transition-colors" title="Sil">
+                        <span class="material-symbols-outlined text-lg">delete</span>
+                    </button>
+                </td>
+            `;
+          tbody.appendChild(tr);
+        });
+      }
+    }
+
+    function addNewSchedule() {
+      // Get values
+      const day = document.getElementById('schDay').value;
+      const cls = document.getElementById('schClass').value;
+      const title = document.getElementById('schTitle').value;
+      const teacher = document.getElementById('schTeacher').value;
+
+      // Get time
+      const sH = document.getElementById('startHour').value;
+      const sM = document.getElementById('startMin').value;
+      const eH = document.getElementById('endHour').value;
+      const eM = document.getElementById('endMin').value;
+
+      // Validation
+      if (!cls || !title) {
+        alert("⚠️ Lütfen en azından Sınıf ve Ders Adı bilgilerini giriniz.");
+        return;
+      }
+
+      const time = `${sH}:${sM}-${eH}:${eM}`;
+
+      // Add to list
+      scheduleEntries.push({
+        day, cls, title, teacher, time
+      });
+
+      // Clear text inputs only (keep day and time for faster bulk entry)
+      document.getElementById('schClass').value = '';
+      document.getElementById('schTitle').value = '';
+      document.getElementById('schTeacher').value = '';
+
+      // Update view
+      if (currentScheduleDay !== day) {
+        setScheduleDay(day); // Switch to the day we just added to
+      } else {
+        renderScheduleTable();
+      }
+
+      // AUTO SAVE
+      saveAllSchedules(true);
+    }
+
+    function removeScheduleEntry(index) {
+      if (confirm("Bu dersi silmek istediğinizden emin misiniz?")) {
+        scheduleEntries.splice(index, 1);
+        renderScheduleTable();
+
+        // AUTO SAVE
+        saveAllSchedules(true);
+      }
+    }
+
+    function saveAllSchedules(silent = false) {
+      // Sort logic could be added here (by day and time)
+      data.cards.schedule.items = scheduleEntries;
+      saveData(data);
+      if (!silent) {
+        alert("✅ Ders programı başarıyla kaydedildi!");
+      }
+    }
+
+    // Load schedule entries on page load
+    loadScheduleEntries();
+
+    // ==== TIME PLAN (LESSON & BREAK SLOTS) ====
+    function setTimePlanDay(day) {
+      currentTimePlanDay = day;
+      const select = document.getElementById('tpDay');
+      if (select && select.value !== day) {
+        select.value = day;
+      }
+      renderTimePlanTable();
+    }
+
+    function renderTimePlanTable() {
+      const tbody = document.getElementById('timePlanTableBody');
+      const emptyMsg = document.getElementById('emptyTimePlanMsg');
+      if (!tbody) return;
+
+      tbody.innerHTML = '';
+
+      const filtered = (timePlanEntries || []).map((item, index) => ({ ...item, originalIndex: index }))
+        .filter(item => item.day === currentTimePlanDay);
+
+      if (!filtered.length) {
+        if (emptyMsg) emptyMsg.classList.remove('hidden');
+        return;
+      }
+      if (emptyMsg) emptyMsg.classList.add('hidden');
+
+      filtered.forEach(entry => {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-slate-100 hover:bg-slate-50 transition-colors';
+        tr.innerHTML = `
+          <td class="p-2">
+            <select class="input-field py-1 px-2 text-xs" onchange="updateTimePlanEntry(${entry.originalIndex}, 'type', this.value)">
+              <option value="ders" ${entry.type === 'ders' ? 'selected' : ''}>Ders</option>
+              <option value="teneffus" ${entry.type === 'teneffus' ? 'selected' : ''}>Teneffüs</option>
+               <option value="ara" ${entry.type === 'ara' ? 'selected' : ''}>Ara</option>
+            </select>
+          </td>
+          <td class="p-2">
+            <input type="text" class="input-field py-1 px-2 text-xs" value="${entry.label || ''}"
+                   onchange="updateTimePlanEntry(${entry.originalIndex}, 'label', this.value)" placeholder="Örn: 1. Ders / 1. Teneffüs">
+          </td>
+          <td class="p-2">
+            <input type="text" class="input-field py-1 px-2 font-mono text-xs" value="${entry.start || ''}"
+                   onchange="updateTimePlanEntry(${entry.originalIndex}, 'start', this.value)" placeholder="08:30">
+          </td>
+          <td class="p-2">
+            <input type="text" class="input-field py-1 px-2 font-mono text-xs" value="${entry.end || ''}"
+                   onchange="updateTimePlanEntry(${entry.originalIndex}, 'end', this.value)" placeholder="09:10">
+          </td>
+          <td class="p-2 text-right">
+            <button onclick="removeTimePlanRow(${entry.originalIndex})" class="text-red-500 hover:bg-red-50 p-2 rounded transition-colors" title="Sil">
+              <span class="material-symbols-outlined text-lg">delete</span>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function addTimePlanRow() {
+      const now = new Date();
+      // Basit varsayılan saatler
+      const defaultStart = '08:30';
+      const defaultEnd = '09:10';
+
+      timePlanEntries.push({
+        day: currentTimePlanDay,
+        type: 'ders',
+        label: '',
+        start: defaultStart,
+        end: defaultEnd
+      });
+
+      renderTimePlanTable();
+    }
+
+    function updateTimePlanEntry(index, key, value) {
+      if (!timePlanEntries[index]) return;
+      timePlanEntries[index][key] = value;
+    }
+
+    function removeTimePlanRow(index) {
+      if (!timePlanEntries[index]) return;
+      if (!confirm('Bu satırı silmek istediğinizden emin misiniz?')) return;
+      timePlanEntries.splice(index, 1);
+      renderTimePlanTable();
+    }
+
+    function saveTimePlan() {
+      // Basit doğrulama: start/end boş olmayanları al
+      const cleaned = (timePlanEntries || []).filter(x => x.start && x.end && x.day);
+      data.cards.timePlan.items = cleaned;
+      saveData(data);
+      alert('✅ Ders ve teneffüs saatleri kaydedildi!');
+    }
+
+    // İlk açılışta time plan tablosu için varsayılan günü yükle
+    setTimePlanDay(currentTimePlanDay);
+
+    // Save functions
+    function saveSchoolName() {
+      data.schoolName = document.getElementById("schoolName").value;
+      saveData(data);
+      alert("✅ Okul adı kaydedildi!");
+    }
+
+    function saveDuty() {
+      const lines = document.getElementById("dutyText").value.split("\n").filter(x => x.trim());
+      data.cards.duty.list = lines.map(x => {
+        const parts = x.split("|");
+        return { place: parts[0]?.trim() || "", teacher: parts[1]?.trim() || "" };
+      });
+      saveData(data);
+      alert("✅ Nöbetçi öğretmenler kaydedildi!");
+    }
+
+    function saveYKS() {
+      data.cards.yks.date = document.getElementById("yksDate").value;
+      saveData(data);
+      alert("✅ YKS tarihi kaydedildi!");
+    }
+
+    function saveMedia() {
+      data.cards.mainMedia.image = document.getElementById("mImage").value;
+      data.cards.mainMedia.tag = document.getElementById("mTag").value;
+      data.cards.mainMedia.title = document.getElementById("mTitle").value;
+      data.cards.mainMedia.desc = document.getElementById("mDesc").value;
+      saveData(data);
+      alert("✅ Ana görsel kaydedildi!");
+    }
+
+
+
+    function saveTicker() {
+      data.cards.ticker.text = document.getElementById("tText").value;
+      data.cards.ticker.speed = parseInt(document.getElementById("tSpeed").value);
+      saveData(data);
+      alert("✅ Kayan yazı kaydedildi!");
+    }
+
+    function updateTickerSpeedLabel() {
+      const speed = document.getElementById("tSpeed").value;
+      document.getElementById("tSpeedLabel").textContent = speed;
+    }
+
+    function showRawData() {
+      const currentData = loadData();
+      const jsonStr = JSON.stringify(currentData, null, 2);
+      document.getElementById('rawDataOutput').value = jsonStr;
+    }
+
+    function importRawData() {
+      const rawText = document.getElementById('rawDataOutput').value;
+      if (!rawText.trim()) {
+        alert("⚠️ Lütfen geçerli bir JSON verisi giriniz.");
+        return;
+      }
+
+      try {
+        const newData = JSON.parse(rawText);
+        // Basic validation
+        if (!newData.cards) {
+          throw new Error("Geçersiz veri formatı: 'cards' objesi eksik.");
+        }
+
+        if (confirm("⚠️ DİKKAT: Mevcut tüm veriler silinecek ve bu yeni verilerle değiştirilecek. Emin misiniz?")) {
+          saveData(newData);
+          alert("✅ Veriler başarıyla içe aktarıldı! Sayfa yenileniyor...");
+          location.reload();
+        }
+      } catch (e) {
+        alert("❌ HATA: Geçersiz JSON formatı!\n\nDetay: " + e.message);
+      }
+    }
+
+    // ===== MEDIA CENTER MANAGEMENT =====
+    // Variables are now in global scope above
+
+    function setMediaType(type) {
+      currentMediaType = type;
+
+      // Update button states
+      document.querySelectorAll('.media-type-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      document.getElementById(`btn-media-${type}`).classList.add('active');
+
+      // Show/hide settings
+      document.querySelectorAll('.media-settings').forEach(settings => {
+        settings.classList.add('hidden');
+      });
+      document.getElementById(`media-${type}-settings`).classList.remove('hidden');
+    }
+
+    function addSlideshowImage() {
+      slideshowImages.push({
+        path: '',
+        alt: '',
+        showOverlay: false,
+        tag: '',
+        title: '',
+        desc: ''
+      });
+      renderSlideshowImages();
+    }
+
+    function removeSlideshowImage(index) {
+      slideshowImages.splice(index, 1);
+      renderSlideshowImages();
+    }
+
+    function updateSlideshowImage(index, field, value) {
+      slideshowImages[index][field] = value;
+    }
+
+    function renderSlideshowImages() {
+      const container = document.getElementById('slideshow-images-container');
+      if (!container) return;
+
+      container.innerHTML = '';
+
+      if (slideshowImages.length === 0) {
+        container.innerHTML = '<p class="text-xs text-gray-400 text-center italic py-4">Henüz resim eklenmemiş.</p>';
+        return;
+      }
+
+      slideshowImages.forEach((img, index) => {
+        const div = document.createElement('div');
+        div.className = 'bg-slate-50 p-4 rounded-lg border border-slate-200';
+
+        // Ensure overlay fields exist
+        if (img.showOverlay === undefined) img.showOverlay = false;
+        if (img.tag === undefined) img.tag = '';
+        if (img.title === undefined) img.title = '';
+        if (img.desc === undefined) img.desc = '';
+
+        div.innerHTML = `
+          <div class="flex gap-2 items-start mb-3">
+            <div class="flex-1 space-y-2">
+              <div>
+                <label class="text-xs font-semibold text-gray-600 mb-1 block">Resim Yolu</label>
+                <input type="text" class="input-field p-2 text-sm" value="${img.path || ''}" 
+                  onchange="updateSlideshowImage(${index}, 'path', this.value)" 
+                  placeholder="images/photo.jpg veya https://...">
+              </div>
+              <div>
+                <label class="text-xs font-semibold text-gray-600 mb-1 block">Resim Açıklaması (Alt Text)</label>
+                <input type="text" class="input-field p-2 text-sm" value="${img.alt || ''}" 
+                  onchange="updateSlideshowImage(${index}, 'alt', this.value)" 
+                  placeholder="Resim açıklaması (opsiyonel)">
+              </div>
+            </div>
+            <button onclick="removeSlideshowImage(${index})" 
+              class="text-red-500 hover:text-red-700 bg-white p-2 border border-slate-200 rounded flex-shrink-0">
+              <span class="material-symbols-outlined text-lg">delete</span>
+            </button>
+          </div>
+          
+          <!-- Bilgi Katmanı Seçeneği -->
+          <div class="border-t border-slate-300 pt-3 mt-2">
+            <label class="flex items-center gap-2 mb-2 cursor-pointer">
+              <input type="checkbox" 
+                class="accent-primary cursor-pointer" 
+                ${img.showOverlay ? 'checked' : ''}
+                onchange="toggleImageOverlay(${index}, this.checked)">
+              <span class="text-sm font-semibold text-gray-700">Bu resim için bilgi katmanı göster</span>
+            </label>
+            
+            <div id="overlay-fields-${index}" class="ml-6 space-y-2 ${img.showOverlay ? '' : 'hidden'}">
+              <div>
+                <label class="text-xs font-semibold text-gray-600 mb-1 block">Etiket/Badge</label>
+                <input type="text" class="input-field p-2 text-sm" value="${img.tag || ''}" 
+                  onchange="updateSlideshowImage(${index}, 'tag', this.value)" 
+                  placeholder="Örn: DUYURU, ETKİNLİK">
+              </div>
+              <div>
+                <label class="text-xs font-semibold text-gray-600 mb-1 block">Başlık</label>
+                <input type="text" class="input-field p-2 text-sm" value="${img.title || ''}" 
+                  onchange="updateSlideshowImage(${index}, 'title', this.value)" 
+                  placeholder="Etkinlik veya duyuru başlığı">
+              </div>
+              <div>
+                <label class="text-xs font-semibold text-gray-600 mb-1 block">Açıklama</label>
+                <textarea rows="2" class="input-field p-2 text-sm" 
+                  onchange="updateSlideshowImage(${index}, 'desc', this.value)" 
+                  placeholder="Kısa açıklama veya detay">${img.desc || ''}</textarea>
+              </div>
+            </div>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function updateSlideshowSpeedLabel() {
+      const speed = document.getElementById('slideshowSpeed').value;
+      const label = document.getElementById('slideshowSpeedLabel');
+      if (label) label.textContent = speed;
+    }
+
+    function toggleImageOverlay(index, checked) {
+      slideshowImages[index].showOverlay = checked;
+      const overlayFields = document.getElementById(`overlay-fields-${index}`);
+      if (overlayFields) {
+        if (checked) {
+          overlayFields.classList.remove('hidden');
+        } else {
+          overlayFields.classList.add('hidden');
+        }
+      }
+    }
+
+    function loadMediaCenterData() {
+      const mediaData = data.cards.mediaCenter || {};
+
+      // Set media type
+      const mediaType = mediaData.type || 'slideshow';
+      setMediaType(mediaType);
+
+      // Fullscreen
+      const fullscreenCheckbox = document.getElementById('mediaFullscreen');
+      if (fullscreenCheckbox) {
+        fullscreenCheckbox.checked = mediaData.fullscreen || false;
+      }
+
+      // Slideshow
+      if (mediaData.slideshow) {
+        slideshowImages = mediaData.slideshow.images || [];
+        renderSlideshowImages();
+
+        const speedInput = document.getElementById('slideshowSpeed');
+        const speedLabel = document.getElementById('slideshowSpeedLabel');
+        if (speedInput) speedInput.value = mediaData.slideshow.speed || 5;
+        if (speedLabel) speedLabel.textContent = mediaData.slideshow.speed || 5;
+      }
+
+      // Video
+      if (mediaData.video) {
+        const videoUrl = document.getElementById('videoUrl');
+        const videoAutoplay = document.getElementById('videoAutoplay');
+        const videoLoop = document.getElementById('videoLoop');
+        const videoMuted = document.getElementById('videoMuted');
+
+        if (videoUrl) videoUrl.value = mediaData.video.url || '';
+        if (videoAutoplay) videoAutoplay.checked = mediaData.video.autoplay || false;
+        if (videoLoop) videoLoop.checked = mediaData.video.loop || false;
+        if (videoMuted) videoMuted.checked = mediaData.video.muted || false;
+      }
+
+      // Webpage
+      if (mediaData.webpage) {
+        const webpageUrl = document.getElementById('webpageUrl');
+        if (webpageUrl) webpageUrl.value = mediaData.webpage.url || '';
+      }
+    }
+
+    function saveMediaCenter() {
+      if (!data.cards.mediaCenter) {
+        data.cards.mediaCenter = {};
+      }
+
+      data.cards.mediaCenter.type = currentMediaType;
+      data.cards.mediaCenter.fullscreen = document.getElementById('mediaFullscreen').checked;
+
+      // Save slideshow data
+      data.cards.mediaCenter.slideshow = {
+        images: slideshowImages.filter(img => img.path.trim() !== ''),
+        speed: parseInt(document.getElementById('slideshowSpeed').value)
+      };
+
+      // Save video data
+      data.cards.mediaCenter.video = {
+        url: document.getElementById('videoUrl').value,
+        autoplay: document.getElementById('videoAutoplay').checked,
+        loop: document.getElementById('videoLoop').checked,
+        muted: document.getElementById('videoMuted').checked
+      };
+
+      // Save webpage data
+      data.cards.mediaCenter.webpage = {
+        url: document.getElementById('webpageUrl').value
+      };
+
+      saveData(data);
+      alert('✅ Medya merkezi ayarları kaydedildi!');
+    }
+
+    // ===== QUOTE MANAGEMENT =====
+    let quotesList = [];
+
+    function initQuoteData() {
+      // Initialize quote data structure
+      if (!data.cards.quotes) {
+        data.cards.quotes = {
+          title: "Günün Sözü",
+          enableSlider: false,
+          sliderSpeed: 8,
+          maxSlides: 5,
+          items: []
+        };
+      }
+
+      quotesList = data.cards.quotes.items || [];
+      document.getElementById("quoteCardTitle").value = data.cards.quotes.title || "Günün Sözü";
+      document.getElementById("enableQuoteSlider").checked = data.cards.quotes.enableSlider || false;
+      document.getElementById("quoteSliderSpeed").value = data.cards.quotes.sliderSpeed || 8;
+      document.getElementById("quoteMaxSlides").value = data.cards.quotes.maxSlides || 5;
+
+      toggleQuoteSliderSettings();
+      renderQuoteTable();
+    }
+
+    function addManualQuote() {
+      const text = document.getElementById("manualQuoteText").value.trim();
+      const author = document.getElementById("manualQuoteAuthor").value.trim();
+      const date = document.getElementById("manualQuoteDate").value;
+
+      if (!text || !author) {
+        alert("⚠️ Lütfen en azından Söz ve Yazar alanlarını doldurun!");
+        return;
+      }
+
+      quotesList.push({
+        text,
+        author,
+        date: date || null
+      });
+
+      // Clear form
+      document.getElementById("manualQuoteText").value = "";
+      document.getElementById("manualQuoteAuthor").value = "";
+      document.getElementById("manualQuoteDate").value = "";
+
+      renderQuoteTable();
+      alert("✅ Söz eklendi! Değişiklikleri kaydetmeyi unutmayın.");
+    }
+
+    function importBulkQuotes() {
+      const bulkData = document.getElementById("bulkQuoteData").value.trim();
+
+      if (!bulkData) {
+        alert("⚠️ Lütfen toplu söz verisini yapıştırın!");
+        return;
+      }
+
+      const lines = bulkData.split('\n').map(line => line.trim()).filter(line => line);
+
+      if (lines.length < 2) {
+        alert("⚠️ En az bir başlık satırı ve bir veri satırı olmalı!");
+        return;
+      }
+
+      let imported = 0;
+      let errors = 0;
+
+      // Skip header line (index 0)
+      for (let i = 1; i < lines.length; i++) {
+        const parts = lines[i].split('|').map(p => p.trim());
+
+        if (parts.length < 2) {
+          errors++;
+          continue;
+        }
+
+        const [text, author, date = null] = parts;
+
+        if (!text || !author) {
+          errors++;
+          continue;
+        }
+
+        quotesList.push({
+          text,
+          author,
+          date: date || null
+        });
+
+        imported++;
+      }
+
+      document.getElementById("bulkQuoteData").value = "";
+      renderQuoteTable();
+
+      alert(`✅ ${imported} söz içe aktarıldı!${errors > 0 ? `\n⚠️ ${errors} satır hatalı olduğu için atlandı.` : ''}\n\nDeğişiklikleri kaydetmeyi unutmayın.`);
+    }
+
+    function toggleQuoteSliderSettings() {
+      const enabled = document.getElementById("enableQuoteSlider").checked;
+      const settings = document.getElementById("quoteSliderSettings");
+
+      if (enabled) {
+        settings.classList.remove("hidden");
+      } else {
+        settings.classList.add("hidden");
+      }
+    }
+
+    function renderQuoteTable() {
+      const tbody = document.getElementById("quoteTableBody");
+      const emptyMsg = document.getElementById("emptyQuoteMsg");
+      const quoteCount = document.getElementById("quoteCount");
+
+      tbody.innerHTML = "";
+      quoteCount.textContent = `(${quotesList.length} söz)`;
+
+      if (quotesList.length === 0) {
+        emptyMsg.classList.remove("hidden");
+        return;
+      }
+
+      emptyMsg.classList.add("hidden");
+
+      quotesList.forEach((quote, index) => {
+        const tr = document.createElement("tr");
+        tr.className = "border-b border-slate-100 hover:bg-slate-50 transition-colors";
+        tr.id = `quote-row-${index}`;
+
+        const truncatedText = quote.text.length > 60 ? quote.text.substring(0, 60) + "..." : quote.text;
+        const dateDisplay = quote.date || "-";
+
+        tr.innerHTML = `
+          <td class="p-3 font-semibold text-slate-700">${index + 1}</td>
+          <td class="p-3 text-slate-800" title="${quote.text}">${truncatedText}</td>
+          <td class="p-3 text-slate-600">${quote.author}</td>
+          <td class="p-3 font-mono text-sm text-slate-500">${dateDisplay}</td>
+          <td class="p-3 text-right">
+            <button onclick="editQuote(${index})" 
+              class="text-blue-500 hover:bg-blue-50 p-2 rounded transition-colors mr-1" title="Düzenle">
+              <span class="material-symbols-outlined text-lg">edit</span>
+            </button>
+            <button onclick="removeQuote(${index})" 
+              class="text-red-500 hover:bg-red-50 p-2 rounded transition-colors" title="Sil">
+              <span class="material-symbols-outlined text-lg">delete</span>
+            </button>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function editQuote(index) {
+      const quote = quotesList[index];
+      const row = document.getElementById(`quote-row-${index}`);
+
+      row.innerHTML = `
+        <td class="p-3 font-semibold text-slate-700">${index + 1}</td>
+        <td class="p-3">
+          <textarea id="edit-quote-text-${index}" rows="2" 
+            class="input-field p-2 text-sm w-full">${quote.text}</textarea>
+        </td>
+        <td class="p-3">
+          <input type="text" id="edit-quote-author-${index}" value="${quote.author}" 
+            class="input-field p-2 text-sm w-full">
+        </td>
+        <td class="p-3">
+          <input type="date" id="edit-quote-date-${index}" value="${quote.date || ''}" 
+            class="input-field p-2 text-sm w-full">
+        </td>
+        <td class="p-3 text-right">
+          <button onclick="saveEditQuote(${index})" 
+            class="text-green-500 hover:bg-green-50 p-2 rounded transition-colors mr-1" title="Kaydet">
+            <span class="material-symbols-outlined text-lg">check</span>
+          </button>
+          <button onclick="renderQuoteTable()" 
+            class="text-gray-500 hover:bg-gray-50 p-2 rounded transition-colors" title="İptal">
+            <span class="material-symbols-outlined text-lg">close</span>
+          </button>
+        </td>
+      `;
+    }
+
+    function saveEditQuote(index) {
+      const text = document.getElementById(`edit-quote-text-${index}`).value.trim();
+      const author = document.getElementById(`edit-quote-author-${index}`).value.trim();
+      const date = document.getElementById(`edit-quote-date-${index}`).value || null;
+
+      if (!text || !author) {
+        alert("⚠️ Lütfen Söz ve Yazar alanlarını doldurun!");
+        return;
+      }
+
+      quotesList[index] = { text, author, date };
+      renderQuoteTable();
+      alert("✅ Söz güncellendi! Değişiklikleri kaydetmeyi unutmayın.");
+    }
+
+    function removeQuote(index) {
+      if (confirm("Bu sözü silmek istediğinizden emin misiniz?")) {
+        quotesList.splice(index, 1);
+        renderQuoteTable();
+        alert("✅ Söz silindi! Değişiklikleri kaydetmeyi unutmayın.");
+      }
+    }
+
+    function clearAllQuotes() {
+      if (confirm("⚠️ TÜM söz kayıtlarını silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz!")) {
+        if (confirm("Son kez soruyoruz: Tüm kayıtlar silinecek, emin misiniz?")) {
+          quotesList = [];
+          renderQuoteTable();
+          alert("✅ Tüm kayıtlar silindi! Değişiklikleri kaydetmeyi unutmayın.");
+        }
+      }
+    }
+
+    function saveQuoteData() {
+      data.cards.quotes = {
+        title: document.getElementById("quoteCardTitle").value,
+        enableSlider: document.getElementById("enableQuoteSlider").checked,
+        sliderSpeed: parseInt(document.getElementById("quoteSliderSpeed").value),
+        maxSlides: parseInt(document.getElementById("quoteMaxSlides").value),
+        items: quotesList
+      };
+
+      saveData(data);
+      alert(`✅ Günün sözü verileri kaydedildi!\n\nToplam ${quotesList.length} söz kaydı bulunuyor.`);
+    }
+
+    // Initialize quote data on page load
+    initQuoteData();
+
+    // ===== INFO CARD MANAGEMENT =====
+    let infoList = [];
+
+    function initInfoData() {
+      // Load existing info data
+      if (data.cards && data.cards.info) {
+        infoList = data.cards.info.items || [];
+        document.getElementById("infoEnabled").checked = data.cards.info.enabled || false;
+        document.getElementById("infoSliderSpeed").value = data.cards.info.sliderSpeed || 5;
+      }
+
+      renderInfoTable();
+
+      // Add first entry row if empty
+      if (infoList.length === 0) {
+        addInfoEntryRow();
+      }
+    }
+
+    function addInfoEntryRow() {
+      const container = document.getElementById("infoEntriesContainer");
+      const rowId = `info-row-${Date.now()}`;
+
+      const row = document.createElement("div");
+      row.id = rowId;
+      row.className = "p-4 bg-white rounded-lg border border-slate-200";
+      row.innerHTML = `
+        <div class="grid grid-cols-1 gap-3">
+          <div>
+            <label class="input-label text-sm">Başlık</label>
+            <input type="text" class="input-field p-2 text-sm info-title" placeholder="Örn: Haftanın Sınıfı">
+          </div>
+          <div>
+            <label class="input-label text-sm">Detay</label>
+            <input type="text" class="input-field p-2 text-sm info-detail" placeholder="Örn: 10-B">
+          </div>
+          <div>
+            <label class="input-label text-sm">Not</label>
+            <input type="text" class="input-field p-2 text-sm info-note" placeholder="Örn: En iyi ders dinleyen sınıf. Tebrikler!">
+          </div>
+          <div class="flex gap-2">
+            <button onclick="addInfoFromRow('${rowId}')" class="btn-save flex-1">
+              <span class="material-symbols-outlined text-sm mr-1">add</span>
+              Listeye Ekle
+            </button>
+            <button onclick="removeInfoRow('${rowId}')" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-bold">
+              <span class="material-symbols-outlined text-sm">close</span>
+            </button>
+          </div>
+        </div>
+      `;
+
+      container.appendChild(row);
+    }
+
+    function removeInfoRow(rowId) {
+      const row = document.getElementById(rowId);
+      if (row) {
+        row.remove();
+      }
+    }
+
+    function addInfoFromRow(rowId) {
+      const row = document.getElementById(rowId);
+      if (!row) return;
+
+      const title = row.querySelector(".info-title").value.trim();
+      const detail = row.querySelector(".info-detail").value.trim();
+      const note = row.querySelector(".info-note").value.trim();
+
+      if (!title || !detail) {
+        alert("⚠️ Lütfen en az Başlık ve Detay alanlarını doldurun!");
+        return;
+      }
+
+      infoList.push({ title, detail, note });
+
+      // Clear form
+      row.querySelector(".info-title").value = "";
+      row.querySelector(".info-detail").value = "";
+      row.querySelector(".info-note").value = "";
+
+      renderInfoTable();
+      alert("✅ Bilgi listeye eklendi! Değişiklikleri kaydetmeyi unutmayın.");
+    }
+
+    function renderInfoTable() {
+      const tbody = document.getElementById("infoTableBody");
+      const emptyMsg = document.getElementById("emptyInfoMsg");
+      const infoCount = document.getElementById("infoCount");
+
+      tbody.innerHTML = "";
+      infoCount.textContent = `(${infoList.length} kayıt)`;
+
+      if (infoList.length === 0) {
+        emptyMsg.classList.remove("hidden");
+        return;
+      }
+
+      emptyMsg.classList.add("hidden");
+
+      infoList.forEach((info, index) => {
+        const tr = document.createElement("tr");
+        tr.className = "border-b border-slate-100 hover:bg-slate-50 transition-colors";
+        tr.id = `info-row-${index}`;
+
+        tr.innerHTML = `
+          <td class="p-3 font-semibold text-slate-700">${index + 1}</td>
+          <td class="p-3 text-slate-800" id="info-title-${index}">${info.title}</td>
+          <td class="p-3 text-slate-600" id="info-detail-${index}">${info.detail}</td>
+          <td class="p-3 text-slate-500 text-sm" id="info-note-${index}">${info.note || '-'}</td>
+          <td class="p-3 text-right">
+            <button onclick="editInfo(${index})" 
+              class="text-blue-500 hover:bg-blue-50 p-2 rounded transition-colors mr-1" title="Düzenle">
+              <span class="material-symbols-outlined text-lg">edit</span>
+            </button>
+            <button onclick="removeInfo(${index})" 
+              class="text-red-500 hover:bg-red-50 p-2 rounded transition-colors" title="Sil">
+              <span class="material-symbols-outlined text-lg">delete</span>
+            </button>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function editInfo(index) {
+      const info = infoList[index];
+      const row = document.getElementById(`info-row-${index}`);
+
+      // Replace row with editable inputs
+      row.innerHTML = `
+        <td class="p-3 font-semibold text-slate-700">${index + 1}</td>
+        <td class="p-3">
+          <input type="text" id="edit-info-title-${index}" value="${info.title}" 
+            class="input-field p-2 text-sm w-full">
+        </td>
+        <td class="p-3">
+          <input type="text" id="edit-info-detail-${index}" value="${info.detail}" 
+            class="input-field p-2 text-sm w-full">
+        </td>
+        <td class="p-3">
+          <input type="text" id="edit-info-note-${index}" value="${info.note || ''}" 
+            class="input-field p-2 text-sm w-full">
+        </td>
+        <td class="p-3 text-right">
+          <button onclick="saveEditInfo(${index})" 
+            class="text-green-500 hover:bg-green-50 p-2 rounded transition-colors mr-1" title="Kaydet">
+            <span class="material-symbols-outlined text-lg">check</span>
+          </button>
+          <button onclick="renderInfoTable()" 
+            class="text-gray-500 hover:bg-gray-50 p-2 rounded transition-colors" title="İptal">
+            <span class="material-symbols-outlined text-lg">close</span>
+          </button>
+        </td>
+      `;
+    }
+
+    function saveEditInfo(index) {
+      const title = document.getElementById(`edit-info-title-${index}`).value.trim();
+      const detail = document.getElementById(`edit-info-detail-${index}`).value.trim();
+      const note = document.getElementById(`edit-info-note-${index}`).value.trim();
+
+      if (!title || !detail) {
+        alert("⚠️ Lütfen en az Başlık ve Detay alanlarını doldurun!");
+        return;
+      }
+
+      infoList[index] = { title, detail, note };
+      renderInfoTable();
+      alert("✅ Bilgi güncellendi! Değişiklikleri kaydetmeyi unutmayın.");
+    }
+
+    function removeInfo(index) {
+      if (confirm("Bu bilgiyi silmek istediğinizden emin misiniz?")) {
+        infoList.splice(index, 1);
+        renderInfoTable();
+        alert("✅ Bilgi silindi! Değişiklikleri kaydetmeyi unutmayın.");
+      }
+    }
+
+    function clearAllInfos() {
+      if (confirm("⚠️ TÜM bilgi kayıtlarını silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz!")) {
+        if (confirm("Son kez soruyoruz: Tüm kayıtlar silinecek, emin misiniz?")) {
+          infoList = [];
+          renderInfoTable();
+          alert("✅ Tüm kayıtlar silindi! Değişiklikleri kaydetmeyi unutmayın.");
+        }
+      }
+    }
+
+    // YKS Sayaç Kaydetme
+    function saveYKS() {
+      const yksEnabled = document.getElementById("yksEnabled").checked;
+      const yksTitle = document.getElementById("yksTitle").value.trim() || "YKS'ye Kalan";
+      const yksDate = document.getElementById("yksDate").value;
+
+      data.cards.yks = {
+        enabled: yksEnabled,
+        title: yksTitle,
+        date: yksDate
+      };
+
+      saveData(data);
+      alert(`✅ YKS Sayaç verileri kaydedildi!\\n\\nBaşlık: ${yksTitle}\\nTarih: ${yksDate || 'Belirtilmemiş'}\\nDurum: ${yksEnabled ? 'Gösteriliyor' : 'Gizli'}`);
+    }
+
+    // Doğum Günü Kaydetme (mevcut fonksiyonu güncelle)
+    function saveBirthdayData() {
+      const birthdayEnabled = document.getElementById("birthdayEnabled").checked;
+      const bTitle = document.getElementById("bTitle").value.trim() || "İyi ki doğdun!";
+
+      // Mevcut öğrenci listesini al (varsa)
+      const currentStudents = (data.cards.birthdays && data.cards.birthdays.students) ? data.cards.birthdays.students : [];
+
+      data.cards.birthdays = {
+        enabled: birthdayEnabled,
+        title: bTitle,
+        students: currentStudents
+      };
+
+      saveData(data);
+      alert(`✅ Doğum günü verileri kaydedildi!\n\nToplam ${currentStudents.length} öğrenci kaydı bulunuyor.\nKart durumu: ${birthdayEnabled ? 'Gösteriliyor' : 'Gizli'}`);
+    }
+
+    function saveInfoData() {
+      data.cards.info = {
+        enabled: document.getElementById("infoEnabled").checked,
+        sliderSpeed: parseInt(document.getElementById("infoSliderSpeed").value),
+        items: infoList
+      };
+
+      saveData(data);
+      alert(`✅ Bilgi kartı verileri kaydedildi!\n\nToplam ${infoList.length} bilgi kaydı bulunuyor.\nKart durumu: ${data.cards.info.enabled ? 'Aktif' : 'Pasif'}`);
+    }
+
+    // YKS ve Doğum Günü verilerini yükle
+    function loadYKSAndBirthdayData() {
+      // YKS verilerini yükle
+      if (data.cards.yks) {
+        document.getElementById("yksEnabled").checked = data.cards.yks.enabled !== false; // Default true
+        document.getElementById("yksTitle").value = data.cards.yks.title || "YKS'ye Kalan";
+        document.getElementById("yksDate").value = data.cards.yks.date || "";
+      } else {
+        // Varsayılan değerler
+        document.getElementById("yksEnabled").checked = true;
+        document.getElementById("yksTitle").value = "YKS'ye Kalan";
+      }
+
+      // Doğum günü verilerini yükle
+      if (data.cards.birthdays) {
+        document.getElementById("birthdayEnabled").checked = data.cards.birthdays.enabled !== false; // Default true
+        document.getElementById("bTitle").value = data.cards.birthdays.title || "İyi ki doğdun!";
+      } else {
+        // Varsayılan değerler
+        document.getElementById("birthdayEnabled").checked = true;
+        document.getElementById("bTitle").value = "İyi ki doğdun!";
+      }
+    }
+
+    // Initialize info data on page load
+    // initInfoData();
+
+    // Load media center data after page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      displayUserInfo(); // Kullanıcı bilgilerini göster
+      loadYKSAndBirthdayData();
+      setTimeout(() => {
+        loadMediaCenterData();
+      }, 100);
+    });
+  </script>
+
+</body>
+
+</html>
+```

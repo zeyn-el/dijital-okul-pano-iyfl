@@ -78,6 +78,13 @@
       animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
   </style>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+  <!-- Firebase Configuration -->
+  <script src="firebase-config.js"></script>
 </head>
 
 <body class="bg-background-light text-text-dark font-display h-screen flex flex-col overflow-hidden">
@@ -309,10 +316,9 @@
   </footer>
 
   <script>
-    // Load data from localStorage
-    function loadData() {
-      const savedData = localStorage.getItem('panoData');
-      return savedData ? JSON.parse(savedData) : null;
+    // Load data from Firebase (async)
+    async function loadData() {
+      return await FirebaseStorage.loadData();
     }
 
     // Calculate days until YKS
@@ -326,8 +332,8 @@
     }
 
     // Update content with saved data
-    function updateContent() {
-      const data = loadData();
+    async function updateContent() {
+      const data = await loadData();
       if (!data || !data.cards) return;
 
       // Update school name

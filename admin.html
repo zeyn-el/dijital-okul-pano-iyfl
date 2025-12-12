@@ -201,32 +201,52 @@
       }
     }
   </style>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+  <!-- Firebase Configuration -->
+  <script src="firebase-config.js"></script>
+
   <script>
-    function loadData() {
-      const raw = localStorage.getItem("panoData");
-      return raw ? JSON.parse(raw) : {};
+    // Firebase-based data loading and saving
+    async function loadData() {
+      return await FirebaseStorage.loadData();
     }
-    function saveData(x) { localStorage.setItem("panoData", JSON.stringify(x)); }
 
-    let data = loadData();
+    // Synchronous wrapper for saveData (calls Firebase async in background)
+    function saveData(x) {
+      FirebaseStorage.saveData(x).then(() => {
+        console.log('✅ Veriler Firebase\'e kaydedildi');
+      }).catch(err => {
+        console.error('❌ Firebase kaydetme hatası:', err);
+      });
+    }
 
-    // Eğer veri hiç yoksa veya bozuksa varsayılan yapıyı oluştur
-    if (!data.cards) {
-      data = {
-        schoolName: "OKUL ADI GİRİNİZ",
-        cards: {
-          birthday: { title: "Doğum Günü", list: [] },
-          duty: { list: [] },
-          dutyByDate: { items: [] },
-          yks: { date: "" },
-          mainMedia: { image: "", tag: "DUYURU", title: "Başlık", desc: "Açıklama" },
-          quote: { text: "", author: "" },
-          ticker: { text: "", speed: 20 },
-          schedule: { items: [] },
-          timePlan: { items: [] }
-        }
-      };
-      // Varsayılanı kaydetmeyelim, kullanıcı 'Kaydet'e basınca oluşsun ama panel açılsın.
+    let data = {};
+
+    // Initialize data on page load
+    async function initializeData() {
+      data = await loadData();
+
+      // Eğer veri hiç yoksa veya bozuksa varsayılan yapıyı oluştur
+      if (!data.cards) {
+        data = {
+          schoolName: "OKUL ADI GİRİNİZ",
+          cards: {
+            birthday: { title: "Doğum Günü", list: [] },
+            duty: { list: [] },
+            dutyByDate: { items: [] },
+            yks: { date: "" },
+            mainMedia: { image: "", tag: "DUYURU", title: "Başlık", desc: "Açıklama" },
+            quote: { text: "", author: "" },
+            ticker: { text: "", speed: 20 },
+            schedule: { items: [] },
+            timePlan: { items: [] }
+          }
+        };
+      }
     }
 
     // Tab switching
@@ -2230,8 +2250,8 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
       document.getElementById("tSpeedLabel").textContent = speed;
     }
 
-    function showRawData() {
-      const currentData = loadData();
+    async function showRawData() {
+      const currentData = await loadData();
       const jsonStr = JSON.stringify(currentData, null, 2);
       document.getElementById('rawDataOutput').value = jsonStr;
     }
@@ -2971,7 +2991,10 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
     // initInfoData();
 
     // Load media center data after page loads
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Initialize Firebase data first
+      await initializeData();
+
       displayUserInfo(); // Kullanıcı bilgilerini göster
       loadYKSAndBirthdayData();
       setTimeout(() => {
@@ -2983,4 +3006,3 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
 </body>
 
 </html>
-```

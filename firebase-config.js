@@ -2,14 +2,17 @@
 // NOT: Bu bilgileri Firebase Console'dan alacaksınız
 
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY_HERE",
-    authDomain: "okul-pano.firebaseapp.com",
-    databaseURL: "https://okul-pano-default-rtdb.firebaseio.com",
-    projectId: "okul-pano",
-    storageBucket: "okul-pano.appspot.com",
-    messagingSenderId: "123456789",
-    appId: "1:123456789:web:abcdef123456"
+  apiKey: "AIzaSyCtIFXSGV_BOX1Ew3dAK-YAuCEZkR7f32U",
+  authDomain: "okul-dijital-pano.firebaseapp.com",
+  databaseURL: "https://okul-dijital-pano-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "okul-dijital-pano",
+  storageBucket: "okul-dijital-pano.firebasestorage.app",
+  messagingSenderId: "1017147130408",
+  appId: "1:1017147130408:web:925fada3c9436187242b1d"
 };
+
+
+
 
 // Firebase'i başlat
 firebase.initializeApp(firebaseConfig);

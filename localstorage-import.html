@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalStorage Aktarım Aracı</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gradient-to-br from-green-50 to-emerald-100 min-h-screen p-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-2xl p-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">
+                💾 LocalStorage Veri Aktarım Aracı
+            </h1>
+            <p class="text-gray-600 mb-8">
+                localStorage.txt dosyanızdaki verileri tarayıcınıza aktarın
+            </p>
+
+            <!-- Status Box -->
+            <div id="statusBox" class="mb-6 p-6 bg-gray-50 rounded-xl border-2 border-gray-200">
+                <p class="text-lg">
+                    <span class="font-bold">Durum:</span>
+                    <span id="statusText" class="text-gray-600">Hazır</span>
+                </p>
+            </div>
+
+            <!-- JSON Input Area -->
+            <div class="mb-6">
+                <label class="block text-sm font-bold text-gray-700 mb-2">
+                    📄 localStorage.txt İçeriğini Buraya Yapıştırın:
+                </label>
+                <textarea id="jsonInput" rows="15"
+                    class="w-full p-4 border-2 border-gray-300 rounded-lg font-mono text-xs bg-slate-900 text-green-400 focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none"
+                    placeholder='{"schoolName": "...", "cards": {...}}'></textarea>
+                <p class="text-sm text-gray-500 mt-2">
+                    💡 localStorage.txt dosyasını açın, tüm içeriği kopyalayın (Ctrl+A, Ctrl+C) ve yukarıya yapıştırın.
+                </p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-4">
+                <button onclick="validateJSON()"
+                    class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 px-6 rounded-lg transition-all shadow-lg hover:shadow-xl">
+                    🔍 JSON'u Kontrol Et
+                </button>
+                <button onclick="importToLocalStorage()"
+                    class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-6 rounded-lg transition-all shadow-lg hover:shadow-xl">
+                    💾 LocalStorage'a Aktar
+                </button>
+            </div>
+
+            <!-- Info Box -->
+            <div class="mt-8 p-4 bg-green-50 border-l-4 border-green-500 rounded">
+                <h3 class="font-bold text-green-900 mb-2">📌 Kullanım Talimatları:</h3>
+                <ol class="list-decimal list-inside text-sm text-green-800 space-y-1">
+                    <li>localStorage.txt dosyasını bir metin editöründe açın</li>
+                    <li>Tüm içeriği kopyalayın (Ctrl+A, Ctrl+C)</li>
+                    <li>Yukarıdaki metin kutusuna yapıştırın (Ctrl+V)</li>
+                    <li>"JSON'u Kontrol Et" ile doğrulayın</li>
+                    <li>"LocalStorage'a Aktar" ile kaydedin</li>
+                    <li>Admin paneli açın ve Firebase'e senkronize edin</li>
+                </ol>
+            </div>
+
+            <!-- Next Steps -->
+            <div class="mt-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
+                <h3 class="font-bold text-blue-900 mb-2">🚀 Sonraki Adımlar:</h3>
+                <p class="text-sm text-blue-800">
+                    Veriler LocalStorage'a aktarıldıktan sonra:
+                </p>
+                <ol class="list-decimal list-inside text-sm text-blue-800 space-y-1 mt-2">
+                    <li>Admin panelini açın: <a href="admin.html" class="underline font-bold">admin.html</a></li>
+                    <li>Genel sekmesinde "🔥 Firebase Veri Aktarımı" kartını bulun</li>
+                    <li>"🚀 LocalStorage Verilerini Firebase'e Aktar" butonuna tıklayın</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let parsedData = null;
+
+        function updateStatus(message, type = 'info') {
+            const statusText = document.getElementById('statusText');
+            const statusBox = document.getElementById('statusBox');
+
+            statusText.textContent = message;
+
+            // Reset classes
+            statusBox.className = 'mb-6 p-6 rounded-xl border-2';
+
+            // Apply type-specific styling
+            if (type === 'success') {
+                statusBox.classList.add('bg-green-50', 'border-green-500');
+                statusText.className = 'text-green-700 font-bold';
+            } else if (type === 'error') {
+                statusBox.classList.add('bg-red-50', 'border-red-500');
+                statusText.className = 'text-red-700 font-bold';
+            } else if (type === 'warning') {
+                statusBox.classList.add('bg-yellow-50', 'border-yellow-500');
+                statusText.className = 'text-yellow-700 font-bold';
+            } else {
+                statusBox.classList.add('bg-gray-50', 'border-gray-200');
+                statusText.className = 'text-gray-600';
+            }
+        }
+
+        function validateJSON() {
+            const input = document.getElementById('jsonInput').value.trim();
+
+            if (!input) {
+                updateStatus('❌ Lütfen JSON verisini yapıştırın!', 'error');
+                alert('Metin kutusu boş! Lütfen localStorage.txt içeriğini yapıştırın.');
+                return false;
+            }
+
+            try {
+                parsedData = JSON.parse(input);
+
+                // Validate structure
+                const hasSchoolName = parsedData.schoolName ? '✅' : '❌';
+                const hasCards = parsedData.cards ? '✅' : '❌';
+                const dataSize = (JSON.stringify(parsedData).length / 1024).toFixed(2);
+
+                updateStatus('✅ JSON geçerli! Boyut: ' + dataSize + ' KB', 'success');
+
+                alert('✅ JSON Doğrulama Başarılı!\n\n' +
+                    'Okul Adı: ' + hasSchoolName + ' ' + (parsedData.schoolName || 'Yok') + '\n' +
+                    'Kartlar: ' + hasCards + '\n' +
+                    'Toplam Boyut: ' + dataSize + ' KB\n\n' +
+                    'Şimdi "LocalStorage\'a Aktar" butonuna tıklayabilirsiniz.');
+
+                return true;
+            } catch (error) {
+                updateStatus('❌ Geçersiz JSON formatı!', 'error');
+                alert('❌ JSON Hatası!\n\n' + error.message + '\n\nLütfen localStorage.txt dosyasının tamamını kopyaladığınızdan emin olun.');
+                return false;
+            }
+        }
+
+        function importToLocalStorage() {
+            // First validate
+            if (!parsedData) {
+                const isValid = validateJSON();
+                if (!isValid) return;
+            }
+
+            try {
+                // Save to localStorage
+                localStorage.setItem('panoData', JSON.stringify(parsedData));
+
+                updateStatus('✅ Veriler başarıyla LocalStorage\'a kaydedildi!', 'success');
+
+                const dataSize = (JSON.stringify(parsedData).length / 1024).toFixed(2);
+                alert('🎉 Başarılı!\n\n' +
+                    'Verileriniz tarayıcının LocalStorage\'ına kaydedildi.\n\n' +
+                    'Kaydedilen Veri Boyutu: ' + dataSize + ' KB\n' +
+                    'Okul Adı: ' + (parsedData.schoolName || 'Yok') + '\n\n' +
+                    'ŞİMDİ:\n' +
+                    '1. Admin panelini açın (admin.html)\n' +
+                    '2. "Genel" sekmesinde "🔥 Firebase Veri Aktarımı" kartını bulun\n' +
+                    '3. "🚀 LocalStorage Verilerini Firebase\'e Aktar" butonuna tıklayın\n\n' +
+                    'VEYA:\n' +
+                    'index.html sayfasını açarak verilerinizi hemen görebilirsiniz!');
+
+            } catch (error) {
+                console.error('LocalStorage error:', error);
+                updateStatus('❌ Kaydetme hatası: ' + error.message, 'error');
+                alert('❌ LocalStorage Hatası!\n\n' + error.message);
+            }
+        }
+
+        // Auto-focus on text area
+        window.addEventListener('load', function () {
+            document.getElementById('jsonInput').focus();
+            updateStatus('Hazır - localStorage.txt içeriğini yapıştırın', 'info');
+        });
+    </script>
+</body>
+
+</html>

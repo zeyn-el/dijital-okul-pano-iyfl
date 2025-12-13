@@ -1,0 +1,17 @@
+# Hassas veriler
+localstorage.txt
+
+# Node modules (eğer varsa)
+node_modules/
+
+# IDE ayarları
+.vscode/
+.idea/
+
+# Sistem dosyaları
+.DS_Store
+Thumbs.db
+
+# Geçici dosyalar
+*.tmp
+*.log

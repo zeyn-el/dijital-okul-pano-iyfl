@@ -1,0 +1,25 @@
+\u003c!-- FİREBASE VERİ AKTARIMI --\u003e
+\u003cdiv class="card-admin border-l-4 border-l-orange-500"\u003e
+\u003ch2\u003e🔥 Firebase Veri Aktarımı\u003c/h2\u003e
+\u003cp class="text-gray-600 text-sm mb-4"\u003e
+LocalStorage'daki tüm verilerinizi Firebase'e manuel olarak aktarabilirsiniz.
+\u003cbr\u003e\u003cspan class="text-orange-600 font-bold"\u003eNOT:\u003c/span\u003e Bu işlem Firebase'deki mevcut
+verilerin üzerine yazacaktır.
+\u003c/p\u003e
+
+\u003cdiv id="migrationStatus" class="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200"\u003e
+\u003cp class="text-sm text-gray-600"\u003e
+\u003cspan class="font-bold"\u003eDurum:\u003c/span\u003e
+\u003cspan id="migrationStatusText"\u003eHazır\u003c/span\u003e
+\u003c/p\u003e
+\u003c/div\u003e
+
+\u003cdiv class="flex gap-2"\u003e
+\u003cbutton onclick="migrateToFirebase()" class="btn-save bg-orange-600 hover:bg-orange-700"\u003e
+🚀 LocalStorage Verilerini Firebase'e Aktar
+\u003c/button\u003e
+\u003cbutton onclick="checkFirebaseData()" class="btn-save bg-blue-600 hover:bg-blue-700"\u003e
+🔍 Firebase Verilerini Kontrol Et
+\u003c/button\u003e
+\u003c/div\u003e
+\u003c/div\u003e

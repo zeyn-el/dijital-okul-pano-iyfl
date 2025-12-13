@@ -398,7 +398,31 @@
           </div>
           <button onclick="saveTicker()" class="btn-save">💾 Kaydet</button>
         </div>
+        <!-- FİREBASE VERİ AKTARIMI -->
+        <div class="card-admin border-l-4 border-l-orange-500">
+          <h2>🔥 Firebase Veri Aktarımı</h2>
+          <p class="text-gray-600 text-sm mb-4">
+            LocalStorage'daki tüm verilerinizi Firebase'e manuel olarak aktarabilirsiniz.
+            <br><span class="text-orange-600 font-bold">NOT:</span> Bu işlem Firebase'deki mevcut verilerin üzerine
+            yazacaktır.
+          </p>
 
+          <div id="migrationStatus" class="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <p class="text-sm text-gray-600">
+              <span class="font-bold">Durum:</span>
+              <span id="migrationStatusText">Hazır</span>
+            </p>
+          </div>
+
+          <div class="flex gap-2">
+            <button onclick="migrateToFirebase()" class="btn-save bg-orange-600 hover:bg-orange-700">
+              🚀 LocalStorage Verilerini Firebase'e Aktar
+            </button>
+            <button onclick="checkFirebaseData()" class="btn-save bg-blue-600 hover:bg-blue-700">
+              🔍 Firebase Verilerini Kontrol Et
+            </button>
+          </div>
+        </div>
         <!-- HAM VERİ GÖRÜNTÜLEME VE DÜZENLEME -->
         <div class="card-admin border-l-4 border-l-purple-500">
           <h2>🛠️ Gelişmiş Veri Yönetimi (Yedek/JSON)</h2>
@@ -3001,6 +3025,96 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
         loadMediaCenterData();
       }, 100);
     });
+
+    // ===== FIREBASE MIGRATION FUNCTIONS =====
+
+    /**
+     * Migrate localStorage data to Firebase manually
+     */
+    async function migrateToFirebase() {
+      const statusEl = document.getElementById('migrationStatusText');
+
+      try {
+        statusEl.textContent = '⏳ LocalStorage verileri okunuyor...';
+        statusEl.className = 'text-blue-600 font-bold';
+
+        // Read from localStorage
+        const localData = localStorage.getItem('panoData');
+
+        if (!localData) {
+          statusEl.textContent = '❌ LocalStorage boş! Aktarılacak veri yok.';
+          statusEl.className = 'text-red-600 font-bold';
+          alert('LocalStorage\'da veri bulunamadı. Önce admin panelden veri girmeniz gerekiyor.');
+          return;
+        }
+
+        const parsedData = JSON.parse(localData);
+
+        statusEl.textContent = '🚀 Firebase\'e aktarılıyor...';
+        statusEl.className = 'text-orange-600 font-bold';
+
+        // Force save to Firebase
+        const success = await FirebaseStorage.saveData(parsedData);
+
+        if (success) {
+          statusEl.textContent = '✅ Başarıyla aktarıldı! Firebase güncel.';
+          statusEl.className = 'text-green-600 font-bold';
+          alert('✅ LocalStorage verileri başarıyla Firebase\'e aktarıldı!');
+        } else {
+          statusEl.textContent = '⚠️ Kısmen başarılı (LocalStorage\'a kaydedildi ama Firebase hatası olabilir)';
+          statusEl.className = 'text-yellow-600 font-bold';
+          alert('⚠️ Firebase\'e kaydetme sırasında bir sorun oluştu, ancak veriler LocalStorage\'da güvende.');
+        }
+
+      } catch (error) {
+        console.error('Migration error:', error);
+        statusEl.textContent = '❌ Hata: ' + error.message;
+        statusEl.className = 'text-red-600 font-bold';
+        alert('❌ Aktarım sırasında bir hata oluştu: ' + error.message);
+      }
+    }
+
+    /**
+     * Check what data exists in Firebase
+     */
+    async function checkFirebaseData() {
+      const statusEl = document.getElementById('migrationStatusText');
+
+      try {
+        statusEl.textContent = '🔍 Firebase kontrol ediliyor...';
+        statusEl.className = 'text-blue-600 font-bold';
+
+        const snapshot = await firebase.database().ref('panoData').once('value');
+        const firebaseData = snapshot.val();
+
+        if (firebaseData) {
+          const dataSize = JSON.stringify(firebaseData).length;
+          const hasSchoolName = firebaseData.schoolName ? '✅' : '❌';
+          const hasCards = firebaseData.cards ? '✅' : '❌';
+
+          statusEl.textContent = `✅ Firebase\'de veri var (${(dataSize / 1024).toFixed(2)} KB)`;
+          statusEl.className = 'text-green-600 font-bold';
+
+          alert(`🔍 Firebase Durum Raporu:\n\n` +
+            `Okul Adı: ${hasSchoolName} ${firebaseData.schoolName || 'Yok'}\n` +
+            `Kartlar: ${hasCards}\n` +
+            `Toplam Veri Boyutu: ${(dataSize / 1024).toFixed(2)} KB\n\n` +
+            `Detaylar için tarayıcı konsolunu kontrol edin.`);
+
+          console.log('📊 Firebase Data:', firebaseData);
+        } else {
+          statusEl.textContent = '⚠️ Firebase boş! Veri aktarımı gerekiyor.';
+          statusEl.className = 'text-orange-600 font-bold';
+          alert('⚠️ Firebase\'de henüz veri yok.\n\n"LocalStorage Verilerini Firebase\'e Aktar" butonuna tıklayarak verilerinizi aktarabilirsiniz.');
+        }
+
+      } catch (error) {
+        console.error('Firebase check error:', error);
+        statusEl.textContent = '❌ Firebase bağlantı hatası: ' + error.message;
+        statusEl.className = 'text-red-600 font-bold';
+        alert('❌ Firebase\'e bağlanırken hata oluştu:\n' + error.message);
+      }
+    }
   </script>
 
 </body>

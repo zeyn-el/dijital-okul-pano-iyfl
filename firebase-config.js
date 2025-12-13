@@ -2,15 +2,14 @@
 // NOT: Bu bilgileri Firebase Console'dan alacaksınız
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCtIFXSGV_BOX1Ew3dAK-YAuCEZkR7f32U",
-  authDomain: "okul-dijital-pano.firebaseapp.com",
-  databaseURL: "https://okul-dijital-pano-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "okul-dijital-pano",
-  storageBucket: "okul-dijital-pano.firebasestorage.app",
-  messagingSenderId: "1017147130408",
-  appId: "1:1017147130408:web:925fada3c9436187242b1d"
+    apiKey: "AIzaSyCtIFXSGV_BOX1Ew3dAK-YAuCEZkR7f32U",
+    authDomain: "okul-dijital-pano.firebaseapp.com",
+    databaseURL: "https://okul-dijital-pano-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "okul-dijital-pano",
+    storageBucket: "okul-dijital-pano.firebasestorage.app",
+    messagingSenderId: "1017147130408",
+    appId: "1:1017147130408:web:925fada3c9436187242b1d"
 };
-
 
 
 

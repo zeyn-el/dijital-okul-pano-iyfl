@@ -1,64 +1,85 @@
 // Firebase Yapılandırması
-// NOT: Bu bilgileri Firebase Console'dan alacaksınız
+// NOT: Bu API anahtarlarını, Firebase Console'da kendi oluşturduğunuz projeden aldığınız değerlerle değiştirmeniz gerekebilir.
+// Aşağıdaki değerler sizin yüklediğiniz dosyadaki mevcut değerlerdir.
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDnJnjXSF0eHexIGpVy3YxM_cijatPlFXw",
-  authDomain: "okul-dijital-pano-cba18.firebaseapp.com",
-  databaseURL: "https://okul-dijital-pano-cba18-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "okul-dijital-pano-cba18",
-  storageBucket: "okul-dijital-pano-cba18.firebasestorage.app",
-  messagingSenderId: "636596557200",
-  appId: "1:636596557200:web:22e36371e09fa75af80f15"
+    apiKey: "AIzaSyCtIFXSGV_BOX1Ew3dAK-YAuCEZkR7f32U",
+    authDomain: "okul-dijital-pano.firebaseapp.com",
+    databaseURL: "https://okul-dijital-pano-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "okul-dijital-pano",
+    storageBucket: "okul-dijital-pano.firebasestorage.app",
+    messagingSenderId: "1017147130408",
+    appId: "1:1017147130408:web:925fada3c9436187242b1d"
 };
 
-
-
-// Firebase'i başlat
-firebase.initializeApp(firebaseConfig);
+// Firebase'i başlat (Kontrol ederek)
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
 const database = firebase.database();
 
-// localStorage yerine Firebase kullan
+// localStorage ile Firebase arasında köprü kuran Akıllı Depolama Yapısı
 const FirebaseStorage = {
-    // Veri kaydetme
+    // 1. Veri Kaydetme Fonksiyonu
     async saveData(data) {
         try {
+            // Önce Firebase'e kaydetmeyi dene
             await database.ref('panoData').set(data);
-            console.log('✅ Veriler Firebase\'e kaydedildi');
+            console.log('✅ Veriler Firebase\'e başarıyla kaydedildi');
+            
+            // İnternet kesilirse diye localStorage'a da yedekle
+            localStorage.setItem('panoData', JSON.stringify(data));
             return true;
         } catch (error) {
             console.error('❌ Firebase kaydetme hatası:', error);
-            // Yedek olarak localStorage kullan
+            // Hata olursa sadece localStorage'a yaz
             localStorage.setItem('panoData', JSON.stringify(data));
             return false;
         }
     },
 
-    // Veri okuma
+    // 2. Veri Okuma Fonksiyonu (OTOMATİK YÜKLEME MANTIĞI BURADA)
     async loadData() {
         try {
+            // Firebase'den veriyi çekmeye çalış
             const snapshot = await database.ref('panoData').once('value');
             const data = snapshot.val();
 
             if (data) {
+                // Firebase'de veri VARSA, onu kullan ve yerel hafızayı güncelle
                 console.log('✅ Veriler Firebase\'den yüklendi');
-                // Yedek olarak localStorage'a da kaydet
                 localStorage.setItem('panoData', JSON.stringify(data));
                 return data;
             } else {
-                console.log('⚠️ Firebase\'de veri yok, localStorage kontrol ediliyor');
-                // Firebase'de veri yoksa localStorage'dan yükle
-                const localData = localStorage.getItem('panoData');
-                return localData ? JSON.parse(localData) : this.getDefaultData();
+                // Firebase BOŞSA (null), bu ilk kurulum demektir.
+                console.log('⚠️ Firebase boş. Yerel veriler kontrol ediliyor...');
+                
+                // Yerel veriyi (localStorage) oku
+                const localData = this.loadLocalOrDefault();
+                
+                // Eğer yerel veri varsa, bunu hemen Firebase'e yükle!
+                if (localData) {
+                    console.log('🚀 Yerel veriler Buluta (Firebase) yükleniyor...');
+                    await this.saveData(localData);
+                    console.log('✨ Taşıma işlemi tamamlandı!');
+                }
+                
+                return localData;
             }
         } catch (error) {
-            console.error('❌ Firebase okuma hatası:', error);
-            // Hata durumunda localStorage kullan
-            const localData = localStorage.getItem('panoData');
-            return localData ? JSON.parse(localData) : this.getDefaultData();
+            console.error('❌ Firebase okuma hatası (İnternet yok veya yetki sorunu):', error);
+            // Bir sorun varsa mecburen yerel veriyi kullan
+            return this.loadLocalOrDefault();
         }
     },
 
-    // Varsayılan veri yapısı
+    // Yardımcı Fonksiyon: Yerel veriyi veya varsayılanı getir
+    loadLocalOrDefault() {
+        const localData = localStorage.getItem('panoData');
+        return localData ? JSON.parse(localData) : this.getDefaultData();
+    },
+
+    // Varsayılan Boş Veri Şablonu
     getDefaultData() {
         return {
             schoolName: "OKUL ADI GİRİNİZ",
@@ -78,22 +99,20 @@ const FirebaseStorage = {
         };
     },
 
-    // Kullanıcı verilerini kaydet
+    // Kullanıcıları Kaydet (Admin Paneli İçin)
     async saveUsers(users) {
         try {
             await database.ref('adminUsers').set(users);
-            console.log('✅ Kullanıcılar Firebase\'e kaydedildi');
-            // Yedek
             localStorage.setItem('adminUsers', JSON.stringify(users));
             return true;
         } catch (error) {
-            console.error('❌ Kullanıcı kaydetme hatası:', error);
+            console.error('Kullanıcı kaydetme hatası:', error);
             localStorage.setItem('adminUsers', JSON.stringify(users));
             return false;
         }
     },
 
-    // Kullanıcı verilerini oku
+    // Kullanıcıları Yükle
     async loadUsers() {
         try {
             const snapshot = await database.ref('adminUsers').once('value');
@@ -103,17 +122,19 @@ const FirebaseStorage = {
                 localStorage.setItem('adminUsers', JSON.stringify(users));
                 return users;
             } else {
+                // Kullanıcılar yoksa yerelden yükle ve buluta at
                 const localUsers = localStorage.getItem('adminUsers');
-                return localUsers ? JSON.parse(localUsers) : this.getDefaultUsers();
+                const usersToLoad = localUsers ? JSON.parse(localUsers) : this.getDefaultUsers();
+                await this.saveUsers(usersToLoad);
+                return usersToLoad;
             }
         } catch (error) {
-            console.error('❌ Kullanıcı okuma hatası:', error);
             const localUsers = localStorage.getItem('adminUsers');
             return localUsers ? JSON.parse(localUsers) : this.getDefaultUsers();
         }
     },
 
-    // Varsayılan kullanıcılar
+    // Varsayılan Kullanıcılar
     getDefaultUsers() {
         return [
             { username: 'admin', password: 'admin123', role: 'Yönetici' },
@@ -123,7 +144,7 @@ const FirebaseStorage = {
     }
 };
 
-// Geriye uyumluluk için eski fonksiyonları koru
+// Eski kodlarla uyumluluk için global fonksiyonlar
 async function loadData() {
     return await FirebaseStorage.loadData();
 }
@@ -132,5 +153,4 @@ async function saveData(data) {
     return await FirebaseStorage.saveData(data);
 }
 
-console.log('🔥 Firebase Storage hazır!');
-
+console.log('🔥 Firebase Storage Hazır!');

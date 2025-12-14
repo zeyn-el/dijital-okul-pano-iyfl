@@ -234,19 +234,53 @@
       data = await loadData();
 
       // Eğer veri hiç yoksa veya bozuksa varsayılan yapıyı oluştur
-      if (!data.cards) {
+      if (!data || !data.cards) {
         data = {
           schoolName: "OKUL ADI GİRİNİZ",
           cards: {
-            birthday: { title: "Doğum Günü", list: [] },
-            duty: { list: [] },
-            dutyByDate: { items: [] },
-            yks: { date: "" },
-            mainMedia: { image: "", tag: "DUYURU", title: "Başlık", desc: "Açıklama" },
-            quote: { text: "", author: "" },
-            ticker: { text: "", speed: 20 },
-            schedule: { items: [] },
-            timePlan: { items: [] }
+            birthdays: {
+              enabled: true,
+              title: "İyi ki doğdun!",
+              students: []
+            },
+            duty: {
+              list: []
+            },
+            dutyByDate: {
+              items: []
+            },
+            yks: {
+              enabled: true,
+              title: "YKS'ye Kalan",
+              date: ""
+            },
+            info: {
+              enabled: true,
+              items: [],
+              sliderSpeed: 5
+            },
+            mediaCenter: {
+              type: "slideshow",
+              images: [],
+              speed: 5
+            },
+            quotes: {
+              title: "Günün Sözü",
+              items: [],
+              enableSlider: false,
+              sliderSpeed: 8,
+              maxSlides: 5
+            },
+            ticker: {
+              text: "",
+              speed: 20
+            },
+            schedule: {
+              items: []
+            },
+            timePlan: {
+              items: []
+            }
           }
         };
       }

@@ -4,6 +4,7 @@
 
 
 const firebaseConfig = {
+
     apiKey: "AIzaSyDnJnjXSF0eHexIGpVy3YxM_cijatPlFXw",
     authDomain: "okul-dijital-pano-cba18.firebaseapp.com",
     databaseURL: "https://okul-dijital-pano-cba18-default-rtdb.europe-west1.firebasedatabase.app",
@@ -19,22 +20,60 @@ if (!firebase.apps.length) {
 }
 const database = firebase.database();
 
+// Derin birleştirme (deep merge) yardımcı fonksiyonu
+function deepMerge(target, source) {
+    if (!source || typeof source !== 'object') return target;
+
+    const output = Array.isArray(target) ? [...target] : { ...(target || {}) };
+
+    Object.keys(source).forEach(key => {
+        const srcVal = source[key];
+        const tgtVal = output[key];
+
+        if (srcVal && typeof srcVal === 'object' && !Array.isArray(srcVal)) {
+            output[key] = deepMerge(tgtVal && typeof tgtVal === 'object' && !Array.isArray(tgtVal) ? tgtVal : {}, srcVal);
+        } else {
+            output[key] = srcVal;
+        }
+    });
+
+    return output;
+}
+
 // localStorage ile Firebase arasında köprü kuran Akıllı Depolama Yapısı
 const FirebaseStorage = {
+
     // 1. Veri Kaydetme Fonksiyonu
     async saveData(data) {
         try {
+            // Mevcut veriyi Firebase'den çek ve yeni gelen verilerle birleştir
+            const snapshot = await database.ref('panoData').once('value');
+            const existingData = snapshot.val() || {};
+            const mergedData = deepMerge(existingData, data || {});
+
             // Önce Firebase'e kaydetmeyi dene
-            await database.ref('panoData').set(data);
+            await database.ref('panoData').set(mergedData);
             console.log('✅ Veriler Firebase\'e başarıyla kaydedildi');
 
             // İnternet kesilirse diye localStorage'a da yedekle
-            localStorage.setItem('panoData', JSON.stringify(data));
+            localStorage.setItem('panoData', JSON.stringify(mergedData));
             return true;
         } catch (error) {
             console.error('❌ Firebase kaydetme hatası:', error);
-            // Hata olursa sadece localStorage'a yaz
-            localStorage.setItem('panoData', JSON.stringify(data));
+
+            // Hata olursa en azından localStorage tarafında mevcut veri ile yenisini birleştir
+            try {
+                const localExistingRaw = localStorage.getItem('panoData');
+                const localExisting = localExistingRaw ? JSON.parse(localExistingRaw) : {};
+                const mergedLocal = deepMerge(localExisting, data || {});
+                localStorage.setItem('panoData', JSON.stringify(mergedLocal));
+            } catch (e) {
+                // localStorage erişiminde de sorun olursa, son çare olarak sadece gelen veriyi yaz
+                try {
+                    localStorage.setItem('panoData', JSON.stringify(data || {}));
+                } catch (_) { }
+            }
+
             return false;
         }
     },
@@ -112,7 +151,7 @@ const FirebaseStorage = {
                     speed: 5
                 },
                 quotes: {
-                    title: "Günün Sözü",
+                    title: "Günün Sözü"
                     items: [],
                     enableSlider: false,
                     sliderSpeed: 8,

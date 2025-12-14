@@ -1769,7 +1769,7 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
     }
 
     // Initialize birthday data on page load
-    initBirthdayData();
+    // MOVED TO DOMContentLoaded - initBirthdayData();
 
     // ===== DUTY TEACHER MANAGEMENT =====
     let dutyEntries = [];
@@ -2004,14 +2004,14 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
     }
 
     // Initialize duty data on page load
-    initDutyData();
+    // MOVED TO DOMContentLoaded - initDutyData();
 
-    if (!data.cards.dutyByDate) {
-      data.cards.dutyByDate = { items: [] }
-        ;
-    }
+    // MOVED TO DOMContentLoaded
+    // if (!data.cards.dutyByDate) {
+    //   data.cards.dutyByDate = { items: [] };
+    // }
 
-    document.getElementById("yksDate").value = data.cards.yks.date || "";
+    // MOVED TO DOMContentLoaded - document.getElementById("yksDate").value = data.cards.yks.date || "";
 
     // Media Center variables (global scope)
     var slideshowImages = [];
@@ -2019,12 +2019,13 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
 
 
 
-    document.getElementById("tText").value = data.cards.ticker.text || "";
+    // MOVED TO DOMContentLoaded - document.getElementById("tText").value = data.cards.ticker.text || "";
 
     // Initialize ticker speed
-    const tickerSpeed = data.cards.ticker.speed || 20;
-    document.getElementById("tSpeed").value = tickerSpeed;
-    document.getElementById("tSpeedLabel").textContent = tickerSpeed;
+    // MOVED TO DOMContentLoaded
+    // const tickerSpeed = data.cards.ticker.speed || 20;
+    // document.getElementById("tSpeed").value = tickerSpeed;
+    // document.getElementById("tSpeedLabel").textContent = tickerSpeed;
 
 
     // Schedule Management
@@ -3070,6 +3071,26 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
     document.addEventListener('DOMContentLoaded', async () => {
       // Initialize Firebase data first
       await initializeData();
+
+      console.log('✅ initializeData tamamlandı, şimdi diğer init fonksiyonları çağrılıyor...');
+
+      // Now initialize all components (data is ready)
+      initBirthdayData();
+      initDutyData();
+      initQuoteData();
+      loadScheduleEntries();
+
+      // Set UI values
+      if (data.cards.yks) {
+        document.getElementById("yksDate").value = data.cards.yks.date || "";
+      }
+
+      if (data.cards.ticker) {
+        document.getElementById("tText").value = data.cards.ticker.text || "";
+        const tickerSpeed = data.cards.ticker.speed || 20;
+        document.getElementById("tSpeed").value = tickerSpeed;
+        document.getElementById("tSpeedLabel").textContent = tickerSpeed;
+      }
 
       displayUserInfo(); // Kullanıcı bilgilerini göster
       loadYKSAndBirthdayData();

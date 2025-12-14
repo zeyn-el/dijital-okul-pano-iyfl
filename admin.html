@@ -3093,6 +3093,14 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
 
       console.log('✅ initializeData tamamlandı, şimdi diğer init fonksiyonları çağrılıyor...');
 
+      // Expose loaded data to window for easier debugging in console
+      try {
+        window.__panoData = data;
+        console.log('🔎 window.__panoData set for debugging:', window.__panoData);
+      } catch (e) {
+        console.warn('⚠️ Could not set window.__panoData', e);
+      }
+
       // Now initialize all components (data is ready)
       initBirthdayData();
       initDutyData();

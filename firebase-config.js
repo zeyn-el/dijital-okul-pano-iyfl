@@ -151,7 +151,7 @@ const FirebaseStorage = {
                     speed: 5
                 },
                 quotes: {
-                    title: "Günün Sözü"
+                    title: "Günün Sözü",
                     items: [],
                     enableSlider: false,
                     sliderSpeed: 8,

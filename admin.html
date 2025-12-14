@@ -231,7 +231,10 @@
 
     // Initialize data on page load
     async function initializeData() {
+      console.log('🔄 initializeData başladı...');
       data = await loadData();
+      console.log('📥 Firebase\'den yüklenen data:', data);
+      console.log('📥 data.cards var mı?', !!data?.cards);
 
       // Eğer veri hiç yoksa veya bozuksa varsayılan yapıyı oluştur
       if (!data || !data.cards) {
@@ -284,6 +287,9 @@
           }
         };
       }
+
+      console.log('✅ initializeData tamamlandı. Final data:', data);
+      console.log('✅ Final data.cards:', data.cards);
     }
 
     // Tab switching
@@ -2269,6 +2275,12 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
     // Save functions
     async function saveSchoolName() {
       data.schoolName = document.getElementById("schoolName").value;
+
+      // DEBUG: Veriyi kaydetmeden önce kontrol et
+      console.log('🔍 saveSchoolName - data objesi:', data);
+      console.log('🔍 data.cards var mı?', !!data.cards);
+      console.log('🔍 data.cards içeriği:', data.cards);
+
       await saveData(data);
       alert("✅ Okul adı kaydedildi!");
     }

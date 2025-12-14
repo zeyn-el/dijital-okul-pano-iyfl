@@ -2052,10 +2052,9 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
     let currentScheduleDay = 'Pazartesi';
 
     // TimePlan Management (ders ve teneffüs saatleri)
-    if (!data.cards.timePlan) {
-      data.cards.timePlan = { items: [] };
-    }
-    let timePlanEntries = data.cards.timePlan.items || [];
+    // Do NOT access `data.cards` at load time (data may be undefined until initializeData runs).
+    // Initialize empty/default variables; `initializeData` / `loadScheduleEntries` will populate them.
+    let timePlanEntries = [];
     let currentTimePlanDay = 'Pazartesi';
 
     function loadScheduleEntries() {

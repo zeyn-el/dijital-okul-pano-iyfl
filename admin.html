@@ -236,6 +236,25 @@
       console.log('📥 Firebase\'den yüklenen data:', data);
       console.log('📥 data.cards var mı?', !!data?.cards);
 
+      // Normalize incoming data for backward compatibility
+      // Some installations may use older key names (birthday, quote, duty.list, etc.).
+      if (data && data.cards) {
+        // birthday -> birthdays
+        if (data.cards.birthday && !data.cards.birthdays) {
+          data.cards.birthdays = data.cards.birthday;
+        }
+
+        // quote -> quotes
+        if (data.cards.quote && !data.cards.quotes) {
+          data.cards.quotes = data.cards.quote;
+        }
+
+        // duty.list -> dutyByDate.items (keep original if already present)
+        if ((!data.cards.dutyByDate || !Array.isArray(data.cards.dutyByDate.items)) && data.cards.duty && Array.isArray(data.cards.duty.list)) {
+          data.cards.dutyByDate = { items: data.cards.duty.list.slice() };
+        }
+      }
+
       // Eğer veri hiç yoksa veya bozuksa varsayılan yapıyı oluştur
       if (!data || !data.cards) {
         data = {

@@ -236,25 +236,6 @@
       console.log('📥 Firebase\'den yüklenen data:', data);
       console.log('📥 data.cards var mı?', !!data?.cards);
 
-      // Normalize incoming data for backward compatibility
-      // Some installations may use older key names (birthday, quote, duty.list, etc.).
-      if (data && data.cards) {
-        // birthday -> birthdays
-        if (data.cards.birthday && !data.cards.birthdays) {
-          data.cards.birthdays = data.cards.birthday;
-        }
-
-        // quote -> quotes
-        if (data.cards.quote && !data.cards.quotes) {
-          data.cards.quotes = data.cards.quote;
-        }
-
-        // duty.list -> dutyByDate.items (keep original if already present)
-        if ((!data.cards.dutyByDate || !Array.isArray(data.cards.dutyByDate.items)) && data.cards.duty && Array.isArray(data.cards.duty.list)) {
-          data.cards.dutyByDate = { items: data.cards.duty.list.slice() };
-        }
-      }
-
       // Eğer veri hiç yoksa veya bozuksa varsayılan yapıyı oluştur
       if (!data || !data.cards) {
         data = {
@@ -2052,9 +2033,10 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
     let currentScheduleDay = 'Pazartesi';
 
     // TimePlan Management (ders ve teneffüs saatleri)
-    // Do NOT access `data.cards` at load time (data may be undefined until initializeData runs).
-    // Initialize empty/default variables; `initializeData` / `loadScheduleEntries` will populate them.
-    let timePlanEntries = [];
+    if (!data.cards.timePlan) {
+      data.cards.timePlan = { items: [] };
+    }
+    let timePlanEntries = data.cards.timePlan.items || [];
     let currentTimePlanDay = 'Pazartesi';
 
     function loadScheduleEntries() {
@@ -3091,14 +3073,6 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
       await initializeData();
 
       console.log('✅ initializeData tamamlandı, şimdi diğer init fonksiyonları çağrılıyor...');
-
-      // Expose loaded data to window for easier debugging in console
-      try {
-        window.__panoData = data;
-        console.log('🔎 window.__panoData set for debugging:', window.__panoData);
-      } catch (e) {
-        console.warn('⚠️ Could not set window.__panoData', e);
-      }
 
       // Now initialize all components (data is ready)
       initBirthdayData();

@@ -215,13 +215,16 @@
       return await FirebaseStorage.loadData();
     }
 
-    // Synchronous wrapper for saveData (calls Firebase async in background)
-    function saveData(x) {
-      FirebaseStorage.saveData(x).then(() => {
+    // Async wrapper for saveData (waits for Firebase to complete)
+    async function saveData(x) {
+      try {
+        await FirebaseStorage.saveData(x);
         console.log('✅ Veriler Firebase\'e kaydedildi');
-      }).catch(err => {
+        return true;
+      } catch (err) {
         console.error('❌ Firebase kaydetme hatası:', err);
-      });
+        return false;
+      }
     }
 
     let data = {};
@@ -2229,9 +2232,9 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
     setTimePlanDay(currentTimePlanDay);
 
     // Save functions
-    function saveSchoolName() {
+    async function saveSchoolName() {
       data.schoolName = document.getElementById("schoolName").value;
-      saveData(data);
+      await saveData(data);
       alert("✅ Okul adı kaydedildi!");
     }
 
@@ -2245,9 +2248,11 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
       alert("✅ Nöbetçi öğretmenler kaydedildi!");
     }
 
-    function saveYKS() {
+    async function saveYKS() {
+      data.cards.yks.enabled = document.getElementById("yksEnabled").checked;
+      data.cards.yks.title = document.getElementById("yksTitle").value;
       data.cards.yks.date = document.getElementById("yksDate").value;
-      saveData(data);
+      await saveData(data);
       alert("✅ YKS tarihi kaydedildi!");
     }
 

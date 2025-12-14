@@ -4,13 +4,13 @@
 
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDnJnjXSF0eHexIGpVy3YxM_cijatPlFXw",
-  authDomain: "okul-dijital-pano-cba18.firebaseapp.com",
-  databaseURL: "https://okul-dijital-pano-cba18-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "okul-dijital-pano-cba18",
-  storageBucket: "okul-dijital-pano-cba18.firebasestorage.app",
-  messagingSenderId: "636596557200",
-  appId: "1:636596557200:web:22e36371e09fa75af80f15"
+    apiKey: "AIzaSyDnJnjXSF0eHexIGpVy3YxM_cijatPlFXw",
+    authDomain: "okul-dijital-pano-cba18.firebaseapp.com",
+    databaseURL: "https://okul-dijital-pano-cba18-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "okul-dijital-pano-cba18",
+    storageBucket: "okul-dijital-pano-cba18.firebasestorage.app",
+    messagingSenderId: "636596557200",
+    appId: "1:636596557200:web:22e36371e09fa75af80f15"
 };
 
 // Firebase'i başlat (Kontrol ederek)
@@ -27,7 +27,7 @@ const FirebaseStorage = {
             // Önce Firebase'e kaydetmeyi dene
             await database.ref('panoData').set(data);
             console.log('✅ Veriler Firebase\'e başarıyla kaydedildi');
-            
+
             // İnternet kesilirse diye localStorage'a da yedekle
             localStorage.setItem('panoData', JSON.stringify(data));
             return true;
@@ -54,17 +54,17 @@ const FirebaseStorage = {
             } else {
                 // Firebase BOŞSA (null), bu ilk kurulum demektir.
                 console.log('⚠️ Firebase boş. Yerel veriler kontrol ediliyor...');
-                
+
                 // Yerel veriyi (localStorage) oku
                 const localData = this.loadLocalOrDefault();
-                
+
                 // Eğer yerel veri varsa, bunu hemen Firebase'e yükle!
                 if (localData) {
                     console.log('🚀 Yerel veriler Buluta (Firebase) yükleniyor...');
                     await this.saveData(localData);
                     console.log('✨ Taşıma işlemi tamamlandı!');
                 }
-                
+
                 return localData;
             }
         } catch (error) {
@@ -85,19 +85,52 @@ const FirebaseStorage = {
         return {
             schoolName: "OKUL ADI GİRİNİZ",
             cards: {
-                birthday: { enabled: true, title: "İyi ki doğdun!", students: [] },
-                birthdays: { enabled: true, title: "İyi ki doğdun!", students: [] },
-                duty: { list: [] },
-                dutyByDate: { items: [] },
-                yks: { enabled: true, title: "YKS'ye Kalan", date: "" },
-                info: { enabled: true, items: [], sliderSpeed: 5 },
-                mainMedia: { type: "slideshow", images: [], speed: 5 },
-                quote: { title: "Günün Sözü", items: [], sliderEnabled: false, sliderSpeed: 5 },
-                ticker: { text: "", speed: 20 },
-                schedule: { items: [] },
-                timePlan: { items: [] }
+                birthdays: {
+                    enabled: true,
+                    title: "İyi ki doğdun!",
+                    students: []
+                },
+                duty: {
+                    list: []
+                },
+                dutyByDate: {
+                    items: []
+                },
+                yks: {
+                    enabled: true,
+                    title: "YKS'ye Kalan",
+                    date: ""
+                },
+                info: {
+                    enabled: true,
+                    items: [],
+                    sliderSpeed: 5
+                },
+                mediaCenter: {
+                    type: "slideshow",
+                    images: [],
+                    speed: 5
+                },
+                quotes: {
+                    title: "Günün Sözü",
+                    items: [],
+                    enableSlider: false,
+                    sliderSpeed: 8,
+                    maxSlides: 5
+                },
+                ticker: {
+                    text: "",
+                    speed: 20
+                },
+                schedule: {
+                    items: []
+                },
+                timePlan: {
+                    items: []
+                }
             }
         };
+
     },
 
     // Kullanıcıları Kaydet (Admin Paneli İçin)

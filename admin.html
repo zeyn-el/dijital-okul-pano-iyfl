@@ -1751,13 +1751,14 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
       }
     }
 
-    function saveBirthdayData() {
+    async function saveBirthdayData() {
       data.cards.birthdays = {
+        enabled: document.getElementById("birthdayEnabled").checked,
         title: document.getElementById("bTitle").value,
         students: birthdayStudents
       };
 
-      saveData(data);
+      await saveData(data);
       alert(`✅ Doğum günü verileri kaydedildi!\n\nToplam ${birthdayStudents.length} öğrenci kaydı bulunuyor.`);
     }
 
@@ -1987,12 +1988,12 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
       alert(`✅ ${imported} nöbetçi kaydı içe aktarıldı!${errors > 0 ? `\n⚠️ ${errors} satır hatalı olduğu için atlandı.` : ''}\n\nDeğişiklikleri kaydetmeyi unutmayın.`);
     }
 
-    function saveDutyData() {
+    async function saveDutyData() {
       data.cards.dutyByDate = {
         items: dutyEntries
       };
 
-      saveData(data);
+      await saveData(data);
       alert(`✅ Nöbetçi öğretmen verileri kaydedildi!\n\nToplam ${dutyEntries.length} kayıt bulunuyor.`);
     }
 
@@ -2272,13 +2273,13 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
       alert("✅ Okul adı kaydedildi!");
     }
 
-    function saveDuty() {
+    async function saveDuty() {
       const lines = document.getElementById("dutyText").value.split("\n").filter(x => x.trim());
       data.cards.duty.list = lines.map(x => {
         const parts = x.split("|");
         return { place: parts[0]?.trim() || "", teacher: parts[1]?.trim() || "" };
       });
-      saveData(data);
+      await saveData(data);
       alert("✅ Nöbetçi öğretmenler kaydedildi!");
     }
 

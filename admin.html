@@ -2063,15 +2063,17 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
     // document.getElementById("tSpeedLabel").textContent = tickerSpeed;
 
 
+
     // Schedule Management
     let scheduleEntries = [];
     let currentScheduleDay = 'Pazartesi';
 
     // TimePlan Management (ders ve teneffüs saatleri)
-    if (!data.cards.timePlan) {
-      data.cards.timePlan = { items: [] };
-    }
-    let timePlanEntries = data.cards.timePlan.items || [];
+    // MOVED TO DOMContentLoaded to prevent accessing undefined data.cards
+    // if (!data.cards.timePlan) {
+    //   data.cards.timePlan = { items: [] };
+    // }
+    let timePlanEntries = [];
     let currentTimePlanDay = 'Pazartesi';
 
     function loadScheduleEntries() {
@@ -3115,6 +3117,11 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
       initQuoteData();
       initInfoData();
       loadScheduleEntries();
+
+      // Initialize timePlan entries
+      if (data.cards.timePlan && data.cards.timePlan.items) {
+        timePlanEntries = data.cards.timePlan.items;
+      }
 
       // Set UI values
       if (data.cards.yks) {

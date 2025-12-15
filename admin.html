@@ -286,10 +286,45 @@
             }
           }
         };
+      } else {
+        // Firebase'den veri geldi ama bazı alanlar eksik olabilir, onları ekle
+        if (!data.cards.birthdays) {
+          data.cards.birthdays = { enabled: true, title: "İyi ki doğdun!", students: [] };
+        }
+        if (!data.cards.dutyByDate) {
+          data.cards.dutyByDate = { items: [] };
+        }
+        if (!data.cards.quotes) {
+          data.cards.quotes = { title: "Günün Sözü", items: [], enableSlider: false, sliderSpeed: 8, maxSlides: 5 };
+        }
+        if (!data.cards.info) {
+          data.cards.info = { enabled: true, items: [], sliderSpeed: 5 };
+        }
+        if (!data.cards.duty) {
+          data.cards.duty = { list: [] };
+        }
+        if (!data.cards.yks) {
+          data.cards.yks = { enabled: true, title: "YKS'ye Kalan", date: "" };
+        }
+        if (!data.cards.mediaCenter) {
+          data.cards.mediaCenter = { type: "slideshow", images: [], speed: 5 };
+        }
+        if (!data.cards.ticker) {
+          data.cards.ticker = { text: "", speed: 20 };
+        }
+        if (!data.cards.schedule) {
+          data.cards.schedule = { items: [] };
+        }
+        if (!data.cards.timePlan) {
+          data.cards.timePlan = { items: [] };
+        }
       }
 
       console.log('✅ initializeData tamamlandı. Final data:', data);
       console.log('✅ Final data.cards:', data.cards);
+      console.log('✅ data.cards.dutyByDate:', data.cards.dutyByDate);
+      console.log('✅ data.cards.birthdays:', data.cards.birthdays);
+      console.log('✅ data.cards.quotes:', data.cards.quotes);
     }
 
     // Tab switching
@@ -2801,7 +2836,7 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
     }
 
     // Initialize quote data on page load
-    initQuoteData();
+    // MOVED TO DOMContentLoaded - initQuoteData();
 
     // ===== INFO CARD MANAGEMENT =====
     let infoList = [];
@@ -3078,6 +3113,7 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
       initBirthdayData();
       initDutyData();
       initQuoteData();
+      initInfoData();
       loadScheduleEntries();
 
       // Set UI values

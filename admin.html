@@ -2519,13 +2519,23 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
     }
 
     async function saveYKS() {
+      // Global data objesinin var olduğundan emin ol
+      if (!data) {
+        data = {};
+      }
+      if (!data.cards) {
+        data.cards = {};
+      }
+      if (!data.cards.yks) {
+        data.cards.yks = {};
+      }
+
       data.cards.yks.enabled = document.getElementById("yksEnabled").checked;
       data.cards.yks.title = document.getElementById("yksTitle").value;
       data.cards.yks.date = document.getElementById("yksDate").value;
       await saveData(data);
       alert("✅ YKS tarihi kaydedildi!");
     }
-
     function saveMedia() {
       data.cards.mainMedia.image = document.getElementById("mImage").value;
       data.cards.mainMedia.tag = document.getElementById("mTag").value;

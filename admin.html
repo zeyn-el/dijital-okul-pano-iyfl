@@ -780,10 +780,18 @@
       <div id="tab-birthdays" class="tab-content">
 
         <div class="card-admin">
-          <h2 class="flex items-center gap-2 mb-6">
-            <span class="material-symbols-outlined text-3xl text-pink-500">cake</span>
-            🎂 Doğum Günü Yönetimi
-          </h2>
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-3xl text-pink-500">cake</span>
+              🎂 Doğum Günü Yönetimi
+            </h2>
+            <!-- Debug Butonu -->
+            <button onclick="openBirthdayDebugModal()"
+              class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-bold flex items-center gap-2">
+              <span class="material-symbols-outlined text-sm">bug_report</span>
+              Firebase Debug
+            </button>
+          </div>
 
           <p class="text-gray-600 mb-6">
             Öğrenci doğum günlerini yönetin. Manuel olarak ekleyebilir veya Excel'den toplu olarak içe aktarabilirsiniz.
@@ -3236,7 +3244,113 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
         alert('❌ Firebase\'e bağlanırken hata oluştu:\n' + error.message);
       }
     }
+
+    // ===== BIRTHDAY DEBUG MODAL =====
+    async function openBirthdayDebugModal() {
+      const modal = document.getElementById('birthdayDebugModal');
+      const content = document.getElementById('debugModalContent');
+      const countEl = document.getElementById('debugStudentCount');
+
+      modal.classList.remove('hidden');
+      content.innerHTML = '<div class="text-center py-8"><span class="material-symbols-outlined text-6xl text-gray-300 animate-pulse">hourglass_top</span><p class="mt-4 text-gray-500">Firebase\'den veriler yükleniyor...</p></div>';
+
+      try {
+        // Doğrudan Firebase'den çek
+        const snapshot = await firebase.database().ref('panoData/cards/birthdays').once('value');
+        const birthdaysData = snapshot.val();
+
+        console.log('🔍 Firebase Debug - Raw birthdaysData:', birthdaysData);
+        console.log('🔍 Firebase Debug - Type:', typeof birthdaysData);
+
+        if (!birthdaysData) {
+          content.innerHTML = '<div class="text-center py-8 text-red-500"><span class="material-symbols-outlined text-6xl">error</span><p class="mt-4 font-bold">Firebase\'de birthdays verisi bulunamadı!</p><p class="text-sm text-gray-500 mt-2">Path: panoData/cards/birthdays</p></div>';
+          countEl.textContent = '0';
+          return;
+        }
+
+        let students = birthdaysData.students;
+        console.log('🔍 Firebase Debug - students:', students);
+        console.log('🔍 Firebase Debug - students type:', typeof students);
+        console.log('🔍 Firebase Debug - students isArray:', Array.isArray(students));
+
+        if (!students) {
+          content.innerHTML = '<div class="text-center py-8 text-orange-500"><span class="material-symbols-outlined text-6xl">warning</span><p class="mt-4 font-bold">students alanı bulunamadı!</p><p class="text-sm text-gray-500 mt-2">birthdays objesi var ama students yok</p><pre class="mt-4 p-4 bg-gray-100 rounded text-left text-xs overflow-auto max-h-60">' + JSON.stringify(birthdaysData, null, 2) + '</pre></div>';
+          countEl.textContent = '0';
+          return;
+        }
+
+        // Object ise array'e çevir
+        if (typeof students === 'object' && !Array.isArray(students)) {
+          console.log('🔍 Firebase Debug - Converting object to array...');
+          students = Object.values(students);
+        }
+
+        countEl.textContent = students.length;
+
+        if (students.length === 0) {
+          content.innerHTML = '<div class="text-center py-8 text-gray-500"><span class="material-symbols-outlined text-6xl">sentiment_dissatisfied</span><p class="mt-4">Öğrenci listesi boş!</p></div>';
+          return;
+        }
+
+        // İlk 20 öğrenciyi listele (performans için)
+        const displayStudents = students.slice(0, 20);
+        let html = '<table class="w-full text-left text-sm"><thead><tr class="bg-slate-100"><th class="p-2">#</th><th class="p-2">Ad Soyad</th><th class="p-2">Doğum Tarihi</th><th class="p-2">Cinsiyet</th></tr></thead><tbody>';
+
+        displayStudents.forEach((student, i) => {
+          html += `<tr class="border-b hover:bg-slate-50">
+            <td class="p-2">${i + 1}</td>
+            <td class="p-2 font-medium">${student.name || '-'} ${student.surname || ''}</td>
+            <td class="p-2 font-mono text-xs">${student.birthdate || '-'}</td>
+            <td class="p-2">${student.gender === 'K' ? '👧' : '👦'}</td>
+          </tr>`;
+        });
+
+        html += '</tbody></table>';
+
+        if (students.length > 20) {
+          html += `<p class="mt-4 text-center text-gray-500 text-sm">... ve ${students.length - 20} öğrenci daha (toplam: ${students.length})</p>`;
+        }
+
+        content.innerHTML = html;
+
+      } catch (error) {
+        console.error('🔍 Firebase Debug Error:', error);
+        content.innerHTML = `<div class="text-center py-8 text-red-500"><span class="material-symbols-outlined text-6xl">error</span><p class="mt-4 font-bold">Hata: ${error.message}</p></div>`;
+        countEl.textContent = 'Hata';
+      }
+    }
+
+    function closeBirthdayDebugModal() {
+      document.getElementById('birthdayDebugModal').classList.add('hidden');
+    }
   </script>
+
+  <!-- Birthday Debug Modal -->
+  <div id="birthdayDebugModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[80vh] overflow-hidden">
+      <div class="bg-gradient-to-r from-orange-500 to-pink-500 text-white p-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-2xl">bug_report</span>
+          <div>
+            <h3 class="font-bold text-lg">Firebase Debug - Doğum Günleri</h3>
+            <p class="text-sm opacity-90">Toplam Öğrenci: <span id="debugStudentCount" class="font-bold">-</span></p>
+          </div>
+        </div>
+        <button onclick="closeBirthdayDebugModal()" class="p-2 hover:bg-white/20 rounded-lg transition-colors">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div id="debugModalContent" class="p-4 overflow-auto max-h-[60vh]">
+        <!-- İçerik JS ile doldurulacak -->
+      </div>
+      <div class="p-4 border-t bg-slate-50 flex justify-end">
+        <button onclick="closeBirthdayDebugModal()"
+          class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-bold">
+          Kapat
+        </button>
+      </div>
+    </div>
+  </div>
 
 </body>
 

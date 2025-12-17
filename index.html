@@ -584,27 +584,28 @@
         console.log('💬 Toplam söz sayısı:', quoteItems ? quoteItems.length : 0);
 
         if (quoteItems && Array.isArray(quoteItems)) {
-          // New system: filter by date or random
-          const quotesWithDate = quoteItems.filter(q => q.date === todayStr);
+          // Slider açıksa, maxSlides kadar rastgele söz göster
+          if (quoteData.enableSlider && quoteItems.length > 1) {
+            const maxSlides = quoteData.maxSlides || 5;
 
-          if (quotesWithDate.length > 0) {
-            // Show quotes for today's date
-            quotesToShow = quotesWithDate;
+            // Shuffle array and take first N items
+            const shuffled = [...quoteItems].sort(() => 0.5 - Math.random());
+            quotesToShow = shuffled.slice(0, Math.min(maxSlides, quoteItems.length));
+            console.log('💬 Slider modu: ' + quotesToShow.length + ' söz gösterilecek (maxSlides: ' + maxSlides + ')');
+
           } else {
-            // No quotes for today, show random or all
-            if (quoteData.enableSlider && quoteItems.length > 1) {
-              // Show LIMITED number of random quotes in slider
-              const maxSlides = quoteData.maxSlides || 5; // Default limit if not set
+            // Slider kapalı - tarih kontrolü yap veya rastgele tek söz göster
+            const quotesWithDate = quoteItems.filter(q => q.date === todayStr);
 
-              // Shuffle array (using Fisher-Yates or simple sort) and take first N items
-              // Simple sort randomizer is sufficient here
-              const shuffled = [...quoteItems].sort(() => 0.5 - Math.random());
-              quotesToShow = shuffled.slice(0, maxSlides);
-
+            if (quotesWithDate.length > 0) {
+              // Bugünün tarihine ait sözleri göster
+              quotesToShow = quotesWithDate;
+              console.log('💬 Tarih eşleşmesi: ' + quotesToShow.length + ' söz bulundu');
             } else {
-              // Show one random quote
+              // Rastgele tek söz göster
               const randomIndex = Math.floor(Math.random() * quoteItems.length);
               quotesToShow = [quoteItems[randomIndex]];
+              console.log('💬 Rastgele tek söz gösteriliyor');
             }
           }
         } else if (quoteData.text && quoteData.author) {

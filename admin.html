@@ -905,11 +905,18 @@ Mehmet,Kaya,E,2009-12-10,10-A"></textarea>
                 Öğrenci Listesi
                 <span id="studentCount" class="text-sm font-normal text-gray-500">(0 öğrenci)</span>
               </h3>
-              <button onclick="clearAllBirthdays()"
-                class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-bold">
-                <span class="material-symbols-outlined text-sm mr-1">delete_sweep</span>
-                Tümünü Temizle
-              </button>
+              <div class="flex gap-2">
+                <button onclick="initBirthdayData()"
+                  class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm font-bold flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm">refresh</span>
+                  Listeyi Yenile
+                </button>
+                <button onclick="clearAllBirthdays()"
+                  class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-bold">
+                  <span class="material-symbols-outlined text-sm mr-1">delete_sweep</span>
+                  Tümünü Temizle
+                </button>
+              </div>
             </div>
 
             <div class="overflow-x-auto rounded-lg border border-slate-200">

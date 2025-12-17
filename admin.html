@@ -3071,24 +3071,6 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
       alert(`✅ YKS Sayaç verileri kaydedildi!\\n\\nBaşlık: ${yksTitle}\\nTarih: ${yksDate || 'Belirtilmemiş'}\\nDurum: ${yksEnabled ? 'Gösteriliyor' : 'Gizli'}`);
     }
 
-    // Doğum Günü Kaydetme (mevcut fonksiyonu güncelle)
-    function saveBirthdayData() {
-      const birthdayEnabled = document.getElementById("birthdayEnabled").checked;
-      const bTitle = document.getElementById("bTitle").value.trim() || "İyi ki doğdun!";
-
-      // Mevcut öğrenci listesini al (varsa)
-      const currentStudents = (data.cards.birthdays && data.cards.birthdays.students) ? data.cards.birthdays.students : [];
-
-      data.cards.birthdays = {
-        enabled: birthdayEnabled,
-        title: bTitle,
-        students: currentStudents
-      };
-
-      saveData(data);
-      alert(`✅ Doğum günü verileri kaydedildi!\n\nToplam ${currentStudents.length} öğrenci kaydı bulunuyor.\nKart durumu: ${birthdayEnabled ? 'Gösteriliyor' : 'Gizli'}`);
-    }
-
     function saveInfoData() {
       data.cards.info = {
         enabled: document.getElementById("infoEnabled").checked,

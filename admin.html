@@ -1530,6 +1530,14 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
     async function initBirthdayData() {
       console.log('🎂 initBirthdayData başladı...');
 
+      // Global data objesinin var olduğundan emin ol
+      if (!data) {
+        data = {};
+      }
+      if (!data.cards) {
+        data.cards = {};
+      }
+
       try {
         // Doğrudan Firebase'den çek (modal'daki gibi)
         const snapshot = await firebase.database().ref('panoData/cards/birthdays').once('value');

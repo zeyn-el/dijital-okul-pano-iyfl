@@ -1082,11 +1082,18 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
                 Söz Listesi
                 <span id="quoteCount" class="text-sm font-normal text-gray-500">(0 söz)</span>
               </h3>
-              <button onclick="clearAllQuotes()"
-                class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-bold">
-                <span class="material-symbols-outlined text-sm mr-1">delete_sweep</span>
-                Tümünü Temizle
-              </button>
+              <div class="flex gap-2">
+                <button onclick="initQuoteData()"
+                  class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm font-bold flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm">refresh</span>
+                  Listeyi Yenile
+                </button>
+                <button onclick="clearAllQuotes()"
+                  class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-bold">
+                  <span class="material-symbols-outlined text-sm mr-1">delete_sweep</span>
+                  Tümünü Temizle
+                </button>
+              </div>
             </div>
 
             <div class="overflow-x-auto rounded-lg border border-slate-200">
@@ -2787,26 +2794,75 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
     // ===== QUOTE MANAGEMENT =====
     let quotesList = [];
 
-    function initQuoteData() {
-      // Initialize quote data structure
-      if (!data.cards.quotes) {
-        data.cards.quotes = {
-          title: "Günün Sözü",
-          enableSlider: false,
-          sliderSpeed: 8,
-          maxSlides: 5,
-          items: []
-        };
+    async function initQuoteData() {
+      console.log('💬 initQuoteData başladı...');
+
+      // Global data objesinin var olduğundan emin ol
+      if (!data) {
+        data = {};
+      }
+      if (!data.cards) {
+        data.cards = {};
       }
 
-      quotesList = data.cards.quotes.items || [];
-      document.getElementById("quoteCardTitle").value = data.cards.quotes.title || "Günün Sözü";
-      document.getElementById("enableQuoteSlider").checked = data.cards.quotes.enableSlider || false;
-      document.getElementById("quoteSliderSpeed").value = data.cards.quotes.sliderSpeed || 8;
-      document.getElementById("quoteMaxSlides").value = data.cards.quotes.maxSlides || 5;
+      try {
+        // Doğrudan Firebase'den çek
+        const snapshot = await firebase.database().ref('panoData/cards/quotes').once('value');
+        const quotesData = snapshot.val();
 
-      toggleQuoteSliderSettings();
-      renderQuoteTable();
+        console.log('💬 Firebase\'den çekilen quotesData:', quotesData);
+
+        if (!quotesData) {
+          console.log('💬 Firebase\'de quotes verisi yok, boş başlatılıyor...');
+          data.cards.quotes = {
+            title: "Günün Sözü",
+            enableSlider: false,
+            sliderSpeed: 8,
+            maxSlides: 5,
+            items: []
+          };
+          quotesList = [];
+          document.getElementById("quoteCardTitle").value = "Günün Sözü";
+          document.getElementById("enableQuoteSlider").checked = false;
+          document.getElementById("quoteSliderSpeed").value = 8;
+          document.getElementById("quoteMaxSlides").value = 5;
+          toggleQuoteSliderSettings();
+          renderQuoteTable();
+          return;
+        }
+
+        // Global data objesini güncelle
+        data.cards.quotes = quotesData;
+
+        // items verisini al
+        let itemsData = quotesData.items;
+        console.log('💬 itemsData raw:', itemsData);
+
+        // Firebase'de array veriler bazen object olarak saklanabilir
+        if (itemsData && typeof itemsData === 'object' && !Array.isArray(itemsData)) {
+          console.log('💬 Object -> Array dönüşümü yapılıyor...');
+          itemsData = Object.values(itemsData);
+          data.cards.quotes.items = itemsData;
+        }
+
+        quotesList = itemsData || [];
+        console.log('💬 quotesList final length:', quotesList.length);
+
+        // UI güncelle
+        document.getElementById("quoteCardTitle").value = quotesData.title || "Günün Sözü";
+        document.getElementById("enableQuoteSlider").checked = quotesData.enableSlider || false;
+        document.getElementById("quoteSliderSpeed").value = quotesData.sliderSpeed || 8;
+        document.getElementById("quoteMaxSlides").value = quotesData.maxSlides || 5;
+
+        toggleQuoteSliderSettings();
+        renderQuoteTable();
+        console.log('💬 initQuoteData tamamlandı - ' + quotesList.length + ' söz yüklendi');
+
+      } catch (error) {
+        console.error('💬 initQuoteData HATA:', error);
+        quotesList = [];
+        renderQuoteTable();
+      }
     }
 
     function addManualQuote() {
@@ -3274,7 +3330,7 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
       // Now initialize all components (data is ready)
       await initBirthdayData();
       await initDutyData();
-      initQuoteData();
+      await initQuoteData();
       initInfoData();
       loadScheduleEntries();
 

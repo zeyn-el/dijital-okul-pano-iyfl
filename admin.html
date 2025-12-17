@@ -2033,6 +2033,7 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
         const originalIndex = dutyEntries.indexOf(duty);
         const tr = document.createElement("tr");
         tr.className = "border-b border-slate-100 hover:bg-slate-50 transition-colors";
+        tr.id = `duty-row-${originalIndex}`;
 
         // Check if this duty is for today
         const today = new Date().toISOString().split('T')[0];
@@ -2051,6 +2052,10 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
           <td class="p-3 text-slate-800 font-medium">${duty.place}</td>
           <td class="p-3 text-slate-800">${duty.teacher}</td>
           <td class="p-3 text-right">
+            <button onclick="editDutyEntry(${originalIndex})" 
+              class="text-blue-500 hover:bg-blue-50 p-2 rounded transition-colors mr-1" title="Düzenle">
+              <span class="material-symbols-outlined text-lg">edit</span>
+            </button>
             <button onclick="removeDutyEntry(${originalIndex})" 
               class="text-red-500 hover:bg-red-50 p-2 rounded transition-colors" title="Sil">
               <span class="material-symbols-outlined text-lg">delete</span>
@@ -2068,6 +2073,68 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
         renderDutyTable();
         alert("✅ Nöbetçi kaydı silindi! Değişiklikleri kaydetmeyi unutmayın.");
       }
+    }
+
+    function editDutyEntry(index) {
+      const duty = dutyEntries[index];
+      const row = document.getElementById(`duty-row-${index}`);
+
+      if (!row || !duty) return;
+
+      // Replace row with editable inputs
+      row.innerHTML = `
+        <td class="p-3 font-semibold text-slate-700">#</td>
+        <td class="p-3">
+          <input type="date" id="edit-duty-date-${index}" value="${duty.date}" class="input-field p-2 text-sm w-full">
+        </td>
+        <td class="p-3">
+          <input type="text" id="edit-duty-day-${index}" value="${duty.day || ''}" class="input-field p-2 text-sm w-full" placeholder="Gün" readonly>
+        </td>
+        <td class="p-3">
+          <input type="text" id="edit-duty-place-${index}" value="${duty.place}" class="input-field p-2 text-sm w-full" placeholder="Yer">
+        </td>
+        <td class="p-3">
+          <input type="text" id="edit-duty-teacher-${index}" value="${duty.teacher}" class="input-field p-2 text-sm w-full" placeholder="Öğretmen">
+        </td>
+        <td class="p-3 text-right">
+          <button onclick="saveEditDutyEntry(${index})" 
+            class="text-green-500 hover:bg-green-50 p-2 rounded transition-colors mr-1" title="Kaydet">
+            <span class="material-symbols-outlined text-lg">check</span>
+          </button>
+          <button onclick="renderDutyTable()" 
+            class="text-gray-500 hover:bg-gray-50 p-2 rounded transition-colors" title="İptal">
+            <span class="material-symbols-outlined text-lg">close</span>
+          </button>
+        </td>
+      `;
+
+      // Update day name when date changes
+      document.getElementById(`edit-duty-date-${index}`).addEventListener('change', function () {
+        const dayInput = document.getElementById(`edit-duty-day-${index}`);
+        dayInput.value = getTurkishDayName(this.value);
+      });
+    }
+
+    function saveEditDutyEntry(index) {
+      const date = document.getElementById(`edit-duty-date-${index}`).value.trim();
+      const day = document.getElementById(`edit-duty-day-${index}`).value.trim();
+      const place = document.getElementById(`edit-duty-place-${index}`).value.trim();
+      const teacher = document.getElementById(`edit-duty-teacher-${index}`).value.trim();
+
+      if (!date || !place || !teacher) {
+        alert("⚠️ Lütfen Tarih, Yer ve Öğretmen alanlarını doldurun!");
+        return;
+      }
+
+      dutyEntries[index] = {
+        date,
+        day: day || getTurkishDayName(date),
+        place,
+        teacher
+      };
+
+      renderDutyTable();
+      alert("✅ Nöbetçi kaydı güncellendi! Değişiklikleri kaydetmeyi unutmayın.");
     }
 
     function clearAllDuties() {

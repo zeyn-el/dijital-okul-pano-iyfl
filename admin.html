@@ -3077,16 +3077,30 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
     }
 
     function saveQuoteData() {
+      // Global data objesinin var olduğundan emin ol
+      if (!data) {
+        data = {};
+      }
+      if (!data.cards) {
+        data.cards = {};
+      }
+
+      const sliderSpeed = parseInt(document.getElementById("quoteSliderSpeed").value) || 8;
+      const maxSlides = parseInt(document.getElementById("quoteMaxSlides").value) || 5;
+
       data.cards.quotes = {
         title: document.getElementById("quoteCardTitle").value,
         enableSlider: document.getElementById("enableQuoteSlider").checked,
-        sliderSpeed: parseInt(document.getElementById("quoteSliderSpeed").value),
-        maxSlides: parseInt(document.getElementById("quoteMaxSlides").value),
+        sliderSpeed: sliderSpeed,
+        maxSlides: maxSlides,
         items: quotesList
       };
 
+      console.log('💬 saveQuoteData - Kaydedilen veri:', data.cards.quotes);
+      console.log('💬 sliderSpeed:', sliderSpeed, 'maxSlides:', maxSlides);
+
       saveData(data);
-      alert(`✅ Günün sözü verileri kaydedildi!\n\nToplam ${quotesList.length} söz kaydı bulunuyor.`);
+      alert(`✅ Günün sözü verileri kaydedildi!\n\nToplam ${quotesList.length} söz kaydı\nSlider: ${data.cards.quotes.enableSlider ? 'Açık' : 'Kapalı'}\nGösterim süresi: ${sliderSpeed} saniye\nMaks. slayt: ${maxSlides}`);
     }
 
     // Initialize quote data on page load

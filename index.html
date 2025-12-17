@@ -79,12 +79,12 @@
     }
   </style>
 
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
-<!-- Firebase Config -->
-<script src="firebase-config.js"></script>
+  <!-- Firebase Config -->
+  <script src="firebase-config.js"></script>
 </head>
 
 <body class="bg-background-light text-text-dark font-display h-screen flex flex-col overflow-hidden">
@@ -574,28 +574,37 @@
 
         let quotesToShow = [];
 
-        if (quoteData.items && Array.isArray(quoteData.items)) {
+        // Firebase'de array veriler bazen object olarak saklanabilir
+        let quoteItems = quoteData.items;
+        if (quoteItems && typeof quoteItems === 'object' && !Array.isArray(quoteItems)) {
+          quoteItems = Object.values(quoteItems);
+        }
+
+        console.log('💬 Quote slider ayarları - enableSlider:', quoteData.enableSlider, 'sliderSpeed:', quoteData.sliderSpeed, 'maxSlides:', quoteData.maxSlides);
+        console.log('💬 Toplam söz sayısı:', quoteItems ? quoteItems.length : 0);
+
+        if (quoteItems && Array.isArray(quoteItems)) {
           // New system: filter by date or random
-          const quotesWithDate = quoteData.items.filter(q => q.date === todayStr);
+          const quotesWithDate = quoteItems.filter(q => q.date === todayStr);
 
           if (quotesWithDate.length > 0) {
             // Show quotes for today's date
             quotesToShow = quotesWithDate;
           } else {
             // No quotes for today, show random or all
-            if (quoteData.enableSlider && quoteData.items.length > 1) {
+            if (quoteData.enableSlider && quoteItems.length > 1) {
               // Show LIMITED number of random quotes in slider
               const maxSlides = quoteData.maxSlides || 5; // Default limit if not set
 
               // Shuffle array (using Fisher-Yates or simple sort) and take first N items
               // Simple sort randomizer is sufficient here
-              const shuffled = [...quoteData.items].sort(() => 0.5 - Math.random());
+              const shuffled = [...quoteItems].sort(() => 0.5 - Math.random());
               quotesToShow = shuffled.slice(0, maxSlides);
 
             } else {
               // Show one random quote
-              const randomIndex = Math.floor(Math.random() * quoteData.items.length);
-              quotesToShow = [quoteData.items[randomIndex]];
+              const randomIndex = Math.floor(Math.random() * quoteItems.length);
+              quotesToShow = [quoteItems[randomIndex]];
             }
           }
         } else if (quoteData.text && quoteData.author) {

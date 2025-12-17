@@ -1513,8 +1513,12 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
     let showAllBirthdays = false;
 
     function initBirthdayData() {
+      console.log('🎂 initBirthdayData başladı...');
+      console.log('🎂 data.cards.birthdays:', data.cards.birthdays);
+
       // Initialize birthday data structure
       if (!data.cards.birthdays) {
+        console.log('🎂 data.cards.birthdays yok, varsayılan oluşturuluyor...');
         data.cards.birthdays = {
           title: "İyi ki doğdun!",
           students: []
@@ -1529,10 +1533,29 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
         delete data.cards.birthday;
       }
 
-      birthdayStudents = data.cards.birthdays.students || [];
+      // Firebase'de array veriler bazen object olarak saklanabilir
+      // Bu durumu handle et
+      let studentsData = data.cards.birthdays.students;
+      console.log('🎂 studentsData raw:', studentsData);
+      console.log('🎂 studentsData type:', typeof studentsData);
+      console.log('🎂 studentsData isArray:', Array.isArray(studentsData));
+
+      if (studentsData && typeof studentsData === 'object' && !Array.isArray(studentsData)) {
+        // Object'i array'e çevir (Firebase index key'lerini kullanıyor olabilir)
+        console.log('🎂 Object -> Array dönüşümü yapılıyor...');
+        studentsData = Object.values(studentsData);
+        // Dönüşümden sonra data.cards.birthdays.students'ı da güncelle
+        data.cards.birthdays.students = studentsData;
+      }
+
+      birthdayStudents = studentsData || [];
+      console.log('🎂 birthdayStudents final:', birthdayStudents);
+      console.log('🎂 birthdayStudents length:', birthdayStudents.length);
+
       document.getElementById("bTitle").value = data.cards.birthdays.title || "İyi ki doğdun!";
 
       renderBirthdayTable();
+      console.log('🎂 initBirthdayData tamamlandı');
     }
 
     function addManualBirthday() {

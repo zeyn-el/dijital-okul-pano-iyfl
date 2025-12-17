@@ -735,11 +735,18 @@
                 Nöbetçi Listesi
                 <span id="dutyCount" class="text-sm font-normal text-gray-500">(0 kayıt)</span>
               </h3>
-              <button onclick="clearAllDuties()"
-                class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-bold">
-                <span class="material-symbols-outlined text-sm mr-1">delete_sweep</span>
-                Tümünü Temizle
-              </button>
+              <div class="flex gap-2">
+                <button onclick="initDutyData()"
+                  class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm font-bold flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm">refresh</span>
+                  Listeyi Yenile
+                </button>
+                <button onclick="clearAllDuties()"
+                  class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-bold">
+                  <span class="material-symbols-outlined text-sm mr-1">delete_sweep</span>
+                  Tümünü Temizle
+                </button>
+              </div>
             </div>
 
             <div class="overflow-x-auto rounded-lg border border-slate-200">
@@ -1865,18 +1872,67 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
     let dutyEntries = [];
     let dutyEntryCounter = 0;
 
-    function initDutyData() {
-      // Initialize duty data structure
-      if (!data.cards.dutyByDate) {
-        data.cards.dutyByDate = { items: [] };
+    async function initDutyData() {
+      console.log('👮 initDutyData başladı...');
+
+      // Global data objesinin var olduğundan emin ol
+      if (!data) {
+        data = {};
+      }
+      if (!data.cards) {
+        data.cards = {};
       }
 
-      dutyEntries = data.cards.dutyByDate.items || [];
-      renderDutyTable();
+      try {
+        // Doğrudan Firebase'den çek
+        const snapshot = await firebase.database().ref('panoData/cards/dutyByDate').once('value');
+        const dutyData = snapshot.val();
 
-      // Add initial entry row
-      if (dutyEntryCounter === 0) {
-        addDutyEntryRow();
+        console.log('👮 Firebase\'den çekilen dutyData:', dutyData);
+
+        if (!dutyData) {
+          console.log('👮 Firebase\'de dutyByDate verisi yok, boş başlatılıyor...');
+          data.cards.dutyByDate = { items: [] };
+          dutyEntries = [];
+          renderDutyTable();
+          if (dutyEntryCounter === 0) {
+            addDutyEntryRow();
+          }
+          return;
+        }
+
+        // Global data objesini güncelle
+        data.cards.dutyByDate = dutyData;
+
+        // items verisini al
+        let itemsData = dutyData.items;
+        console.log('👮 itemsData raw:', itemsData);
+
+        // Firebase'de array veriler bazen object olarak saklanabilir
+        if (itemsData && typeof itemsData === 'object' && !Array.isArray(itemsData)) {
+          console.log('👮 Object -> Array dönüşümü yapılıyor...');
+          itemsData = Object.values(itemsData);
+          data.cards.dutyByDate.items = itemsData;
+        }
+
+        dutyEntries = itemsData || [];
+        console.log('👮 dutyEntries final length:', dutyEntries.length);
+
+        renderDutyTable();
+        console.log('👮 initDutyData tamamlandı - ' + dutyEntries.length + ' kayıt yüklendi');
+
+        // Add initial entry row
+        if (dutyEntryCounter === 0) {
+          addDutyEntryRow();
+        }
+
+      } catch (error) {
+        console.error('👮 initDutyData HATA:', error);
+        dutyEntries = [];
+        renderDutyTable();
+        if (dutyEntryCounter === 0) {
+          addDutyEntryRow();
+        }
       }
     }
 
@@ -3150,7 +3206,7 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
 
       // Now initialize all components (data is ready)
       await initBirthdayData();
-      initDutyData();
+      await initDutyData();
       initQuoteData();
       initInfoData();
       loadScheduleEntries();

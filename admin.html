@@ -2262,6 +2262,14 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
     let currentTimePlanDay = 'Pazartesi';
 
     function loadScheduleEntries() {
+      // Global data objesinin var olduğundan emin ol
+      if (!data) {
+        data = {};
+      }
+      if (!data.cards) {
+        data.cards = {};
+      }
+
       if (!data.cards.schedule) {
         data.cards.schedule = { items: [] };
       }
@@ -3278,6 +3286,14 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
 
     // YKS Sayaç Kaydetme
     function saveYKS() {
+      // Global data objesinin var olduğundan emin ol
+      if (!data) {
+        data = {};
+      }
+      if (!data.cards) {
+        data.cards = {};
+      }
+
       const yksEnabled = document.getElementById("yksEnabled").checked;
       const yksTitle = document.getElementById("yksTitle").value.trim() || "YKS'ye Kalan";
       const yksDate = document.getElementById("yksDate").value;
@@ -3289,7 +3305,7 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
       };
 
       saveData(data);
-      alert(`✅ YKS Sayaç verileri kaydedildi!\\n\\nBaşlık: ${yksTitle}\\nTarih: ${yksDate || 'Belirtilmemiş'}\\nDurum: ${yksEnabled ? 'Gösteriliyor' : 'Gizli'}`);
+      alert(`✅ YKS Sayaç verileri kaydedildi!\n\nBaşlık: ${yksTitle}\nTarih: ${yksDate || 'Belirtilmemiş'}\nDurum: ${yksEnabled ? 'Gösteriliyor' : 'Gizli'}`);
     }
 
     function saveInfoData() {

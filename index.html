@@ -667,13 +667,17 @@
           container.innerHTML = renderQuoteSlide(0);
 
           // Setup Slider Logic
+          const actualSliderSpeed = quoteData.sliderSpeed || 8;
+          const actualMaxSlides = quotesToShow.length;
+          console.log('💬 Quote Slider BAŞLATILIYOR - Gösterim süresi:', actualSliderSpeed, 'saniye, Gösterilen slayt:', actualMaxSlides);
+
           window.quoteState = {
             currentIndex: 0,
             total: quotesToShow.length,
             interval: setInterval(() => {
               window.quoteState.currentIndex = (window.quoteState.currentIndex + 1) % window.quoteState.total;
               container.innerHTML = renderQuoteSlide(window.quoteState.currentIndex);
-            }, (quoteData.sliderSpeed || 8) * 1000) // Convert to milliseconds
+            }, actualSliderSpeed * 1000) // Convert to milliseconds
           };
         }
       }

@@ -205,6 +205,7 @@
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 
   <!-- Firebase Configuration -->
   <script src="firebase-config.js"></script>
@@ -264,8 +265,10 @@
             },
             mediaCenter: {
               type: "slideshow",
-              images: [],
-              speed: 5
+              fullscreen: false,
+              slideshow: { images: [], speed: 5 },
+              video: { url: "", autoplay: false, loop: false, muted: false },
+              webpage: { url: "" }
             },
             quotes: {
               title: "Günün Sözü",
@@ -307,7 +310,7 @@
           data.cards.yks = { enabled: true, title: "YKS'ye Kalan", date: "" };
         }
         if (!data.cards.mediaCenter) {
-          data.cards.mediaCenter = { type: "slideshow", images: [], speed: 5 };
+          data.cards.mediaCenter = { type: "slideshow", fullscreen: false, slideshow: { images: [], speed: 5 }, video: { url: "", autoplay: false, loop: false, muted: false }, webpage: { url: "" } };
         }
         if (!data.cards.ticker) {
           data.cards.ticker = { text: "", speed: 20 };
@@ -2658,14 +2661,37 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
         if (img.title === undefined) img.title = '';
         if (img.desc === undefined) img.desc = '';
 
+        // Resim önizlemesi (eğer path varsa)
+        const imagePreview = img.path ? `
+          <div class="mb-3">
+            <img src="${img.path}" alt="${img.alt || 'Önizleme'}" 
+              class="w-full h-32 object-cover rounded-lg border border-slate-300"
+              onerror="this.style.display='none'">
+          </div>
+        ` : '';
+
         div.innerHTML = `
+          ${imagePreview}
           <div class="flex gap-2 items-start mb-3">
             <div class="flex-1 space-y-2">
               <div>
                 <label class="text-xs font-semibold text-gray-600 mb-1 block">Resim Yolu</label>
-                <input type="text" class="input-field p-2 text-sm" value="${img.path || ''}" 
-                  onchange="updateSlideshowImage(${index}, 'path', this.value)" 
-                  placeholder="images/photo.jpg veya https://...">
+                <div class="flex gap-2">
+                  <input type="text" id="img-path-${index}" class="input-field p-2 text-sm flex-1" value="${img.path || ''}" 
+                    onchange="updateSlideshowImage(${index}, 'path', this.value)" 
+                    placeholder="images/photo.jpg veya https://...">
+                  <label class="cursor-pointer bg-primary text-white px-3 py-2 rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-1 text-sm font-semibold whitespace-nowrap">
+                    <span class="material-symbols-outlined text-lg">upload</span>
+                    Yükle
+                    <input type="file" accept="image/*" class="hidden" onchange="uploadImageToFirebase(this, ${index})">
+                  </label>
+                </div>
+                <div id="upload-progress-${index}" class="hidden mt-2">
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div id="upload-bar-${index}" class="bg-primary h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                  </div>
+                  <p id="upload-status-${index}" class="text-xs text-gray-500 mt-1">Yükleniyor...</p>
+                </div>
               </div>
               <div>
                 <label class="text-xs font-semibold text-gray-600 mb-1 block">Resim Açıklaması (Alt Text)</label>
@@ -2714,6 +2740,89 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
         `;
         container.appendChild(div);
       });
+    }
+
+    // Firebase Storage'a resim yükleme fonksiyonu
+    async function uploadImageToFirebase(inputElement, index) {
+      const file = inputElement.files[0];
+      if (!file) return;
+
+      // Dosya tipi kontrolü
+      if (!file.type.startsWith('image/')) {
+        alert('❌ Lütfen sadece resim dosyası seçin!');
+        return;
+      }
+
+      // Dosya boyutu kontrolü (max 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        alert('❌ Dosya boyutu çok büyük! Maksimum 5MB olmalıdır.');
+        return;
+      }
+
+      // Progress bar'ı göster
+      const progressContainer = document.getElementById(`upload-progress-${index}`);
+      const progressBar = document.getElementById(`upload-bar-${index}`);
+      const statusText = document.getElementById(`upload-status-${index}`);
+      progressContainer.classList.remove('hidden');
+      progressBar.style.width = '0%';
+      statusText.textContent = 'Yükleniyor...';
+
+      try {
+        // Firebase Storage referansı oluştur
+        const storage = firebase.storage();
+        const timestamp = Date.now();
+        const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+        const storagePath = `pano-images/${timestamp}_${sanitizedFileName}`;
+        const storageRef = storage.ref(storagePath);
+
+        // Yükleme işlemini başlat
+        const uploadTask = storageRef.put(file);
+
+        // Yükleme durumunu takip et
+        uploadTask.on('state_changed',
+          (snapshot) => {
+            // İlerleme durumu
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            progressBar.style.width = progress + '%';
+            statusText.textContent = `Yükleniyor... ${Math.round(progress)}%`;
+          },
+          (error) => {
+            // Hata durumu
+            console.error('Upload error:', error);
+            statusText.textContent = '❌ Yükleme hatası!';
+            statusText.className = 'text-xs text-red-500 mt-1';
+            alert('❌ Resim yüklenirken hata oluştu: ' + error.message);
+          },
+          async () => {
+            // Başarılı yükleme
+            try {
+              const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+
+              // Resim yolunu güncelle
+              slideshowImages[index].path = downloadURL;
+              document.getElementById(`img-path-${index}`).value = downloadURL;
+
+              statusText.textContent = '✅ Yükleme tamamlandı!';
+              statusText.className = 'text-xs text-green-500 mt-1';
+
+              // 2 saniye sonra progress bar'ı gizle ve önizlemeyi güncelle
+              setTimeout(() => {
+                renderSlideshowImages();
+              }, 1500);
+
+            } catch (urlError) {
+              console.error('URL error:', urlError);
+              statusText.textContent = '❌ URL alınamadı!';
+            }
+          }
+        );
+
+      } catch (error) {
+        console.error('Firebase Storage error:', error);
+        progressContainer.classList.add('hidden');
+        alert('❌ Firebase Storage hatası: ' + error.message + '\n\nFirebase Storage kurallarını kontrol edin.');
+      }
     }
 
     function updateSlideshowSpeedLabel() {

@@ -147,8 +147,20 @@ const FirebaseStorage = {
                 },
                 mediaCenter: {
                     type: "slideshow",
-                    images: [],
-                    speed: 5
+                    fullscreen: false,
+                    slideshow: {
+                        images: [],
+                        speed: 5
+                    },
+                    video: {
+                        url: "",
+                        autoplay: false,
+                        loop: false,
+                        muted: false
+                    },
+                    webpage: {
+                        url: ""
+                    }
                 },
                 quotes: {
                     title: "Günün Sözü",

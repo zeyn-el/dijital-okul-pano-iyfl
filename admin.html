@@ -596,6 +596,64 @@
             <p class="helper-text mt-2">Bu seçenek işaretli değilse kart gizlenir.</p>
           </div>
 
+          <!-- Kart Rengi Seçimi -->
+          <div class="mb-6 p-4 bg-purple-50 rounded-lg border border-purple-200">
+            <label class="input-label flex items-center gap-2 mb-3">
+              <span class="material-symbols-outlined text-purple-600">palette</span>
+              Kart Arka Plan Rengi
+            </label>
+
+            <div class="grid grid-cols-4 sm:grid-cols-6 gap-2 mb-4">
+              <!-- Preset Colors -->
+              <button type="button" onclick="setInfoCardColor('#2b8cee')"
+                class="info-color-btn w-full h-10 rounded-lg border-2 border-transparent hover:border-gray-400 transition-all"
+                style="background: #2b8cee;" title="Mavi (Varsayılan)"></button>
+              <button type="button" onclick="setInfoCardColor('linear-gradient(135deg, #667eea 0%, #764ba2 100%)')"
+                class="info-color-btn w-full h-10 rounded-lg border-2 border-transparent hover:border-gray-400 transition-all"
+                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" title="Mor Gradyan"></button>
+              <button type="button" onclick="setInfoCardColor('linear-gradient(135deg, #f093fb 0%, #f5576c 100%)')"
+                class="info-color-btn w-full h-10 rounded-lg border-2 border-transparent hover:border-gray-400 transition-all"
+                style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);" title="Pembe Gradyan"></button>
+              <button type="button" onclick="setInfoCardColor('linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)')"
+                class="info-color-btn w-full h-10 rounded-lg border-2 border-transparent hover:border-gray-400 transition-all"
+                style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);"
+                title="Açık Mavi Gradyan"></button>
+              <button type="button" onclick="setInfoCardColor('linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)')"
+                class="info-color-btn w-full h-10 rounded-lg border-2 border-transparent hover:border-gray-400 transition-all"
+                style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);" title="Yeşil Gradyan"></button>
+              <button type="button" onclick="setInfoCardColor('linear-gradient(135deg, #fa709a 0%, #fee140 100%)')"
+                class="info-color-btn w-full h-10 rounded-lg border-2 border-transparent hover:border-gray-400 transition-all"
+                style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);" title="Turuncu-Pembe"></button>
+              <button type="button" onclick="setInfoCardColor('linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)')"
+                class="info-color-btn w-full h-10 rounded-lg border-2 border-transparent hover:border-gray-400 transition-all"
+                style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);" title="Pastel"></button>
+              <button type="button" onclick="setInfoCardColor('linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)')"
+                class="info-color-btn w-full h-10 rounded-lg border-2 border-transparent hover:border-gray-400 transition-all"
+                style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);" title="Pembe Pastel"></button>
+              <button type="button" onclick="setInfoCardColor('linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)')"
+                class="info-color-btn w-full h-10 rounded-lg border-2 border-transparent hover:border-gray-400 transition-all"
+                style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);" title="İndigo"></button>
+              <button type="button" onclick="setInfoCardColor('linear-gradient(135deg, #0f172a 0%, #1e293b 100%)')"
+                class="info-color-btn w-full h-10 rounded-lg border-2 border-transparent hover:border-gray-400 transition-all"
+                style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);" title="Koyu"></button>
+              <button type="button" onclick="setInfoCardColor('#dc2626')"
+                class="info-color-btn w-full h-10 rounded-lg border-2 border-transparent hover:border-gray-400 transition-all"
+                style="background: #dc2626;" title="Kırmızı"></button>
+              <button type="button" onclick="setInfoCardColor('#059669')"
+                class="info-color-btn w-full h-10 rounded-lg border-2 border-transparent hover:border-gray-400 transition-all"
+                style="background: #059669;" title="Koyu Yeşil"></button>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <label class="text-sm font-medium text-gray-600">Özel Renk:</label>
+              <input type="text" id="infoCardColorInput" class="input-field flex-1 text-sm"
+                placeholder="#2b8cee veya linear-gradient(...)" onchange="setInfoCardColor(this.value)">
+              <div id="infoCardColorPreview" class="w-10 h-10 rounded-lg border border-gray-300 flex-shrink-0"
+                style="background: #2b8cee;"></div>
+            </div>
+            <p class="helper-text mt-2">Hazır renklerden birini seçin veya özel renk/gradyan girin.</p>
+          </div>
+
           <!-- Manuel Bilgi Ekleme -->
           <div class="mb-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
             <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
@@ -3319,6 +3377,11 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
         infoList = data.cards.info.items || [];
         document.getElementById("infoEnabled").checked = data.cards.info.enabled || false;
         document.getElementById("infoSliderSpeed").value = data.cards.info.sliderSpeed || 5;
+
+        // Kart rengini yükle
+        const cardColor = data.cards.info.cardColor || '#2b8cee';
+        document.getElementById("infoCardColorInput").value = cardColor;
+        document.getElementById("infoCardColorPreview").style.background = cardColor;
       }
 
       renderInfoTable();
@@ -3530,11 +3593,31 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
       data.cards.info = {
         enabled: document.getElementById("infoEnabled").checked,
         sliderSpeed: parseInt(document.getElementById("infoSliderSpeed").value),
+        cardColor: document.getElementById("infoCardColorInput").value || '',
         items: infoList
       };
 
       saveData(data);
-      alert(`✅ Bilgi kartı verileri kaydedildi!\n\nToplam ${infoList.length} bilgi kaydı bulunuyor.\nKart durumu: ${data.cards.info.enabled ? 'Aktif' : 'Pasif'}`);
+      alert(`✅ Bilgi kartı verileri kaydedildi!\n\nToplam ${infoList.length} bilgi kaydı bulunuyor.\nKart durumu: ${data.cards.info.enabled ? 'Aktif' : 'Pasif'}\nKart rengi: ${data.cards.info.cardColor || 'Varsayılan (Mavi)'}`);
+    }
+
+    // Bilgi kartı renk seçimi
+    function setInfoCardColor(color) {
+      const input = document.getElementById('infoCardColorInput');
+      const preview = document.getElementById('infoCardColorPreview');
+
+      if (input) input.value = color;
+      if (preview) preview.style.background = color;
+
+      // Tüm renk butonlarından seçili işaretini kaldır
+      document.querySelectorAll('.info-color-btn').forEach(btn => {
+        btn.classList.remove('ring-2', 'ring-offset-2', 'ring-purple-500');
+      });
+
+      // Tıklanan butona seçili işareti ekle (event varsa)
+      if (event && event.target) {
+        event.target.classList.add('ring-2', 'ring-offset-2', 'ring-purple-500');
+      }
     }
 
     // YKS ve Doğum Günü verilerini yükle

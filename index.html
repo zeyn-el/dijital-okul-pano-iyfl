@@ -283,8 +283,7 @@
 
       <!-- Card 2: Info Card (Bilgi) -->
       <div id="card-info"
-        class="rounded-2xl p-4 shadow-md flex flex-col justify-center text-center relative overflow-hidden h-auto min-h-[120px] flex-shrink-0"
-        style="background: linear-gradient(135deg, #a8d5a2 0%, #8bc34a 100%);">
+        class="bg-primary rounded-2xl p-4 shadow-md flex flex-col justify-center text-center relative overflow-hidden h-auto min-h-[180px] flex-shrink-0">
         <span
           class="material-symbols-outlined absolute -right-4 -bottom-4 text-[120px] opacity-20 rotate-12">emoji_events</span>
         <div class="z-10">
@@ -717,6 +716,15 @@
       if (infoData && infoData.enabled && infoData.items && infoData.items.length > 0) {
         const container = document.getElementById('card-info');
         container.style.display = 'flex'; // Show card
+
+        // Kart rengini ayarla
+        if (infoData.cardColor) {
+          container.style.background = infoData.cardColor;
+          container.classList.remove('bg-primary');
+        } else {
+          container.style.background = '';
+          container.classList.add('bg-primary');
+        }
 
         // Clean up previous slider interval if exists
         if (window.infoState && window.infoState.interval) {

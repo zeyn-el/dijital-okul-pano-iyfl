@@ -1366,17 +1366,41 @@
       const leftColumn = document.getElementById('left-column');
       const rightColumn = document.getElementById('right-column');
       const centerColumn = document.getElementById('center-column');
+      const quoteCard = document.getElementById('card-quote');
+      const mainMediaCard = document.getElementById('card-main-media');
 
       if (isFullscreen) {
         leftColumn.classList.add('hidden');
         rightColumn.classList.add('hidden');
         centerColumn.classList.remove('col-span-6');
         centerColumn.classList.add('col-span-12');
+
+        // Günün Sözü kartını gizle
+        if (quoteCard) {
+          quoteCard.classList.add('hidden');
+        }
+
+        // Medya kartını tam ekran yap (padding ve border kaldır)
+        if (mainMediaCard) {
+          mainMediaCard.classList.remove('p-2', 'rounded-2xl', 'border', 'border-slate-100');
+          mainMediaCard.classList.add('p-0', 'rounded-none');
+        }
       } else {
         leftColumn.classList.remove('hidden');
         rightColumn.classList.remove('hidden');
         centerColumn.classList.remove('col-span-12');
         centerColumn.classList.add('col-span-6');
+
+        // Günün Sözü kartını göster
+        if (quoteCard) {
+          quoteCard.classList.remove('hidden');
+        }
+
+        // Medya kartını normal haline döndür
+        if (mainMediaCard) {
+          mainMediaCard.classList.add('p-2', 'rounded-2xl', 'border', 'border-slate-100');
+          mainMediaCard.classList.remove('p-0', 'rounded-none');
+        }
       }
     }
 

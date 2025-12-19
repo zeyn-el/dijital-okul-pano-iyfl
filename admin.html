@@ -571,10 +571,17 @@
       <div id="tab-info" class="tab-content">
 
         <div class="card-admin">
-          <h2 class="flex items-center gap-2 mb-6">
-            <span class="material-symbols-outlined text-3xl text-green-600">emoji_events</span>
-            🏆 Bilgi Kartı Yönetimi
-          </h2>
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-3xl text-green-600">emoji_events</span>
+              🏆 Bilgi Kartı Yönetimi
+            </h2>
+            <button onclick="saveInfoData()"
+              class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-1 transition-colors shadow-sm">
+              <span class="material-symbols-outlined text-lg">save</span>
+              Kaydet
+            </button>
+          </div>
 
           <p class="text-gray-600 mb-6">
             Teşvik edici bilgiler ekleyin. Haftanın enleri, gelişme gösterenler gibi başarıları paylaşın.
@@ -674,10 +681,17 @@
       <div id="tab-duty" class="tab-content">
 
         <div class="card-admin">
-          <h2 class="flex items-center gap-2 mb-6">
-            <span class="material-symbols-outlined text-3xl text-blue-500">badge</span>
-            👮 Nöbetçi Öğretmen Yönetimi
-          </h2>
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-3xl text-blue-500">badge</span>
+              👮 Nöbetçi Öğretmen Yönetimi
+            </h2>
+            <button onclick="saveDutyData()"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-1 transition-colors shadow-sm">
+              <span class="material-symbols-outlined text-lg">save</span>
+              Kaydet
+            </button>
+          </div>
 
           <p class="text-gray-600 mb-6">
             Nöbetçi öğretmenleri yönetin. Her tarih için birden fazla yer ve öğretmen ekleyebilirsiniz.
@@ -795,12 +809,19 @@
               <span class="material-symbols-outlined text-3xl text-pink-500">cake</span>
               🎂 Doğum Günü Yönetimi
             </h2>
-            <!-- Debug Butonu -->
-            <button onclick="openBirthdayDebugModal()"
-              class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-bold flex items-center gap-2">
-              <span class="material-symbols-outlined text-sm">bug_report</span>
-              Firebase Debug
-            </button>
+            <div class="flex items-center gap-2">
+              <button onclick="saveBirthdayData()"
+                class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-1 transition-colors shadow-sm">
+                <span class="material-symbols-outlined text-lg">save</span>
+                Kaydet
+              </button>
+              <!-- Debug Butonu -->
+              <button onclick="openBirthdayDebugModal()"
+                class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-bold flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm">bug_report</span>
+                Debug
+              </button>
+            </div>
           </div>
 
           <p class="text-gray-600 mb-6">
@@ -968,10 +989,17 @@ Mehmet,Kaya,E,2009-12-10,10-A"></textarea>
       <div id="tab-quotes" class="tab-content">
 
         <div class="card-admin">
-          <h2 class="flex items-center gap-2 mb-6">
-            <span class="material-symbols-outlined text-3xl text-indigo-500">format_quote</span>
-            💬 Günün Sözü Yönetimi
-          </h2>
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-3xl text-indigo-500">format_quote</span>
+              💬 Günün Sözü Yönetimi
+            </h2>
+            <button onclick="saveQuoteData()"
+              class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-1 transition-colors shadow-sm">
+              <span class="material-symbols-outlined text-lg">save</span>
+              Kaydet
+            </button>
+          </div>
 
           <p class="text-gray-600 mb-6">
             Sözleri yönetin. Manuel olarak ekleyebilir veya toplu olarak içe aktarabilirsiniz. Tarihe göre veya rastgele
@@ -1136,10 +1164,17 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
       <div id="tab-media" class="tab-content">
 
         <div class="card-admin">
-          <h2 class="flex items-center gap-2 mb-6">
-            <span class="material-symbols-outlined text-3xl text-primary">movie</span>
-            🎬 Medya Merkezi - Ana Görsel Yönetimi
-          </h2>
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-3xl text-primary">movie</span>
+              🎬 Medya Merkezi - Ana Görsel Yönetimi
+            </h2>
+            <button onclick="saveMediaCenter()"
+              class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-1 transition-colors shadow-sm">
+              <span class="material-symbols-outlined text-lg">save</span>
+              Kaydet
+            </button>
+          </div>
 
           <p class="text-gray-600 mb-6">
             Ana ekrandaki merkez kartı için medya türünü seçin ve ayarlayın. Resim slaytı, video veya web sayfası
@@ -1305,7 +1340,17 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
       <div id="tab-schedule" class="tab-content">
 
         <div class="card-admin">
-          <h2>📚 Ders Programı Yönetimi</h2>
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-3xl text-amber-600">calendar_month</span>
+              📚 Ders Programı Yönetimi
+            </h2>
+            <button onclick="saveAllSchedules()"
+              class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-1 transition-colors shadow-sm">
+              <span class="material-symbols-outlined text-lg">save</span>
+              Kaydet
+            </button>
+          </div>
 
           <!-- YENİ DERS EKLEME FORMU -->
           <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6 shadow-sm">

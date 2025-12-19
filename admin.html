@@ -2742,7 +2742,7 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
       });
     }
 
-    // Firebase Storage'a resim yükleme fonksiyonu
+    // GitHub API ile resim yükleme fonksiyonu
     async function uploadImageToFirebase(inputElement, index) {
       const file = inputElement.files[0];
       if (!file) return;
@@ -2753,11 +2753,22 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
         return;
       }
 
-      // Dosya boyutu kontrolü (max 5MB)
+      // Dosya boyutu kontrolü (max 5MB - GitHub limiti)
       const maxSize = 5 * 1024 * 1024; // 5MB
       if (file.size > maxSize) {
         alert('❌ Dosya boyutu çok büyük! Maksimum 5MB olmalıdır.');
         return;
+      }
+
+      // GitHub token kontrolü
+      let githubToken = localStorage.getItem('github_token');
+      if (!githubToken) {
+        githubToken = prompt('GitHub Personal Access Token giriniz:\n\n(Token\'ı GitHub Settings → Developer settings → Personal access tokens bölümünden oluşturabilirsiniz.\n\nGerekli izin: repo)');
+        if (!githubToken) {
+          alert('❌ GitHub token gerekli!');
+          return;
+        }
+        localStorage.setItem('github_token', githubToken);
       }
 
       // Progress bar'ı göster
@@ -2765,64 +2776,103 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
       const progressBar = document.getElementById(`upload-bar-${index}`);
       const statusText = document.getElementById(`upload-status-${index}`);
       progressContainer.classList.remove('hidden');
-      progressBar.style.width = '0%';
-      statusText.textContent = 'Yükleniyor...';
+      progressBar.style.width = '10%';
+      statusText.textContent = 'Dosya hazırlanıyor...';
 
       try {
-        // Firebase Storage referansı oluştur
-        const storage = firebase.storage();
+        // Dosyayı base64'e çevir
+        const base64Content = await fileToBase64(file);
+        progressBar.style.width = '30%';
+        statusText.textContent = 'GitHub\'a yükleniyor...';
+
+        // Dosya adını sanitize et
         const timestamp = Date.now();
         const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-        const storagePath = `pano-images/${timestamp}_${sanitizedFileName}`;
-        const storageRef = storage.ref(storagePath);
+        const fileName = `${timestamp}_${sanitizedFileName}`;
+        const filePath = `images/${fileName}`;
 
-        // Yükleme işlemini başlat
-        const uploadTask = storageRef.put(file);
+        // GitHub API ayarları
+        const owner = 'zeyn-el';  // GitHub kullanıcı adınız
+        const repo = 'dijital-okul-pano-iyfl';  // Repo adınız
+        const branch = 'main';
 
-        // Yükleme durumunu takip et
-        uploadTask.on('state_changed',
-          (snapshot) => {
-            // İlerleme durumu
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            progressBar.style.width = progress + '%';
-            statusText.textContent = `Yükleniyor... ${Math.round(progress)}%`;
+        // GitHub API'ye yükleme isteği
+        const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${githubToken}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/vnd.github.v3+json'
           },
-          (error) => {
-            // Hata durumu
-            console.error('Upload error:', error);
-            statusText.textContent = '❌ Yükleme hatası!';
-            statusText.className = 'text-xs text-red-500 mt-1';
-            alert('❌ Resim yüklenirken hata oluştu: ' + error.message);
-          },
-          async () => {
-            // Başarılı yükleme
-            try {
-              const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+          body: JSON.stringify({
+            message: `📷 Resim eklendi: ${fileName}`,
+            content: base64Content,
+            branch: branch
+          })
+        });
 
-              // Resim yolunu güncelle
-              slideshowImages[index].path = downloadURL;
-              document.getElementById(`img-path-${index}`).value = downloadURL;
+        progressBar.style.width = '80%';
 
-              statusText.textContent = '✅ Yükleme tamamlandı!';
-              statusText.className = 'text-xs text-green-500 mt-1';
+        if (!response.ok) {
+          const errorData = await response.json();
 
-              // 2 saniye sonra progress bar'ı gizle ve önizlemeyi güncelle
-              setTimeout(() => {
-                renderSlideshowImages();
-              }, 1500);
-
-            } catch (urlError) {
-              console.error('URL error:', urlError);
-              statusText.textContent = '❌ URL alınamadı!';
-            }
+          // Token hatalıysa sil ve tekrar sor
+          if (response.status === 401) {
+            localStorage.removeItem('github_token');
+            throw new Error('Token geçersiz veya süresi dolmuş. Lütfen tekrar deneyin.');
           }
-        );
+
+          throw new Error(errorData.message || 'GitHub API hatası');
+        }
+
+        const result = await response.json();
+        progressBar.style.width = '100%';
+
+        // GitHub Pages URL'si oluştur
+        const imageUrl = `https://zeyn-el.github.io/dijital-okul-pano-iyfl/${filePath}`;
+
+        // Alternatif: Raw GitHub URL (anında erişilebilir)
+        const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${filePath}`;
+
+        // Resim yolunu güncelle (raw URL kullan - anında erişilebilir)
+        slideshowImages[index].path = rawUrl;
+        document.getElementById(`img-path-${index}`).value = rawUrl;
+
+        statusText.textContent = '✅ GitHub\'a yüklendi!';
+        statusText.className = 'text-xs text-green-500 mt-1';
+
+        // 1.5 saniye sonra önizlemeyi güncelle
+        setTimeout(() => {
+          renderSlideshowImages();
+        }, 1500);
 
       } catch (error) {
-        console.error('Firebase Storage error:', error);
-        progressContainer.classList.add('hidden');
-        alert('❌ Firebase Storage hatası: ' + error.message + '\n\nFirebase Storage kurallarını kontrol edin.');
+        console.error('GitHub upload error:', error);
+        progressBar.style.width = '0%';
+        statusText.textContent = '❌ Yükleme hatası!';
+        statusText.className = 'text-xs text-red-500 mt-1';
+        alert('❌ GitHub\'a yüklenirken hata oluştu:\n\n' + error.message);
       }
+    }
+
+    // Dosyayı base64'e çevirme yardımcı fonksiyonu
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          // "data:image/jpeg;base64," kısmını çıkar
+          const base64 = reader.result.split(',')[1];
+          resolve(base64);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // GitHub token'ı temizleme fonksiyonu (gerekirse)
+    function clearGitHubToken() {
+      localStorage.removeItem('github_token');
+      alert('✅ GitHub token temizlendi. Sonraki yüklemede tekrar sorulacak.');
     }
 
     function updateSlideshowSpeedLabel() {

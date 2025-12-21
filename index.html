@@ -1460,7 +1460,7 @@
         slide.className = `absolute inset-0 transition-opacity duration-1000 ${index === 0 ? 'opacity-100' : 'opacity-0'}`;
         slide.innerHTML = `
           <img src="${img.path}" alt="${img.alt || 'Slayt resmi'}" 
-            class="w-full h-full object-cover">
+            class="w-full h-full object-contain bg-slate-900">
         `;
         console.log('Appending slide to track...');
         track.appendChild(slide);

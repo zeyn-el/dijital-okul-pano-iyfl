@@ -459,9 +459,41 @@
           <h2>📢 Alt Kayan Yazı</h2>
           <div class="mb-4">
             <label class="input-label">Duyuru Metni</label>
-            <textarea id="tText" rows="4" class="input-field"
-              placeholder="📢 Toplantı ertelendi. • 🏆 Voleybol takımı finale çıktı."></textarea>
-            <p class="helper-text">Birden fazla duyuru için • işareti kullanın</p>
+            <div class="relative">
+              <textarea id="tText" rows="4" class="input-field"
+                placeholder="📢 Toplantı ertelendi. • 🏆 Voleybol takımı finale çıktı."></textarea>
+              <button type="button" onclick="toggleEmojiPicker()"
+                class="absolute top-2 right-2 p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Emoji Ekle">
+                <span class="text-xl">😀</span>
+              </button>
+            </div>
+
+            <!-- Emoji Picker Panel -->
+            <div id="emojiPickerPanel" class="hidden mt-2 p-3 bg-white border border-gray-200 rounded-xl shadow-lg">
+              <p class="text-xs font-semibold text-gray-500 mb-2">🎯 Popüler Emojiler</p>
+              <div class="grid grid-cols-10 gap-1 mb-3" id="popularEmojis">
+                <!-- Popüler emojiler JavaScript ile doldurulacak -->
+              </div>
+
+              <p class="text-xs font-semibold text-gray-500 mb-2">📚 Okul & Eğitim</p>
+              <div class="grid grid-cols-10 gap-1 mb-3" id="schoolEmojis">
+              </div>
+
+              <p class="text-xs font-semibold text-gray-500 mb-2">🏆 Spor & Etkinlik</p>
+              <div class="grid grid-cols-10 gap-1 mb-3" id="sportEmojis">
+              </div>
+
+              <p class="text-xs font-semibold text-gray-500 mb-2">⚠️ Uyarı & Bilgi</p>
+              <div class="grid grid-cols-10 gap-1 mb-3" id="warningEmojis">
+              </div>
+
+              <p class="text-xs font-semibold text-gray-500 mb-2">🎉 Kutlama</p>
+              <div class="grid grid-cols-10 gap-1" id="celebrationEmojis">
+              </div>
+            </div>
+
+            <p class="helper-text mt-2">Birden fazla duyuru için • işareti kullanın. Emoji eklemek için 😀 butonuna
+              tıklayın.</p>
           </div>
           <div class="mb-4">
             <label class="input-label">Kayan Yazı Hızı</label>
@@ -3853,6 +3885,83 @@ Düşünmek en zor iştir.|Henry Ford|2025-02-20"></textarea>
     function closeBirthdayDebugModal() {
       document.getElementById('birthdayDebugModal').classList.add('hidden');
     }
+
+    // ===== EMOJI PICKER =====
+    const emojiCategories = {
+      popular: ['📢', '🔔', '⚠️', '✅', '❌', '📌', '💡', '🎉', '🏆', '⭐', '❗', '❓', '📝', '📅', '🕐', '👏', '🙏', '💪', '🎯', '🔥'],
+      school: ['📚', '📖', '✏️', '📝', '🎒', '🏫', '👨‍🏫', '👩‍🏫', '👨‍🎓', '👩‍🎓', '🎓', '📐', '📏', '🔬', '🔭', '🧪', '🧮', '💻', '🖥️', '📊'],
+      sport: ['⚽', '🏀', '🏐', '🎾', '🏸', '🏓', '🏊', '🏃', '🚴', '⛹️', '🤸', '🏆', '🥇', '🥈', '🥉', '🎖️', '🏅', '🎪', '🎭', '🎨'],
+      warning: ['⚠️', '🚨', '❗', '❕', '⛔', '🚫', '📛', '🔴', '🟡', '🟢', 'ℹ️', '💬', '📣', '📢', '🔔', '🔕', '⏰', '⏳', '📍', '🗓️'],
+      celebration: ['🎉', '🎊', '🥳', '🎈', '🎁', '🎂', '🍰', '🎇', '🎆', '✨', '💫', '🌟', '⭐', '🎀', '💐', '🌹', '❤️', '💖', '👑', '🏅']
+    };
+
+    function toggleEmojiPicker() {
+      const panel = document.getElementById('emojiPickerPanel');
+      panel.classList.toggle('hidden');
+
+      // İlk açılışta emojileri yükle
+      if (!panel.dataset.loaded) {
+        loadEmojis();
+        panel.dataset.loaded = 'true';
+      }
+    }
+
+    function loadEmojis() {
+      // Popüler emojiler
+      renderEmojiGrid('popularEmojis', emojiCategories.popular);
+
+      // Okul & Eğitim
+      renderEmojiGrid('schoolEmojis', emojiCategories.school);
+
+      // Spor & Etkinlik
+      renderEmojiGrid('sportEmojis', emojiCategories.sport);
+
+      // Uyarı & Bilgi
+      renderEmojiGrid('warningEmojis', emojiCategories.warning);
+
+      // Kutlama
+      renderEmojiGrid('celebrationEmojis', emojiCategories.celebration);
+    }
+
+    function renderEmojiGrid(containerId, emojis) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      container.innerHTML = emojis.map(emoji => `
+        <button type="button" onclick="insertEmoji('${emoji}')" 
+          class="w-8 h-8 flex items-center justify-center text-xl hover:bg-blue-100 rounded-lg transition-colors cursor-pointer"
+          title="${emoji}">
+          ${emoji}
+        </button>
+      `).join('');
+    }
+
+    function insertEmoji(emoji) {
+      const textarea = document.getElementById('tText');
+      if (!textarea) return;
+
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const text = textarea.value;
+
+      // İmlecin olduğu yere emoji ekle
+      textarea.value = text.substring(0, start) + emoji + ' ' + text.substring(end);
+
+      // İmleci emojiden sonraya taşı
+      textarea.selectionStart = textarea.selectionEnd = start + emoji.length + 1;
+      textarea.focus();
+    }
+
+    // Sayfa dışına tıklanınca emoji panelini kapat
+    document.addEventListener('click', function (e) {
+      const panel = document.getElementById('emojiPickerPanel');
+      const emojiBtn = e.target.closest('button[onclick="toggleEmojiPicker()"]');
+      const isInsidePanel = e.target.closest('#emojiPickerPanel');
+
+      if (panel && !panel.classList.contains('hidden') && !emojiBtn && !isInsidePanel) {
+        panel.classList.add('hidden');
+      }
+    });
   </script>
 
   <!-- Birthday Debug Modal -->

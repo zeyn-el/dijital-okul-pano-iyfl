@@ -130,7 +130,7 @@
       <!-- Center: School Name -->
       <div class="flex items-center gap-4">
         <img src="images/school-logo.jpg" alt="Okul Logosu" class="w-14 h-14 rounded-lg object-cover">
-        <h1 class="text-2xl font-bold text-text-dark tracking-tight uppercase">İsmet Yılmaz Fen Lisesi</h1>
+        <h1 class="text-2xl font-bold text-text-dark tracking-tight uppercase">İsmet Yılmaz Fen Lisesi | Şarkışla</h1>
       </div>
 
       <!-- Right: Date + Settings -->
@@ -1360,6 +1360,8 @@
       // ===== MEDIA CENTER FUNCTIONS =====
       let slideshowInterval = null;
       let currentSlideIndex = 0;
+      let mediaCenterInitialized = false; // Flag to prevent re-initialization
+      let lastMediaDataHash = null; // To detect if media data changed
 
       function updateMediaCenter(mediaData) {
         if (!mediaData) {
@@ -1367,6 +1369,19 @@
           showMediaLoading();
           return;
         }
+
+        // Create a hash of media data to detect changes
+        const currentHash = JSON.stringify(mediaData);
+
+        // Skip re-initialization if already initialized with same data
+        if (mediaCenterInitialized && lastMediaDataHash === currentHash) {
+          console.log('📺 MediaCenter: Skipping re-init (data unchanged)');
+          return;
+        }
+
+        console.log('📺 MediaCenter: Initializing...');
+        mediaCenterInitialized = true;
+        lastMediaDataHash = currentHash;
 
         // Handle fullscreen mode
         const isFullscreen = mediaData.fullscreen || false;

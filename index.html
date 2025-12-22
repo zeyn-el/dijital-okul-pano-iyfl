@@ -56,135 +56,14 @@
       overflow: hidden;
     }
 
-    /* Scalable wrapper */
+    /* Scalable wrapper - scales the ENTIRE dashboard */
     #pano-wrapper {
-      width: 100vw;
-      height: 100vh;
+      width: 1920px;
+      height: 1080px;
       display: flex;
       flex-direction: column;
       transform-origin: top left;
-      transform: scale(var(--scale-factor));
-    }
-
-    /* Header responsive */
-    header {
-      padding: calc(0.5rem + 0.5vh) calc(1rem + 1vw);
-    }
-
-    header .text-3xl {
-      font-size: clamp(1rem, 2vw, 1.875rem);
-    }
-
-    header .text-2xl {
-      font-size: clamp(0.875rem, 1.5vw, 1.5rem);
-    }
-
-    header .text-xl {
-      font-size: clamp(0.75rem, 1.2vw, 1.25rem);
-    }
-
-    header h1 {
-      font-size: clamp(0.875rem, 1.8vw, 1.5rem) !important;
-    }
-
-    /* Main grid responsive */
-    #main-content-grid {
-      flex: 1;
-      min-height: 0;
-      padding: clamp(0.5rem, 1vh, 1rem);
-      gap: clamp(0.5rem, 1vh, 1rem);
-    }
-
-    /* Card text scaling */
-    .text-4xl,
-    .text-5xl {
-      font-size: clamp(1.5rem, 3vh, 3rem);
-    }
-
-    .text-2xl {
-      font-size: clamp(0.875rem, 1.8vh, 1.5rem);
-    }
-
-    .text-xl {
-      font-size: clamp(0.75rem, 1.5vh, 1.25rem);
-    }
-
-    .text-lg {
-      font-size: clamp(0.7rem, 1.3vh, 1.125rem);
-    }
-
-    .text-sm {
-      font-size: clamp(0.6rem, 1vh, 0.875rem);
-    }
-
-    .text-xs {
-      font-size: clamp(0.5rem, 0.8vh, 0.75rem);
-    }
-
-    /* Card padding responsive */
-    #main-content-grid .p-4 {
-      padding: clamp(0.5rem, 1.2vh, 1rem);
-    }
-
-    #main-content-grid .p-2 {
-      padding: clamp(0.25rem, 0.8vh, 0.5rem);
-    }
-
-    /* Card min-height responsive */
-    #card-birthday {
-      min-height: clamp(100px, 15vh, 180px) !important;
-    }
-
-    #card-yks {
-      min-height: clamp(80px, 10vh, 120px) !important;
-    }
-
-    #card-quote {
-      min-height: clamp(80px, 12vh, 140px) !important;
-    }
-
-    #card-info {
-      min-height: clamp(100px, 15vh, 180px) !important;
-    }
-
-    /* Footer responsive */
-    footer {
-      padding: clamp(0.5rem, 1vh, 0.75rem) 0;
-    }
-
-    footer .text-lg {
-      font-size: clamp(0.75rem, 1.2vh, 1.125rem);
-    }
-
-    /* Icon sizes responsive */
-    .material-symbols-outlined {
-      font-size: clamp(1rem, 2vh, 1.5rem);
-    }
-
-    header .material-symbols-outlined {
-      font-size: clamp(1rem, 1.8vw, 1.5rem);
-    }
-
-    /* Gap responsive */
-    .gap-4 {
-      gap: clamp(0.5rem, 1vh, 1rem);
-    }
-
-    .gap-3 {
-      gap: clamp(0.4rem, 0.8vh, 0.75rem);
-    }
-
-    .gap-2 {
-      gap: clamp(0.25rem, 0.5vh, 0.5rem);
-    }
-
-    /* Rounded corners responsive */
-    .rounded-2xl {
-      border-radius: clamp(0.5rem, 1vh, 1rem);
-    }
-
-    .rounded-xl {
-      border-radius: clamp(0.4rem, 0.8vh, 0.75rem);
+      background: #f6f7f8;
     }
 
     /* Marquee styles */
@@ -222,26 +101,6 @@
 
     .animate-pulse-slow {
       animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
-
-    /* YKS Card specific */
-    #yks-days {
-      font-size: clamp(2rem, 5vh, 3.5rem) !important;
-    }
-
-    /* Schedule card items */
-    #schedule-content .p-3 {
-      padding: clamp(0.4rem, 0.8vh, 0.75rem);
-    }
-
-    #schedule-content .w-10 {
-      width: clamp(1.5rem, 3vh, 2.5rem);
-      height: clamp(1.5rem, 3vh, 2.5rem);
-    }
-
-    /* Duty list items */
-    #duty-list>div {
-      padding-bottom: clamp(0.25rem, 0.5vh, 0.5rem);
     }
   </style>
 

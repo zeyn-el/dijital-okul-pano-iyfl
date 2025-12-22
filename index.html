@@ -57,9 +57,10 @@
     }
 
     /* Scalable wrapper - scales the ENTIRE dashboard */
+    /* Base: 1600x900 for larger text on 55"+ TV screens */
     #pano-wrapper {
-      width: 1920px;
-      height: 1080px;
+      width: 1600px;
+      height: 900px;
       display: flex;
       flex-direction: column;
       transform-origin: top left;
@@ -1675,9 +1676,10 @@
   <!-- RESPONSIVE VIEWPORT SCALING SCRIPT -->
   <script>
     (function () {
-      // Design base dimensions (the layout was designed for this)
-      const BASE_WIDTH = 1920;
-      const BASE_HEIGHT = 1080;
+      // Design base dimensions - 1600x900 for larger text on 55"+ TV screens
+      // On a 1920x1080 TV, content will be ~20% larger
+      const BASE_WIDTH = 1600;
+      const BASE_HEIGHT = 900;
 
       function scaleDashboard() {
         const wrapper = document.getElementById('pano-wrapper');

@@ -42,6 +42,152 @@
   </script>
 
   <style>
+    /* ===== RESPONSIVE VIEWPORT SCALING ===== */
+    :root {
+      --scale-factor: 1;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Scalable wrapper */
+    #pano-wrapper {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transform-origin: top left;
+      transform: scale(var(--scale-factor));
+    }
+
+    /* Header responsive */
+    header {
+      padding: calc(0.5rem + 0.5vh) calc(1rem + 1vw);
+    }
+
+    header .text-3xl {
+      font-size: clamp(1rem, 2vw, 1.875rem);
+    }
+
+    header .text-2xl {
+      font-size: clamp(0.875rem, 1.5vw, 1.5rem);
+    }
+
+    header .text-xl {
+      font-size: clamp(0.75rem, 1.2vw, 1.25rem);
+    }
+
+    header h1 {
+      font-size: clamp(0.875rem, 1.8vw, 1.5rem) !important;
+    }
+
+    /* Main grid responsive */
+    #main-content-grid {
+      flex: 1;
+      min-height: 0;
+      padding: clamp(0.5rem, 1vh, 1rem);
+      gap: clamp(0.5rem, 1vh, 1rem);
+    }
+
+    /* Card text scaling */
+    .text-4xl,
+    .text-5xl {
+      font-size: clamp(1.5rem, 3vh, 3rem);
+    }
+
+    .text-2xl {
+      font-size: clamp(0.875rem, 1.8vh, 1.5rem);
+    }
+
+    .text-xl {
+      font-size: clamp(0.75rem, 1.5vh, 1.25rem);
+    }
+
+    .text-lg {
+      font-size: clamp(0.7rem, 1.3vh, 1.125rem);
+    }
+
+    .text-sm {
+      font-size: clamp(0.6rem, 1vh, 0.875rem);
+    }
+
+    .text-xs {
+      font-size: clamp(0.5rem, 0.8vh, 0.75rem);
+    }
+
+    /* Card padding responsive */
+    #main-content-grid .p-4 {
+      padding: clamp(0.5rem, 1.2vh, 1rem);
+    }
+
+    #main-content-grid .p-2 {
+      padding: clamp(0.25rem, 0.8vh, 0.5rem);
+    }
+
+    /* Card min-height responsive */
+    #card-birthday {
+      min-height: clamp(100px, 15vh, 180px) !important;
+    }
+
+    #card-yks {
+      min-height: clamp(80px, 10vh, 120px) !important;
+    }
+
+    #card-quote {
+      min-height: clamp(80px, 12vh, 140px) !important;
+    }
+
+    #card-info {
+      min-height: clamp(100px, 15vh, 180px) !important;
+    }
+
+    /* Footer responsive */
+    footer {
+      padding: clamp(0.5rem, 1vh, 0.75rem) 0;
+    }
+
+    footer .text-lg {
+      font-size: clamp(0.75rem, 1.2vh, 1.125rem);
+    }
+
+    /* Icon sizes responsive */
+    .material-symbols-outlined {
+      font-size: clamp(1rem, 2vh, 1.5rem);
+    }
+
+    header .material-symbols-outlined {
+      font-size: clamp(1rem, 1.8vw, 1.5rem);
+    }
+
+    /* Gap responsive */
+    .gap-4 {
+      gap: clamp(0.5rem, 1vh, 1rem);
+    }
+
+    .gap-3 {
+      gap: clamp(0.4rem, 0.8vh, 0.75rem);
+    }
+
+    .gap-2 {
+      gap: clamp(0.25rem, 0.5vh, 0.5rem);
+    }
+
+    /* Rounded corners responsive */
+    .rounded-2xl {
+      border-radius: clamp(0.5rem, 1vh, 1rem);
+    }
+
+    .rounded-xl {
+      border-radius: clamp(0.4rem, 0.8vh, 0.75rem);
+    }
+
+    /* Marquee styles */
     .marquee-container {
       overflow: hidden;
       white-space: nowrap;
@@ -77,6 +223,26 @@
     .animate-pulse-slow {
       animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
+
+    /* YKS Card specific */
+    #yks-days {
+      font-size: clamp(2rem, 5vh, 3.5rem) !important;
+    }
+
+    /* Schedule card items */
+    #schedule-content .p-3 {
+      padding: clamp(0.4rem, 0.8vh, 0.75rem);
+    }
+
+    #schedule-content .w-10 {
+      width: clamp(1.5rem, 3vh, 2.5rem);
+      height: clamp(1.5rem, 3vh, 2.5rem);
+    }
+
+    /* Duty list items */
+    #duty-list>div {
+      padding-bottom: clamp(0.25rem, 0.5vh, 0.5rem);
+    }
   </style>
 
   <!-- Firebase SDK -->
@@ -87,307 +253,309 @@
   <script src="firebase-config.js"></script>
 </head>
 
-<body class="bg-background-light text-text-dark font-display h-screen flex flex-col overflow-hidden">
+<body class="bg-background-light text-text-dark font-display overflow-hidden">
+  <div id="pano-wrapper">
 
-  <!-- Header -->
-  <header
-    class="bg-white border-b border-primary-light px-8 py-4 flex items-center justify-between shrink-0 shadow-sm z-20">
-    <!-- Left: Time -->
-    <div class="flex items-center">
-      <div class="flex items-center justify-center bg-primary/10 text-primary rounded-xl px-6 py-3 h-14">
-        <span class="material-symbols-outlined mr-2 text-2xl">schedule</span>
-        <span id="current-time" class="text-3xl font-bold tracking-tight">22:05:00</span>
-      </div>
-    </div>
-
-    <!-- Center: School Name -->
-    <div class="flex items-center gap-4">
-      <div class="bg-primary text-white p-2 rounded-lg">
-        <span class="material-symbols-outlined text-3xl">school</span>
-      </div>
-      <h1 class="text-2xl font-bold text-text-dark tracking-tight uppercase">İsmet Yılmaz Fen Lisesi</h1>
-    </div>
-
-    <!-- Right: Date + Settings -->
-    <div class="flex items-center gap-4">
-      <div class="flex items-center justify-center bg-primary/10 text-primary rounded-xl px-6 py-3 h-14">
-        <span class="material-symbols-outlined mr-2 text-2xl">calendar_month</span>
-        <span id="current-date" class="text-xl font-bold">9 Aralık 2025 Salı</span>
-      </div>
-      <!-- Ayarlar Butonu (Admin sayfasına geçiş) -->
-      <a href="admin.html" title="Ayarlar"
-        class="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors">
-        <span class="material-symbols-outlined">settings</span>
-      </a>
-    </div>
-  </header>
-
-  <!-- Main Content Grid -->
-  <main id="main-content-grid" class="flex-1 p-4 grid grid-cols-12 gap-4 min-h-0">
-    <!-- Left Column (3 Cards) -->
-    <aside id="left-column" class="col-span-3 flex flex-col gap-4 h-full">
-      <!-- Card 1: Birthday -->
-      <div id="card-birthday"
-        class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col items-center text-center relative overflow-hidden group h-auto min-h-[180px] flex-shrink-0">
-        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-pink-400 to-purple-400"></div>
-        <div class="bg-pink-50 p-4 rounded-full mb-4">
-          <span class="material-symbols-outlined text-pink-500 text-4xl">cake</span>
-        </div>
-        <h3 class="text-lg font-medium text-text-secondary mb-1" id="birthday-title">İyi ki doğdun!</h3>
-        <p class="text-2xl font-bold text-text-dark mb-2" id="birthday-name">Elif ASYA</p>
-        <p class="text-sm text-text-secondary" id="birthday-text">Bugün Elif'in doğum günü 🎂</p>
-      </div>
-
-      <!-- Card 2: Duty Teachers -->
-      <div id="card-duty"
-        class="bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col h-auto flex-1 min-h-0">
-        <div class="p-4 border-b border-primary-light flex items-center gap-3">
-          <div class="bg-primary/10 p-2 rounded-lg text-primary">
-            <span class="material-symbols-outlined">badge</span>
-          </div>
-          <h3 class="font-bold text-lg">Nöbetçi Öğretmenler</h3>
-        </div>
-        <div id="duty-list" class="p-4 flex flex-col gap-2">
-          <!-- JS ile doldurulacak -->
-          <div class="flex items-center justify-between border-b border-dashed border-slate-200 pb-2">
-            <span class="text-text-secondary font-medium">Zemin Kat</span>
-            <span class="font-bold text-text-dark">Ahmet Yılmaz</span>
-          </div>
-          <div class="flex items-center justify-between border-b border-dashed border-slate-200 pb-2">
-            <span class="text-text-secondary font-medium">1. Kat</span>
-            <span class="font-bold text-text-dark">Ayşe Demir</span>
-          </div>
-          <div class="flex items-center justify-between border-b border-dashed border-slate-200 pb-2">
-            <span class="text-text-secondary font-medium">2. Kat</span>
-            <span class="font-bold text-text-dark">Mehmet Kaya</span>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-text-secondary font-medium">Bahçe</span>
-            <span class="font-bold text-text-dark">Zeynep Çelik</span>
-          </div>
+    <!-- Header -->
+    <header
+      class="bg-white border-b border-primary-light px-8 py-4 flex items-center justify-between shrink-0 shadow-sm z-20">
+      <!-- Left: Time -->
+      <div class="flex items-center">
+        <div class="flex items-center justify-center bg-primary/10 text-primary rounded-xl px-6 py-3 h-14">
+          <span class="material-symbols-outlined mr-2 text-2xl">schedule</span>
+          <span id="current-time" class="text-3xl font-bold tracking-tight">22:05:00</span>
         </div>
       </div>
 
-      <!-- Card 3: YKS Counter -->
-      <div id="card-yks"
-        class="bg-primary text-white rounded-2xl p-4 shadow-md flex items-center justify-between relative overflow-hidden h-auto min-h-[120px] flex-shrink-0">
-        <span
-          class="material-symbols-outlined absolute -right-4 -bottom-4 text-[120px] opacity-20 rotate-12">hourglass_top</span>
-        <div class="flex flex-col z-10">
-          <span class="text-primary-light font-medium text-lg">YKS'ye Kalan</span>
-          <span class="text-white font-bold text-xl">Süre</span>
+      <!-- Center: School Name -->
+      <div class="flex items-center gap-4">
+        <div class="bg-primary text-white p-2 rounded-lg">
+          <span class="material-symbols-outlined text-3xl">school</span>
         </div>
-        <div class="flex flex-col items-end z-10">
-          <span id="yks-days" class="text-5xl font-black tracking-tighter">165</span>
-          <span class="text-sm font-medium opacity-90">GÜN</span>
-        </div>
+        <h1 class="text-2xl font-bold text-text-dark tracking-tight uppercase">İsmet Yılmaz Fen Lisesi</h1>
       </div>
-    </aside>
 
-    <!-- Center Column (Media Center + Quote) -->
-    <section id="center-column" class="col-span-6 h-full flex flex-col gap-4 min-h-0">
-      <!-- Card 1: Main Media -->
-      <div id="card-main-media"
-        class="bg-white rounded-2xl shadow-sm border border-slate-100 flex-1 p-2 flex flex-col min-h-0">
+      <!-- Right: Date + Settings -->
+      <div class="flex items-center gap-4">
+        <div class="flex items-center justify-center bg-primary/10 text-primary rounded-xl px-6 py-3 h-14">
+          <span class="material-symbols-outlined mr-2 text-2xl">calendar_month</span>
+          <span id="current-date" class="text-xl font-bold">9 Aralık 2025 Salı</span>
+        </div>
+        <!-- Ayarlar Butonu (Admin sayfasına geçiş) -->
+        <a href="admin.html" title="Ayarlar"
+          class="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors">
+          <span class="material-symbols-outlined">settings</span>
+        </a>
+      </div>
+    </header>
 
-        <!-- Media Container -->
-        <div id="media-container" class="w-full h-full bg-slate-900 rounded-xl overflow-hidden relative">
+    <!-- Main Content Grid -->
+    <main id="main-content-grid" class="flex-1 p-4 grid grid-cols-12 gap-4 min-h-0">
+      <!-- Left Column (3 Cards) -->
+      <aside id="left-column" class="col-span-3 flex flex-col gap-4 h-full">
+        <!-- Card 1: Birthday -->
+        <div id="card-birthday"
+          class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col items-center text-center relative overflow-hidden group h-auto min-h-[180px] flex-shrink-0">
+          <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-pink-400 to-purple-400"></div>
+          <div class="bg-pink-50 p-4 rounded-full mb-4">
+            <span class="material-symbols-outlined text-pink-500 text-4xl">cake</span>
+          </div>
+          <h3 class="text-lg font-medium text-text-secondary mb-1" id="birthday-title">İyi ki doğdun!</h3>
+          <p class="text-2xl font-bold text-text-dark mb-2" id="birthday-name">Elif ASYA</p>
+          <p class="text-sm text-text-secondary" id="birthday-text">Bugün Elif'in doğum günü 🎂</p>
+        </div>
 
-          <!-- SLIDESHOW MODE -->
-          <div id="media-slideshow" class="hidden w-full h-full relative">
-            <div id="slideshow-track" class="w-full h-full relative">
-              <!-- Images will be inserted here by JS -->
+        <!-- Card 2: Duty Teachers -->
+        <div id="card-duty"
+          class="bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col h-auto flex-1 min-h-0">
+          <div class="p-4 border-b border-primary-light flex items-center gap-3">
+            <div class="bg-primary/10 p-2 rounded-lg text-primary">
+              <span class="material-symbols-outlined">badge</span>
             </div>
-
-            <!-- Overlay Info (optional) -->
-            <div id="slideshow-overlay"
-              class="hidden absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-8 pointer-events-none">
-              <span id="slideshow-badge"
-                class="bg-primary text-white text-xs font-bold px-3 py-1 rounded-full w-fit mb-2"></span>
-              <h2 id="slideshow-title" class="text-white text-3xl font-bold max-w-2xl leading-tight"></h2>
-              <p id="slideshow-desc" class="text-slate-300 mt-2 text-lg"></p>
+            <h3 class="font-bold text-lg">Nöbetçi Öğretmenler</h3>
+          </div>
+          <div id="duty-list" class="p-4 flex flex-col gap-2">
+            <!-- JS ile doldurulacak -->
+            <div class="flex items-center justify-between border-b border-dashed border-slate-200 pb-2">
+              <span class="text-text-secondary font-medium">Zemin Kat</span>
+              <span class="font-bold text-text-dark">Ahmet Yılmaz</span>
             </div>
-
-            <!-- Slideshow Indicators -->
-            <div id="slideshow-indicators" class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10">
-              <!-- Dots will be inserted here by JS -->
+            <div class="flex items-center justify-between border-b border-dashed border-slate-200 pb-2">
+              <span class="text-text-secondary font-medium">1. Kat</span>
+              <span class="font-bold text-text-dark">Ayşe Demir</span>
             </div>
-          </div>
-
-          <!-- VIDEO MODE -->
-          <div id="media-video" class="hidden w-full h-full relative">
-            <div id="video-player-container" class="w-full h-full">
-              <!-- Video iframe or element will be inserted here by JS -->
+            <div class="flex items-center justify-between border-b border-dashed border-slate-200 pb-2">
+              <span class="text-text-secondary font-medium">2. Kat</span>
+              <span class="font-bold text-text-dark">Mehmet Kaya</span>
             </div>
-          </div>
-
-          <!-- WEBPAGE MODE -->
-          <div id="media-webpage" class="hidden w-full h-full relative">
-            <iframe id="webpage-iframe" class="w-full h-full border-0"
-              sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
-          </div>
-
-          <!-- Loading State -->
-          <div id="media-loading" class="absolute inset-0 flex items-center justify-center bg-slate-900">
-            <div class="text-center text-white">
-              <span class="material-symbols-outlined text-6xl mb-4 animate-pulse">image</span>
-              <p class="text-lg">Medya yükleniyor...</p>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- Card 2: Quote of the Day -->
-      <div id="card-quote"
-        class="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-2xl p-4 shadow-sm border border-blue-100 flex flex-col items-center justify-center text-center relative h-auto min-h-[140px] flex-shrink-0">
-        <span class="material-symbols-outlined text-primary/20 text-5xl absolute top-2 left-2">format_quote</span>
-        <h3 class="text-primary font-bold text-xs uppercase tracking-widest mb-2 z-10">Günün Sözü</h3>
-        <p id="quote-text" class="text-lg font-medium text-text-dark italic leading-relaxed z-10">
-          "Hayatta en hakiki mürşit ilimdir."
-        </p>
-        <div class="w-8 h-1 bg-primary/30 rounded-full mt-3 z-10"></div>
-        <p id="quote-author" class="text-sm text-text-secondary mt-2 z-10 font-bold">
-          M. Kemal Atatürk
-        </p>
-      </div>
-    </section>
-
-    <!-- Right Column (Schedule Card + Info Card) -->
-    <aside id="right-column" class="col-span-3 flex flex-col gap-4 h-full min-h-0">
-      <!-- Card 1: Schedule Slider -->
-      <div id="card-schedule"
-        class="bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col h-auto flex-1 min-h-0">
-        <div class="p-4 border-b border-primary-light bg-slate-50 flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary">view_carousel</span>
-            <h3 class="font-bold text-lg">Ders Programı</h3>
-          </div>
-          <div id="schedule-indicators" class="flex gap-1">
-            <div class="w-2 h-2 rounded-full bg-primary"></div>
-            <div class="w-2 h-2 rounded-full bg-primary/30"></div>
-            <div class="w-2 h-2 rounded-full bg-primary/30"></div>
-          </div>
-        </div>
-        <div class="p-4 relative" id="schedule-content">
-          <!-- JS ile doldurulacak -->
-          <div id="schedule-countdown" class="mb-3"></div>
-          <div class="space-y-3" id="schedule-entries">
-            <!-- Schedule items will be inserted here by JavaScript -->
-            <div class="flex items-center justify-center h-full">
-              <p class="text-gray-500">Ders programı yükleniyor...</p>
+            <div class="flex items-center justify-between">
+              <span class="text-text-secondary font-medium">Bahçe</span>
+              <span class="font-bold text-text-dark">Zeynep Çelik</span>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Card 2: Info Card (Bilgi) -->
-      <div id="card-info"
-        class="bg-primary rounded-2xl p-4 shadow-md flex flex-col justify-center text-center relative overflow-hidden h-auto min-h-[180px] flex-shrink-0">
-        <span
-          class="material-symbols-outlined absolute -right-4 -bottom-4 text-[120px] opacity-20 rotate-12">emoji_events</span>
-        <div class="z-10">
-          <h3 class="text-white/90 font-medium text-sm uppercase tracking-wider mb-1" id="info-title">Bilgi</h3>
-          <p class="text-white font-bold text-xl mb-1 leading-tight" id="info-detail">Haftanın Sınıfı</p>
-          <p class="text-white/80 text-xs" id="info-note">En iyi ders dinleyen sınıf. Tebrikler!</p>
+        <!-- Card 3: YKS Counter -->
+        <div id="card-yks"
+          class="bg-primary text-white rounded-2xl p-4 shadow-md flex items-center justify-between relative overflow-hidden h-auto min-h-[120px] flex-shrink-0">
+          <span
+            class="material-symbols-outlined absolute -right-4 -bottom-4 text-[120px] opacity-20 rotate-12">hourglass_top</span>
+          <div class="flex flex-col z-10">
+            <span class="text-primary-light font-medium text-lg">YKS'ye Kalan</span>
+            <span class="text-white font-bold text-xl">Süre</span>
+          </div>
+          <div class="flex flex-col items-end z-10">
+            <span id="yks-days" class="text-5xl font-black tracking-tighter">165</span>
+            <span class="text-sm font-medium opacity-90">GÜN</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Center Column (Media Center + Quote) -->
+      <section id="center-column" class="col-span-6 h-full flex flex-col gap-4 min-h-0">
+        <!-- Card 1: Main Media -->
+        <div id="card-main-media"
+          class="bg-white rounded-2xl shadow-sm border border-slate-100 flex-1 p-2 flex flex-col min-h-0">
+
+          <!-- Media Container -->
+          <div id="media-container" class="w-full h-full bg-slate-900 rounded-xl overflow-hidden relative">
+
+            <!-- SLIDESHOW MODE -->
+            <div id="media-slideshow" class="hidden w-full h-full relative">
+              <div id="slideshow-track" class="w-full h-full relative">
+                <!-- Images will be inserted here by JS -->
+              </div>
+
+              <!-- Overlay Info (optional) -->
+              <div id="slideshow-overlay"
+                class="hidden absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-8 pointer-events-none">
+                <span id="slideshow-badge"
+                  class="bg-primary text-white text-xs font-bold px-3 py-1 rounded-full w-fit mb-2"></span>
+                <h2 id="slideshow-title" class="text-white text-3xl font-bold max-w-2xl leading-tight"></h2>
+                <p id="slideshow-desc" class="text-slate-300 mt-2 text-lg"></p>
+              </div>
+
+              <!-- Slideshow Indicators -->
+              <div id="slideshow-indicators" class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10">
+                <!-- Dots will be inserted here by JS -->
+              </div>
+            </div>
+
+            <!-- VIDEO MODE -->
+            <div id="media-video" class="hidden w-full h-full relative">
+              <div id="video-player-container" class="w-full h-full">
+                <!-- Video iframe or element will be inserted here by JS -->
+              </div>
+            </div>
+
+            <!-- WEBPAGE MODE -->
+            <div id="media-webpage" class="hidden w-full h-full relative">
+              <iframe id="webpage-iframe" class="w-full h-full border-0"
+                sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
+            </div>
+
+            <!-- Loading State -->
+            <div id="media-loading" class="absolute inset-0 flex items-center justify-center bg-slate-900">
+              <div class="text-center text-white">
+                <span class="material-symbols-outlined text-6xl mb-4 animate-pulse">image</span>
+                <p class="text-lg">Medya yükleniyor...</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Card 2: Quote of the Day -->
+        <div id="card-quote"
+          class="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-2xl p-4 shadow-sm border border-blue-100 flex flex-col items-center justify-center text-center relative h-auto min-h-[140px] flex-shrink-0">
+          <span class="material-symbols-outlined text-primary/20 text-5xl absolute top-2 left-2">format_quote</span>
+          <h3 class="text-primary font-bold text-xs uppercase tracking-widest mb-2 z-10">Günün Sözü</h3>
+          <p id="quote-text" class="text-lg font-medium text-text-dark italic leading-relaxed z-10">
+            "Hayatta en hakiki mürşit ilimdir."
+          </p>
+          <div class="w-8 h-1 bg-primary/30 rounded-full mt-3 z-10"></div>
+          <p id="quote-author" class="text-sm text-text-secondary mt-2 z-10 font-bold">
+            M. Kemal Atatürk
+          </p>
+        </div>
+      </section>
+
+      <!-- Right Column (Schedule Card + Info Card) -->
+      <aside id="right-column" class="col-span-3 flex flex-col gap-4 h-full min-h-0">
+        <!-- Card 1: Schedule Slider -->
+        <div id="card-schedule"
+          class="bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col h-auto flex-1 min-h-0">
+          <div class="p-4 border-b border-primary-light bg-slate-50 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary">view_carousel</span>
+              <h3 class="font-bold text-lg">Ders Programı</h3>
+            </div>
+            <div id="schedule-indicators" class="flex gap-1">
+              <div class="w-2 h-2 rounded-full bg-primary"></div>
+              <div class="w-2 h-2 rounded-full bg-primary/30"></div>
+              <div class="w-2 h-2 rounded-full bg-primary/30"></div>
+            </div>
+          </div>
+          <div class="p-4 relative" id="schedule-content">
+            <!-- JS ile doldurulacak -->
+            <div id="schedule-countdown" class="mb-3"></div>
+            <div class="space-y-3" id="schedule-entries">
+              <!-- Schedule items will be inserted here by JavaScript -->
+              <div class="flex items-center justify-center h-full">
+                <p class="text-gray-500">Ders programı yükleniyor...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Info Card (Bilgi) -->
+        <div id="card-info"
+          class="bg-primary rounded-2xl p-4 shadow-md flex flex-col justify-center text-center relative overflow-hidden h-auto min-h-[180px] flex-shrink-0">
+          <span
+            class="material-symbols-outlined absolute -right-4 -bottom-4 text-[120px] opacity-20 rotate-12">emoji_events</span>
+          <div class="z-10">
+            <h3 class="text-white/90 font-medium text-sm uppercase tracking-wider mb-1" id="info-title">Bilgi</h3>
+            <p class="text-white font-bold text-xl mb-1 leading-tight" id="info-detail">Haftanın Sınıfı</p>
+            <p class="text-white/80 text-xs" id="info-note">En iyi ders dinleyen sınıf. Tebrikler!</p>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- Footer Ticker -->
+    <footer class="bg-primary text-white py-3 shrink-0 relative z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+      <div class="marquee-container flex items-center">
+        <div
+          class="bg-primary-dark absolute left-0 z-10 px-6 h-full flex items-center font-bold tracking-wide shadow-lg"
+          style="background-color: #1e6bb8;">
+          <span class="material-symbols-outlined mr-2 text-xl">campaign</span> DUYURULAR
+        </div>
+        <div id="ticker-content" class="marquee-content text-lg font-medium pl-48">
+          <span class="mx-8">📢 Yarın yapılacak olan Okul Aile Birliği toplantısı saat 17:00'ye ertelenmiştir.</span>
+          <span class="mx-8">•</span>
+          <span class="mx-8">🏆 Voleybol takımımız ilçe finaline yükselmiştir, tebrik ederiz!</span>
+          <span class="mx-8">•</span>
+          <span class="mx-8">📚 Kütüphane haftası etkinlikleri kapsamında yarın kitap okuma saati yapılacaktır.</span>
+          <span class="mx-8">•</span>
+          <span class="mx-8">⚠️ Lütfen okul kıyafet kurallarına uyalım.</span>
         </div>
       </div>
-    </aside>
-  </main>
+    </footer>
 
-  <!-- Footer Ticker -->
-  <footer class="bg-primary text-white py-3 shrink-0 relative z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
-    <div class="marquee-container flex items-center">
-      <div class="bg-primary-dark absolute left-0 z-10 px-6 h-full flex items-center font-bold tracking-wide shadow-lg"
-        style="background-color: #1e6bb8;">
-        <span class="material-symbols-outlined mr-2 text-xl">campaign</span> DUYURULAR
-      </div>
-      <div id="ticker-content" class="marquee-content text-lg font-medium pl-48">
-        <span class="mx-8">📢 Yarın yapılacak olan Okul Aile Birliği toplantısı saat 17:00'ye ertelenmiştir.</span>
-        <span class="mx-8">•</span>
-        <span class="mx-8">🏆 Voleybol takımımız ilçe finaline yükselmiştir, tebrik ederiz!</span>
-        <span class="mx-8">•</span>
-        <span class="mx-8">📚 Kütüphane haftası etkinlikleri kapsamında yarın kitap okuma saati yapılacaktır.</span>
-        <span class="mx-8">•</span>
-        <span class="mx-8">⚠️ Lütfen okul kıyafet kurallarına uyalım.</span>
-      </div>
-    </div>
-  </footer>
-
-  <script>
-    // Load data from Firebase (async)
-    async function loadData() {
-      return await FirebaseStorage.loadData();
-    }
-
-    // Calculate days until YKS
-    function getDaysUntilYKS(yksDate) {
-      if (!yksDate) return '165'; // Default value
-      const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
-      const today = new Date();
-      const targetDate = new Date(yksDate);
-      const diffDays = Math.round(Math.abs((targetDate - today) / oneDay));
-      return diffDays.toString();
-    }
-
-    // Update content with saved data
-    async function updateContent() {
-      const data = await loadData();
-      if (!data || !data.cards) return;
-
-      // Update school name
-      if (data.schoolName) {
-        document.querySelector('h1').textContent = data.schoolName.toUpperCase();
+    <script>
+      // Load data from Firebase (async)
+      async function loadData() {
+        return await FirebaseStorage.loadData();
       }
 
-      // Update birthday card with new data structure
-      const birthdayData = data.cards.birthdays || data.cards.birthday; // Support both old and new
-      const birthdayCard = document.getElementById('card-birthday');
+      // Calculate days until YKS
+      function getDaysUntilYKS(yksDate) {
+        if (!yksDate) return '165'; // Default value
+        const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
+        const today = new Date();
+        const targetDate = new Date(yksDate);
+        const diffDays = Math.round(Math.abs((targetDate - today) / oneDay));
+        return diffDays.toString();
+      }
 
-      if (birthdayData) {
-        // Görünürlük kontrolü
-        if (birthdayData.enabled === false) {
-          birthdayCard.style.display = 'none';
-        } else {
-          birthdayCard.style.display = 'flex';
+      // Update content with saved data
+      async function updateContent() {
+        const data = await loadData();
+        if (!data || !data.cards) return;
 
-          const container = birthdayCard;
-          const title = birthdayData.title || 'İyi ki doğdun!';
+        // Update school name
+        if (data.schoolName) {
+          document.querySelector('h1').textContent = data.schoolName.toUpperCase();
+        }
 
-          // Get today's date (month and day only)
-          const today = new Date();
-          const todayMonth = today.getMonth();
-          const todayDay = today.getDate();
+        // Update birthday card with new data structure
+        const birthdayData = data.cards.birthdays || data.cards.birthday; // Support both old and new
+        const birthdayCard = document.getElementById('card-birthday');
 
-          // Filter students with birthday today
-          let people = [];
+        if (birthdayData) {
+          // Görünürlük kontrolü
+          if (birthdayData.enabled === false) {
+            birthdayCard.style.display = 'none';
+          } else {
+            birthdayCard.style.display = 'flex';
 
-          if (birthdayData.students && Array.isArray(birthdayData.students)) {
-            // New system: filter by birthdate
-            people = birthdayData.students.filter(student => {
-              const birthDate = new Date(student.birthdate);
-              return birthDate.getMonth() === todayMonth && birthDate.getDate() === todayDay;
-            }).map(student => ({
-              name: `${student.name} ${student.surname}`,
-              note: student.note || '',
-              gender: student.gender
-            }));
-          } else if (birthdayData.list && Array.isArray(birthdayData.list)) {
-            // Old system fallback
-            people = birthdayData.list;
-          } else if (birthdayData.name) {
-            // Very old system fallback
-            people = [{ name: birthdayData.name, note: birthdayData.note }];
-          }
+            const container = birthdayCard;
+            const title = birthdayData.title || 'İyi ki doğdun!';
 
-          // Clean up previous slider interval if exists
-          if (window.birthdayState && window.birthdayState.interval) {
-            clearInterval(window.birthdayState.interval);
-          }
+            // Get today's date (month and day only)
+            const today = new Date();
+            const todayMonth = today.getMonth();
+            const todayDay = today.getDate();
 
-          if (people.length === 0) {
-            // Show default/empty state
-            container.innerHTML = `
+            // Filter students with birthday today
+            let people = [];
+
+            if (birthdayData.students && Array.isArray(birthdayData.students)) {
+              // New system: filter by birthdate
+              people = birthdayData.students.filter(student => {
+                const birthDate = new Date(student.birthdate);
+                return birthDate.getMonth() === todayMonth && birthDate.getDate() === todayDay;
+              }).map(student => ({
+                name: `${student.name} ${student.surname}`,
+                note: student.note || '',
+                gender: student.gender
+              }));
+            } else if (birthdayData.list && Array.isArray(birthdayData.list)) {
+              // Old system fallback
+              people = birthdayData.list;
+            } else if (birthdayData.name) {
+              // Very old system fallback
+              people = [{ name: birthdayData.name, note: birthdayData.note }];
+            }
+
+            // Clean up previous slider interval if exists
+            if (window.birthdayState && window.birthdayState.interval) {
+              clearInterval(window.birthdayState.interval);
+            }
+
+            if (people.length === 0) {
+              // Show default/empty state
+              container.innerHTML = `
                   <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-pink-400 to-purple-400"></div>
                   <div class="flex-1 flex flex-col items-center justify-center p-4">
                       <div class="bg-pink-50 p-4 rounded-full mb-4">
@@ -397,12 +565,12 @@
                       <p class="text-sm text-text-secondary mt-2">Bugün İçin Kayıt Yok</p>
                   </div>
               `;
-          } else if (people.length === 1) {
-            // Single person display (Static)
-            const person = people[0];
-            const genderIcon = person.gender === 'K' ? '👧' : (person.gender === 'E' ? '👦' : '🎂');
+            } else if (people.length === 1) {
+              // Single person display (Static)
+              const person = people[0];
+              const genderIcon = person.gender === 'K' ? '👧' : (person.gender === 'E' ? '👦' : '🎂');
 
-            container.innerHTML = `
+              container.innerHTML = `
                   <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-pink-400 to-purple-400"></div>
                   <div class="flex-1 flex flex-col items-center justify-center p-4">
                       <div class="bg-pink-50 p-4 rounded-full mb-4">
@@ -413,15 +581,15 @@
                       <p class="text-sm text-text-secondary text-center">${person.note || ''}</p>
                   </div>
               `;
-          } else {
-            // Multiple people display (Slider)
+            } else {
+              // Multiple people display (Slider)
 
-            // Initial render
-            const renderSlide = (index) => {
-              const person = people[index];
-              const genderIcon = person.gender === 'K' ? '👧' : (person.gender === 'E' ? '👦' : '🎂');
+              // Initial render
+              const renderSlide = (index) => {
+                const person = people[index];
+                const genderIcon = person.gender === 'K' ? '👧' : (person.gender === 'E' ? '👦' : '🎂');
 
-              return `
+                return `
                       <div class="absolute inset-0 flex flex-col items-center justify-center p-4 transition-opacity duration-500 ease-in-out">
                           <div class="bg-pink-50 p-4 rounded-full mb-4">
                             <span class="text-5xl">${genderIcon}</span>
@@ -438,196 +606,196 @@
                           </div>
                       </div>
                   `;
-            };
+              };
 
-            container.innerHTML = `
+              container.innerHTML = `
                   <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-pink-400 to-purple-400 z-10"></div>
                   ${renderSlide(0)}
               `;
 
-            // Setup Slider Logic
-            window.birthdayState = {
-              currentIndex: 0,
-              total: people.length,
-              interval: setInterval(() => {
-                window.birthdayState.currentIndex = (window.birthdayState.currentIndex + 1) % window.birthdayState.total;
-                container.innerHTML = `
+              // Setup Slider Logic
+              window.birthdayState = {
+                currentIndex: 0,
+                total: people.length,
+                interval: setInterval(() => {
+                  window.birthdayState.currentIndex = (window.birthdayState.currentIndex + 1) % window.birthdayState.total;
+                  container.innerHTML = `
                           <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-pink-400 to-purple-400 z-10"></div>
                           ${renderSlide(window.birthdayState.currentIndex)}
                       `;
-              }, 4000) // 4 seconds interval
-            };
+                }, 4000) // 4 seconds interval
+              };
+            }
           }
+        } else {
+          // Varsayılan olarak göster
+          birthdayCard.style.display = 'flex';
         }
-      } else {
-        // Varsayılan olarak göster
-        birthdayCard.style.display = 'flex';
-      }
 
-      // Update duty teachers (by date: show ONLY today's duties if available)
-      const dutyList = document.getElementById('duty-list');
-      if (dutyList) {
-        dutyList.innerHTML = '';
+        // Update duty teachers (by date: show ONLY today's duties if available)
+        const dutyList = document.getElementById('duty-list');
+        if (dutyList) {
+          dutyList.innerHTML = '';
 
-        const now = new Date();
-        const todayStr = now.toISOString().split('T')[0]; // yyyy-mm-dd
-        let renderedFromByDate = false;
+          const now = new Date();
+          const todayStr = now.toISOString().split('T')[0]; // yyyy-mm-dd
+          let renderedFromByDate = false;
 
-        if (data.cards.dutyByDate && Array.isArray(data.cards.dutyByDate.items)) {
-          const todaysDuties = data.cards.dutyByDate.items.filter(d => d.date === todayStr);
+          if (data.cards.dutyByDate && Array.isArray(data.cards.dutyByDate.items)) {
+            const todaysDuties = data.cards.dutyByDate.items.filter(d => d.date === todayStr);
 
-          if (todaysDuties.length > 0) {
-            todaysDuties.forEach((duty, idx) => {
-              if (duty.place && duty.teacher) {
-                const isLast = idx === todaysDuties.length - 1;
-                const dutyItem = document.createElement('div');
-                dutyItem.className = 'flex items-center justify-between ' + (!isLast ? 'border-b border-dashed border-slate-200 pb-2' : '');
-                dutyItem.innerHTML = `
+            if (todaysDuties.length > 0) {
+              todaysDuties.forEach((duty, idx) => {
+                if (duty.place && duty.teacher) {
+                  const isLast = idx === todaysDuties.length - 1;
+                  const dutyItem = document.createElement('div');
+                  dutyItem.className = 'flex items-center justify-between ' + (!isLast ? 'border-b border-dashed border-slate-200 pb-2' : '');
+                  dutyItem.innerHTML = `
                   <span class="text-text-secondary font-medium">${duty.place}</span>
                   <span class="font-bold text-text-dark">${duty.teacher}</span>
                 `;
-                dutyList.appendChild(dutyItem);
-              }
-            });
-            renderedFromByDate = true;
+                  dutyList.appendChild(dutyItem);
+                }
+              });
+              renderedFromByDate = true;
+            }
           }
-        }
 
-        // Fallback: eski yapıyı kullan (sabit liste), eğer bugün için tarihe bağlı kayıt yoksa
-        if (!renderedFromByDate && data.cards.duty && Array.isArray(data.cards.duty.list)) {
-          data.cards.duty.list.forEach((duty, idx) => {
-            if (duty.place && duty.teacher) {
-              const isLast = idx === data.cards.duty.list.length - 1;
-              const dutyItem = document.createElement('div');
-              dutyItem.className = 'flex items-center justify-between ' + (!isLast ? 'border-b border-dashed border-slate-200 pb-2' : '');
-              dutyItem.innerHTML = `
+          // Fallback: eski yapıyı kullan (sabit liste), eğer bugün için tarihe bağlı kayıt yoksa
+          if (!renderedFromByDate && data.cards.duty && Array.isArray(data.cards.duty.list)) {
+            data.cards.duty.list.forEach((duty, idx) => {
+              if (duty.place && duty.teacher) {
+                const isLast = idx === data.cards.duty.list.length - 1;
+                const dutyItem = document.createElement('div');
+                dutyItem.className = 'flex items-center justify-between ' + (!isLast ? 'border-b border-dashed border-slate-200 pb-2' : '');
+                dutyItem.innerHTML = `
                 <span class="text-text-secondary font-medium">${duty.place}</span>
                 <span class="font-bold text-text-dark">${duty.teacher}</span>
               `;
-              dutyList.appendChild(dutyItem);
-            }
-          });
-        }
-
-        // Eğer hiç veri yoksa sade bir mesaj göster
-        if (!dutyList.hasChildNodes()) {
-          const empty = document.createElement('div');
-          empty.className = 'text-xs text-slate-400 italic';
-          empty.textContent = 'Bugün için tanımlı nöbetçi öğretmen yok.';
-          dutyList.appendChild(empty);
-        }
-      }
-
-      // Update YKS counter
-      const yksCard = document.getElementById('card-yks');
-      if (data.cards.yks) {
-        // Görünürlük kontrolü
-        if (data.cards.yks.enabled === false) {
-          yksCard.style.display = 'none';
-        } else {
-          yksCard.style.display = 'flex';
-
-          // Başlığı güncelle
-          const yksTitle = data.cards.yks.title || "YKS'ye Kalan";
-          const titleElement = yksCard.querySelector('.text-primary-light');
-          if (titleElement) {
-            titleElement.textContent = yksTitle;
+                dutyList.appendChild(dutyItem);
+              }
+            });
           }
 
-          // Gün sayısını güncelle
-          if (data.cards.yks.date) {
-            const daysLeft = getDaysUntilYKS(data.cards.yks.date);
-            document.getElementById('yks-days').textContent = daysLeft;
+          // Eğer hiç veri yoksa sade bir mesaj göster
+          if (!dutyList.hasChildNodes()) {
+            const empty = document.createElement('div');
+            empty.className = 'text-xs text-slate-400 italic';
+            empty.textContent = 'Bugün için tanımlı nöbetçi öğretmen yok.';
+            dutyList.appendChild(empty);
           }
         }
-      } else {
-        // Varsayılan olarak göster
-        yksCard.style.display = 'flex';
-      }
 
-      // ===== UPDATE MEDIA CENTER =====
-      console.log('Calling updateMediaCenter with:', data.cards.mediaCenter);
-      // Use setTimeout to ensure DOM is fully ready
-      if (data.cards && data.cards.mediaCenter) {
-        setTimeout(() => {
-          updateMediaCenter(data.cards.mediaCenter);
-        }, 100);
-      } else {
-        console.warn('MediaCenter data not found!');
-        // Show loading state as fallback
-        setTimeout(() => {
-          showMediaLoading();
-        }, 100);
-      }
-
-      // ===== UPDATE QUOTE CARD WITH NEW SYSTEM =====
-      const quoteData = data.cards.quotes || data.cards.quote; // Support both old and new
-
-      if (quoteData) {
-        const container = document.getElementById('card-quote');
-        const title = quoteData.title || 'Günün Sözü';
-
-        // Get today's date (YYYY-MM-DD format)
-        const today = new Date();
-        const todayStr = today.toISOString().split('T')[0];
-
-        let quotesToShow = [];
-
-        // Firebase'de array veriler bazen object olarak saklanabilir
-        let quoteItems = quoteData.items;
-        if (quoteItems && typeof quoteItems === 'object' && !Array.isArray(quoteItems)) {
-          quoteItems = Object.values(quoteItems);
-        }
-
-        console.log('💬 Quote slider ayarları - enableSlider:', quoteData.enableSlider, 'sliderSpeed:', quoteData.sliderSpeed, 'maxSlides:', quoteData.maxSlides);
-        console.log('💬 Toplam söz sayısı:', quoteItems ? quoteItems.length : 0);
-
-        if (quoteItems && Array.isArray(quoteItems)) {
-          // Slider açıksa, maxSlides kadar rastgele söz göster
-          if (quoteData.enableSlider && quoteItems.length > 1) {
-            const maxSlides = quoteData.maxSlides || 5;
-
-            // Shuffle array and take first N items
-            const shuffled = [...quoteItems].sort(() => 0.5 - Math.random());
-            quotesToShow = shuffled.slice(0, Math.min(maxSlides, quoteItems.length));
-            console.log('💬 Slider modu: ' + quotesToShow.length + ' söz gösterilecek (maxSlides: ' + maxSlides + ')');
-
+        // Update YKS counter
+        const yksCard = document.getElementById('card-yks');
+        if (data.cards.yks) {
+          // Görünürlük kontrolü
+          if (data.cards.yks.enabled === false) {
+            yksCard.style.display = 'none';
           } else {
-            // Slider kapalı - tarih kontrolü yap veya rastgele tek söz göster
-            const quotesWithDate = quoteItems.filter(q => q.date === todayStr);
+            yksCard.style.display = 'flex';
 
-            if (quotesWithDate.length > 0) {
-              // Bugünün tarihine ait sözleri göster
-              quotesToShow = quotesWithDate;
-              console.log('💬 Tarih eşleşmesi: ' + quotesToShow.length + ' söz bulundu');
-            } else {
-              // Rastgele tek söz göster
-              const randomIndex = Math.floor(Math.random() * quoteItems.length);
-              quotesToShow = [quoteItems[randomIndex]];
-              console.log('💬 Rastgele tek söz gösteriliyor');
+            // Başlığı güncelle
+            const yksTitle = data.cards.yks.title || "YKS'ye Kalan";
+            const titleElement = yksCard.querySelector('.text-primary-light');
+            if (titleElement) {
+              titleElement.textContent = yksTitle;
+            }
+
+            // Gün sayısını güncelle
+            if (data.cards.yks.date) {
+              const daysLeft = getDaysUntilYKS(data.cards.yks.date);
+              document.getElementById('yks-days').textContent = daysLeft;
             }
           }
-        } else if (quoteData.text && quoteData.author) {
-          // Old system fallback
-          quotesToShow = [{ text: quoteData.text, author: quoteData.author }];
+        } else {
+          // Varsayılan olarak göster
+          yksCard.style.display = 'flex';
         }
 
-        // Clean up previous slider interval if exists
-        if (window.quoteState && window.quoteState.interval) {
-          clearInterval(window.quoteState.interval);
+        // ===== UPDATE MEDIA CENTER =====
+        console.log('Calling updateMediaCenter with:', data.cards.mediaCenter);
+        // Use setTimeout to ensure DOM is fully ready
+        if (data.cards && data.cards.mediaCenter) {
+          setTimeout(() => {
+            updateMediaCenter(data.cards.mediaCenter);
+          }, 100);
+        } else {
+          console.warn('MediaCenter data not found!');
+          // Show loading state as fallback
+          setTimeout(() => {
+            showMediaLoading();
+          }, 100);
         }
 
-        if (quotesToShow.length === 0) {
-          // No quotes available
-          container.innerHTML = `
+        // ===== UPDATE QUOTE CARD WITH NEW SYSTEM =====
+        const quoteData = data.cards.quotes || data.cards.quote; // Support both old and new
+
+        if (quoteData) {
+          const container = document.getElementById('card-quote');
+          const title = quoteData.title || 'Günün Sözü';
+
+          // Get today's date (YYYY-MM-DD format)
+          const today = new Date();
+          const todayStr = today.toISOString().split('T')[0];
+
+          let quotesToShow = [];
+
+          // Firebase'de array veriler bazen object olarak saklanabilir
+          let quoteItems = quoteData.items;
+          if (quoteItems && typeof quoteItems === 'object' && !Array.isArray(quoteItems)) {
+            quoteItems = Object.values(quoteItems);
+          }
+
+          console.log('💬 Quote slider ayarları - enableSlider:', quoteData.enableSlider, 'sliderSpeed:', quoteData.sliderSpeed, 'maxSlides:', quoteData.maxSlides);
+          console.log('💬 Toplam söz sayısı:', quoteItems ? quoteItems.length : 0);
+
+          if (quoteItems && Array.isArray(quoteItems)) {
+            // Slider açıksa, maxSlides kadar rastgele söz göster
+            if (quoteData.enableSlider && quoteItems.length > 1) {
+              const maxSlides = quoteData.maxSlides || 5;
+
+              // Shuffle array and take first N items
+              const shuffled = [...quoteItems].sort(() => 0.5 - Math.random());
+              quotesToShow = shuffled.slice(0, Math.min(maxSlides, quoteItems.length));
+              console.log('💬 Slider modu: ' + quotesToShow.length + ' söz gösterilecek (maxSlides: ' + maxSlides + ')');
+
+            } else {
+              // Slider kapalı - tarih kontrolü yap veya rastgele tek söz göster
+              const quotesWithDate = quoteItems.filter(q => q.date === todayStr);
+
+              if (quotesWithDate.length > 0) {
+                // Bugünün tarihine ait sözleri göster
+                quotesToShow = quotesWithDate;
+                console.log('💬 Tarih eşleşmesi: ' + quotesToShow.length + ' söz bulundu');
+              } else {
+                // Rastgele tek söz göster
+                const randomIndex = Math.floor(Math.random() * quoteItems.length);
+                quotesToShow = [quoteItems[randomIndex]];
+                console.log('💬 Rastgele tek söz gösteriliyor');
+              }
+            }
+          } else if (quoteData.text && quoteData.author) {
+            // Old system fallback
+            quotesToShow = [{ text: quoteData.text, author: quoteData.author }];
+          }
+
+          // Clean up previous slider interval if exists
+          if (window.quoteState && window.quoteState.interval) {
+            clearInterval(window.quoteState.interval);
+          }
+
+          if (quotesToShow.length === 0) {
+            // No quotes available
+            container.innerHTML = `
             <span class="material-symbols-outlined text-primary/20 text-5xl absolute top-2 left-2">format_quote</span>
             <h3 class="text-primary font-bold text-xs uppercase tracking-widest mb-2 z-10">${title}</h3>
             <p class="text-sm text-text-secondary z-10">Henüz söz eklenmemiş.</p>
           `;
-        } else if (quotesToShow.length === 1 || !quoteData.enableSlider) {
-          // Single quote display (Static)
-          const quote = quotesToShow[0];
-          container.innerHTML = `
+          } else if (quotesToShow.length === 1 || !quoteData.enableSlider) {
+            // Single quote display (Static)
+            const quote = quotesToShow[0];
+            container.innerHTML = `
             <span class="material-symbols-outlined text-primary/20 text-5xl absolute top-2 left-2">format_quote</span>
             <h3 class="text-primary font-bold text-xs uppercase tracking-widest mb-2 z-10">${title}</h3>
             <p class="text-lg font-medium text-text-dark italic leading-relaxed z-10">
@@ -638,11 +806,11 @@
               ${quote.author}
             </p>
           `;
-        } else {
-          // Multiple quotes display (Slider)
-          const renderQuoteSlide = (index) => {
-            const quote = quotesToShow[index];
-            return `
+          } else {
+            // Multiple quotes display (Slider)
+            const renderQuoteSlide = (index) => {
+              const quote = quotesToShow[index];
+              return `
               <div class="absolute inset-0 flex flex-col items-center justify-center text-center p-4 transition-opacity duration-500 ease-in-out">
                 <span class="material-symbols-outlined text-primary/20 text-5xl absolute top-2 left-2">format_quote</span>
                 <h3 class="text-primary font-bold text-xs uppercase tracking-widest mb-2 z-10">${title}</h3>
@@ -662,79 +830,79 @@
                 </div>
               </div>
             `;
-          };
+            };
 
-          container.innerHTML = renderQuoteSlide(0);
+            container.innerHTML = renderQuoteSlide(0);
 
-          // Setup Slider Logic
-          const actualSliderSpeed = quoteData.sliderSpeed || 8;
-          const actualMaxSlides = quotesToShow.length;
-          console.log('💬 Quote Slider BAŞLATILIYOR - Gösterim süresi:', actualSliderSpeed, 'saniye, Gösterilen slayt:', actualMaxSlides);
+            // Setup Slider Logic
+            const actualSliderSpeed = quoteData.sliderSpeed || 8;
+            const actualMaxSlides = quotesToShow.length;
+            console.log('💬 Quote Slider BAŞLATILIYOR - Gösterim süresi:', actualSliderSpeed, 'saniye, Gösterilen slayt:', actualMaxSlides);
 
-          window.quoteState = {
-            currentIndex: 0,
-            total: quotesToShow.length,
-            interval: setInterval(() => {
-              window.quoteState.currentIndex = (window.quoteState.currentIndex + 1) % window.quoteState.total;
-              container.innerHTML = renderQuoteSlide(window.quoteState.currentIndex);
-            }, actualSliderSpeed * 1000) // Convert to milliseconds
-          };
-        }
-      }
-
-      // Update ticker
-      if (data.cards.ticker && data.cards.ticker.text) {
-        const tickerContent = document.getElementById('ticker-content');
-        tickerContent.innerHTML = ''; // Clear existing content
-
-        const announcements = data.cards.ticker.text.split('\n').filter(a => a.trim());
-        announcements.forEach((announcement, index) => {
-          if (announcement.trim()) {
-            const span = document.createElement('span');
-            span.className = 'mx-8';
-            span.textContent = announcement.trim();
-            tickerContent.appendChild(span);
-
-            // Add separator if not the last item
-            if (index < announcements.length - 1) {
-              const separator = document.createElement('span');
-              separator.className = 'mx-8';
-              separator.textContent = '•';
-              tickerContent.appendChild(separator);
-            }
+            window.quoteState = {
+              currentIndex: 0,
+              total: quotesToShow.length,
+              interval: setInterval(() => {
+                window.quoteState.currentIndex = (window.quoteState.currentIndex + 1) % window.quoteState.total;
+                container.innerHTML = renderQuoteSlide(window.quoteState.currentIndex);
+              }, actualSliderSpeed * 1000) // Convert to milliseconds
+            };
           }
-        });
-
-        // Apply ticker speed
-        const speed = data.cards.ticker.speed || 20; // Default 20 seconds
-        tickerContent.style.setProperty('--marquee-duration', `${speed}s`);
-      }
-
-      // ===== UPDATE INFO CARD =====
-      const infoData = data.cards.info;
-
-      if (infoData && infoData.enabled && infoData.items && infoData.items.length > 0) {
-        const container = document.getElementById('card-info');
-        container.style.display = 'flex'; // Show card
-
-        // Kart rengini ayarla
-        if (infoData.cardColor) {
-          container.style.background = infoData.cardColor;
-          container.classList.remove('bg-primary');
-        } else {
-          container.style.background = '';
-          container.classList.add('bg-primary');
         }
 
-        // Clean up previous slider interval if exists
-        if (window.infoState && window.infoState.interval) {
-          clearInterval(window.infoState.interval);
+        // Update ticker
+        if (data.cards.ticker && data.cards.ticker.text) {
+          const tickerContent = document.getElementById('ticker-content');
+          tickerContent.innerHTML = ''; // Clear existing content
+
+          const announcements = data.cards.ticker.text.split('\n').filter(a => a.trim());
+          announcements.forEach((announcement, index) => {
+            if (announcement.trim()) {
+              const span = document.createElement('span');
+              span.className = 'mx-8';
+              span.textContent = announcement.trim();
+              tickerContent.appendChild(span);
+
+              // Add separator if not the last item
+              if (index < announcements.length - 1) {
+                const separator = document.createElement('span');
+                separator.className = 'mx-8';
+                separator.textContent = '•';
+                tickerContent.appendChild(separator);
+              }
+            }
+          });
+
+          // Apply ticker speed
+          const speed = data.cards.ticker.speed || 20; // Default 20 seconds
+          tickerContent.style.setProperty('--marquee-duration', `${speed}s`);
         }
 
-        if (infoData.items.length === 1) {
-          // Single info display (Static)
-          const info = infoData.items[0];
-          container.innerHTML = `
+        // ===== UPDATE INFO CARD =====
+        const infoData = data.cards.info;
+
+        if (infoData && infoData.enabled && infoData.items && infoData.items.length > 0) {
+          const container = document.getElementById('card-info');
+          container.style.display = 'flex'; // Show card
+
+          // Kart rengini ayarla
+          if (infoData.cardColor) {
+            container.style.background = infoData.cardColor;
+            container.classList.remove('bg-primary');
+          } else {
+            container.style.background = '';
+            container.classList.add('bg-primary');
+          }
+
+          // Clean up previous slider interval if exists
+          if (window.infoState && window.infoState.interval) {
+            clearInterval(window.infoState.interval);
+          }
+
+          if (infoData.items.length === 1) {
+            // Single info display (Static)
+            const info = infoData.items[0];
+            container.innerHTML = `
             <span class="material-symbols-outlined absolute -right-4 -bottom-4 text-[120px] text-white/10 rotate-12">emoji_events</span>
             <div class="z-10">
               <h3 class="text-white font-bold text-base uppercase tracking-wider mb-2">${info.title || 'Bilgi'}</h3>
@@ -742,11 +910,11 @@
               <p class="text-white/90 text-sm font-medium">${info.note || ''}</p>
             </div>
           `;
-        } else {
-          // Multiple info display (Slider)
-          const renderInfoSlide = (index) => {
-            const info = infoData.items[index];
-            return `
+          } else {
+            // Multiple info display (Slider)
+            const renderInfoSlide = (index) => {
+              const info = infoData.items[index];
+              return `
               <div class="absolute inset-0 flex flex-col justify-center text-center p-4 transition-opacity duration-500 ease-in-out">
                 <span class="material-symbols-outlined absolute -right-4 -bottom-4 text-[120px] text-white/10 rotate-12">emoji_events</span>
                 <div class="z-10">
@@ -763,80 +931,80 @@
                 </div>
               </div>
             `;
+            };
+
+            container.innerHTML = renderInfoSlide(0);
+
+            // Setup Slider Logic
+            window.infoState = {
+              currentIndex: 0,
+              total: infoData.items.length,
+              interval: setInterval(() => {
+                window.infoState.currentIndex = (window.infoState.currentIndex + 1) % window.infoState.total;
+                container.innerHTML = renderInfoSlide(window.infoState.currentIndex);
+              }, (infoData.sliderSpeed || 5) * 1000) // Convert to milliseconds
+            };
+          }
+        } else {
+          // Hide card if disabled or no items
+          const container = document.getElementById('card-info');
+          if (container) {
+            container.style.display = 'none';
+          }
+        }
+
+        // Update schedule with slider functionality + timePlan countdown
+        if (data.cards.schedule && Array.isArray(data.cards.schedule.items)) {
+          const scheduleContainer = document.getElementById('schedule-entries');
+          const countdownContainer = document.getElementById('schedule-countdown');
+          let scheduleItems = data.cards.schedule.items.slice();
+
+          // Helper: Convert time string "HH:MM" to minutes
+          const toMinutes = (timeStr) => {
+            if (!timeStr) return -1;
+            const parts = timeStr.split(':');
+            return parseInt(parts[0]) * 60 + parseInt(parts[1]);
           };
 
-          container.innerHTML = renderInfoSlide(0);
+          // Zaman ve gün bilgisi
+          const now = new Date();
+          const currentMinutes = now.getHours() * 60 + now.getMinutes();
+          const weekdayNames = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
+          const today = weekdayNames[now.getDay()];
 
-          // Setup Slider Logic
-          window.infoState = {
-            currentIndex: 0,
-            total: infoData.items.length,
-            interval: setInterval(() => {
-              window.infoState.currentIndex = (window.infoState.currentIndex + 1) % window.infoState.total;
-              container.innerHTML = renderInfoSlide(window.infoState.currentIndex);
-            }, (infoData.sliderSpeed || 5) * 1000) // Convert to milliseconds
-          };
-        }
-      } else {
-        // Hide card if disabled or no items
-        const container = document.getElementById('card-info');
-        if (container) {
-          container.style.display = 'none';
-        }
-      }
+          // ==== TIMEPLAN COUNTDOWN (ders / teneffüs) ====
+          const timePlan = data.cards.timePlan && Array.isArray(data.cards.timePlan.items)
+            ? data.cards.timePlan.items
+            : [];
 
-      // Update schedule with slider functionality + timePlan countdown
-      if (data.cards.schedule && Array.isArray(data.cards.schedule.items)) {
-        const scheduleContainer = document.getElementById('schedule-entries');
-        const countdownContainer = document.getElementById('schedule-countdown');
-        let scheduleItems = data.cards.schedule.items.slice();
+          if (countdownContainer) {
+            // Önceki interval'ı temizle
+            if (!window.timePlanInterval) {
+              window.timePlanInterval = null;
+            }
+            if (window.timePlanInterval) {
+              clearInterval(window.timePlanInterval);
+              window.timePlanInterval = null;
+            }
 
-        // Helper: Convert time string "HH:MM" to minutes
-        const toMinutes = (timeStr) => {
-          if (!timeStr) return -1;
-          const parts = timeStr.split(':');
-          return parseInt(parts[0]) * 60 + parseInt(parts[1]);
-        };
+            const todaysSlots = timePlan
+              .filter(x => x.day === today && x.start && x.end)
+              .map(x => {
+                const startMin = toMinutes(x.start);
+                const endMin = toMinutes(x.end);
+                return { ...x, _start: startMin, _end: endMin };
+              })
+              .filter(x => x._start >= 0 && x._end >= 0)
+              .sort((a, b) => a._start - b._start);
 
-        // Zaman ve gün bilgisi
-        const now = new Date();
-        const currentMinutes = now.getHours() * 60 + now.getMinutes();
-        const weekdayNames = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
-        const today = weekdayNames[now.getDay()];
+            const currentSlot = todaysSlots.find(x => currentMinutes >= x._start && currentMinutes < x._end) || null;
 
-        // ==== TIMEPLAN COUNTDOWN (ders / teneffüs) ====
-        const timePlan = data.cards.timePlan && Array.isArray(data.cards.timePlan.items)
-          ? data.cards.timePlan.items
-          : [];
+            if (currentSlot) {
+              const isLesson = currentSlot.type === 'ders';
+              const label = isLesson ? 'Ders Saati' : 'Teneffüs';
+              const name = currentSlot.label || (isLesson ? 'Ders' : 'Teneffüs');
 
-        if (countdownContainer) {
-          // Önceki interval'ı temizle
-          if (!window.timePlanInterval) {
-            window.timePlanInterval = null;
-          }
-          if (window.timePlanInterval) {
-            clearInterval(window.timePlanInterval);
-            window.timePlanInterval = null;
-          }
-
-          const todaysSlots = timePlan
-            .filter(x => x.day === today && x.start && x.end)
-            .map(x => {
-              const startMin = toMinutes(x.start);
-              const endMin = toMinutes(x.end);
-              return { ...x, _start: startMin, _end: endMin };
-            })
-            .filter(x => x._start >= 0 && x._end >= 0)
-            .sort((a, b) => a._start - b._start);
-
-          const currentSlot = todaysSlots.find(x => currentMinutes >= x._start && currentMinutes < x._end) || null;
-
-          if (currentSlot) {
-            const isLesson = currentSlot.type === 'ders';
-            const label = isLesson ? 'Ders Saati' : 'Teneffüs';
-            const name = currentSlot.label || (isLesson ? 'Ders' : 'Teneffüs');
-
-            countdownContainer.innerHTML = `
+              countdownContainer.innerHTML = `
               <div class="flex items-center justify-between px-4 py-3 rounded-xl ${isLesson ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200' : 'bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200'} shadow-sm">
                 <div class="flex items-center gap-3">
                   <div class="${isLesson ? 'bg-blue-500' : 'bg-green-500'} text-white p-2 rounded-lg">
@@ -854,149 +1022,149 @@
               </div>
             `;
 
-            const endMinutes = currentSlot._end;
+              const endMinutes = currentSlot._end;
 
-            const updateTimePlanCountdown = () => {
-              const now2 = new Date();
-              const currentTotalSec = now2.getHours() * 3600 + now2.getMinutes() * 60 + now2.getSeconds();
-              const targetTotalSec = endMinutes * 60;
-              let remaining = targetTotalSec - currentTotalSec;
+              const updateTimePlanCountdown = () => {
+                const now2 = new Date();
+                const currentTotalSec = now2.getHours() * 3600 + now2.getMinutes() * 60 + now2.getSeconds();
+                const targetTotalSec = endMinutes * 60;
+                let remaining = targetTotalSec - currentTotalSec;
 
-              if (remaining <= 0) {
-                clearInterval(window.timePlanInterval);
-                window.timePlanInterval = null;
-                // Slot bitti, içeriği tazele
-                updateContent();
-                return;
-              }
+                if (remaining <= 0) {
+                  clearInterval(window.timePlanInterval);
+                  window.timePlanInterval = null;
+                  // Slot bitti, içeriği tazele
+                  updateContent();
+                  return;
+                }
 
-              const mm = String(Math.floor(remaining / 60)).padStart(2, '0');
-              const ss = String(remaining % 60).padStart(2, '0');
-              const el = document.getElementById('timeplan-countdown');
-              if (el) {
-                el.textContent = `${mm}:${ss}`;
-              }
-            };
-
-            updateTimePlanCountdown();
-            window.timePlanInterval = setInterval(updateTimePlanCountdown, 1000);
-          } else {
-            countdownContainer.innerHTML = '';
-          }
-        }
-
-        // FILTER: Bugünkü dersler ve şuan devam eden saatler
-        scheduleItems = scheduleItems.filter(item => {
-          // 1) Gün kontrolü (day alanı varsa bugünün günü ile aynı olmalı)
-          if (item.day && item.day !== today) return false;
-
-          // 2) Saat kontrolü (time "HH:MM-HH:MM" formatında olmalı)
-          if (!item.time || !item.time.includes('-')) return false;
-
-          try {
-            const [startStr, endStr] = item.time.split('-');
-            const start = toMinutes(startStr);
-            const end = toMinutes(endStr);
-
-            return currentMinutes >= start && currentMinutes <= end;
-          } catch (e) {
-            return false;
-          }
-        });
-
-        // SIRALAMA: Sınıf sırası 9-A, 9-B, 9-C, 10-A, 10-B, 10-C, 11-A, 11-B, 11-C, 12-A, 12-B, 12-C
-        const classOrder = [
-          '9-A', '9-B', '9-C',
-          '10-A', '10-B', '10-C',
-          '11-A', '11-B', '11-C',
-          '12-A', '12-B', '12-C'
-        ];
-
-        scheduleItems.sort((a, b) => {
-          const aCls = a.cls || '';
-          const bCls = b.cls || '';
-
-          const aIdx = classOrder.indexOf(aCls);
-          const bIdx = classOrder.indexOf(bCls);
-
-          const aPos = aIdx === -1 ? Number.MAX_SAFE_INTEGER : aIdx;
-          const bPos = bIdx === -1 ? Number.MAX_SAFE_INTEGER : bIdx;
-
-          if (aPos !== bPos) return aPos - bPos;
-
-          // Aynı sınıf ise başlangıç saatine göre sırala (varsa)
-          if (a.time && b.time && a.time.includes('-') && b.time.includes('-')) {
-            try {
-              const [aStart] = a.time.split('-');
-              const [bStart] = b.time.split('-');
-              return toMinutes(aStart) - toMinutes(bStart);
-            } catch (e) {
-              return 0;
-            }
-          }
-          return 0;
-        });
-
-        if (scheduleItems.length === 0) {
-          // Bugün için tüm dersleri al (güne göre)
-          const allToday = data.cards.schedule.items
-            .filter(it => it.day === today && it.time && it.time.includes('-'))
-            .map(it => {
-              const [sStr, eStr] = it.time.split('-');
-              return {
-                ...it,
-                _start: toMinutes(sStr),
-                _end: toMinutes(eStr)
+                const mm = String(Math.floor(remaining / 60)).padStart(2, '0');
+                const ss = String(remaining % 60).padStart(2, '0');
+                const el = document.getElementById('timeplan-countdown');
+                if (el) {
+                  el.textContent = `${mm}:${ss}`;
+                }
               };
-            })
-            .filter(it => it._start >= 0 && it._end >= 0)
-            .sort((a, b) => a._start - b._start);
 
-          // Bir sonraki dersi bul
-          const nextLesson = allToday.find(it => it._start > currentMinutes);
-          const prevLesson = [...allToday].reverse().find(it => it._end <= currentMinutes);
-
-          // Teneffüs: önceki ders bitmiş ve henüz sonraki ders başlamamışsa
-          if (prevLesson && nextLesson && currentMinutes >= prevLesson._end && currentMinutes < nextLesson._start) {
-            // Tüm sınıfların bir sonraki derslerini bul
-            const nextLessonsForAllClasses = [];
-            const uniqueClasses = [...new Set(data.cards.schedule.items.map(it => it.cls))].filter(Boolean);
-
-            uniqueClasses.forEach(className => {
-              const classLessons = allToday
-                .filter(it => it.cls === className && it._start > currentMinutes)
-                .sort((a, b) => a._start - b._start);
-
-              if (classLessons.length > 0) {
-                nextLessonsForAllClasses.push(classLessons[0]);
-              }
-            });
-
-            // Sınıf sırasına göre sırala
-            const classOrder = [
-              '9-A', '9-B', '9-C',
-              '10-A', '10-B', '10-C',
-              '11-A', '11-B', '11-C',
-              '12-A', '12-B', '12-C'
-            ];
-
-            nextLessonsForAllClasses.sort((a, b) => {
-              const aIdx = classOrder.indexOf(a.cls || '');
-              const bIdx = classOrder.indexOf(b.cls || '');
-              const aPos = aIdx === -1 ? Number.MAX_SAFE_INTEGER : aIdx;
-              const bPos = bIdx === -1 ? Number.MAX_SAFE_INTEGER : bIdx;
-              return aPos - bPos;
-            });
-
-            // 3'erli gruplara böl (slider için)
-            const breakChunkSize = 3;
-            const breakSlides = [];
-            for (let i = 0; i < nextLessonsForAllClasses.length; i += breakChunkSize) {
-              breakSlides.push(nextLessonsForAllClasses.slice(i, i + breakChunkSize));
+              updateTimePlanCountdown();
+              window.timePlanInterval = setInterval(updateTimePlanCountdown, 1000);
+            } else {
+              countdownContainer.innerHTML = '';
             }
+          }
 
-            // Teneffüs kartı HTML - Geri sayım + Sıradaki Dersler Slider
-            scheduleContainer.innerHTML = `
+          // FILTER: Bugünkü dersler ve şuan devam eden saatler
+          scheduleItems = scheduleItems.filter(item => {
+            // 1) Gün kontrolü (day alanı varsa bugünün günü ile aynı olmalı)
+            if (item.day && item.day !== today) return false;
+
+            // 2) Saat kontrolü (time "HH:MM-HH:MM" formatında olmalı)
+            if (!item.time || !item.time.includes('-')) return false;
+
+            try {
+              const [startStr, endStr] = item.time.split('-');
+              const start = toMinutes(startStr);
+              const end = toMinutes(endStr);
+
+              return currentMinutes >= start && currentMinutes <= end;
+            } catch (e) {
+              return false;
+            }
+          });
+
+          // SIRALAMA: Sınıf sırası 9-A, 9-B, 9-C, 10-A, 10-B, 10-C, 11-A, 11-B, 11-C, 12-A, 12-B, 12-C
+          const classOrder = [
+            '9-A', '9-B', '9-C',
+            '10-A', '10-B', '10-C',
+            '11-A', '11-B', '11-C',
+            '12-A', '12-B', '12-C'
+          ];
+
+          scheduleItems.sort((a, b) => {
+            const aCls = a.cls || '';
+            const bCls = b.cls || '';
+
+            const aIdx = classOrder.indexOf(aCls);
+            const bIdx = classOrder.indexOf(bCls);
+
+            const aPos = aIdx === -1 ? Number.MAX_SAFE_INTEGER : aIdx;
+            const bPos = bIdx === -1 ? Number.MAX_SAFE_INTEGER : bIdx;
+
+            if (aPos !== bPos) return aPos - bPos;
+
+            // Aynı sınıf ise başlangıç saatine göre sırala (varsa)
+            if (a.time && b.time && a.time.includes('-') && b.time.includes('-')) {
+              try {
+                const [aStart] = a.time.split('-');
+                const [bStart] = b.time.split('-');
+                return toMinutes(aStart) - toMinutes(bStart);
+              } catch (e) {
+                return 0;
+              }
+            }
+            return 0;
+          });
+
+          if (scheduleItems.length === 0) {
+            // Bugün için tüm dersleri al (güne göre)
+            const allToday = data.cards.schedule.items
+              .filter(it => it.day === today && it.time && it.time.includes('-'))
+              .map(it => {
+                const [sStr, eStr] = it.time.split('-');
+                return {
+                  ...it,
+                  _start: toMinutes(sStr),
+                  _end: toMinutes(eStr)
+                };
+              })
+              .filter(it => it._start >= 0 && it._end >= 0)
+              .sort((a, b) => a._start - b._start);
+
+            // Bir sonraki dersi bul
+            const nextLesson = allToday.find(it => it._start > currentMinutes);
+            const prevLesson = [...allToday].reverse().find(it => it._end <= currentMinutes);
+
+            // Teneffüs: önceki ders bitmiş ve henüz sonraki ders başlamamışsa
+            if (prevLesson && nextLesson && currentMinutes >= prevLesson._end && currentMinutes < nextLesson._start) {
+              // Tüm sınıfların bir sonraki derslerini bul
+              const nextLessonsForAllClasses = [];
+              const uniqueClasses = [...new Set(data.cards.schedule.items.map(it => it.cls))].filter(Boolean);
+
+              uniqueClasses.forEach(className => {
+                const classLessons = allToday
+                  .filter(it => it.cls === className && it._start > currentMinutes)
+                  .sort((a, b) => a._start - b._start);
+
+                if (classLessons.length > 0) {
+                  nextLessonsForAllClasses.push(classLessons[0]);
+                }
+              });
+
+              // Sınıf sırasına göre sırala
+              const classOrder = [
+                '9-A', '9-B', '9-C',
+                '10-A', '10-B', '10-C',
+                '11-A', '11-B', '11-C',
+                '12-A', '12-B', '12-C'
+              ];
+
+              nextLessonsForAllClasses.sort((a, b) => {
+                const aIdx = classOrder.indexOf(a.cls || '');
+                const bIdx = classOrder.indexOf(b.cls || '');
+                const aPos = aIdx === -1 ? Number.MAX_SAFE_INTEGER : aIdx;
+                const bPos = bIdx === -1 ? Number.MAX_SAFE_INTEGER : bIdx;
+                return aPos - bPos;
+              });
+
+              // 3'erli gruplara böl (slider için)
+              const breakChunkSize = 3;
+              const breakSlides = [];
+              for (let i = 0; i < nextLessonsForAllClasses.length; i += breakChunkSize) {
+                breakSlides.push(nextLessonsForAllClasses.slice(i, i + breakChunkSize));
+              }
+
+              // Teneffüs kartı HTML - Geri sayım + Sıradaki Dersler Slider
+              scheduleContainer.innerHTML = `
               <div class="flex flex-col h-full gap-3">
                 <!-- Teneffüs Geri Sayım -->
                 <div class="flex flex-col items-center justify-center bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border-2 border-green-200 shadow-sm">
@@ -1051,115 +1219,115 @@
               </div>
             `;
 
-            const nextStartMinutes = nextLesson._start;
+              const nextStartMinutes = nextLesson._start;
 
-            // Geri sayım interval'ı
-            if (!window.breakInterval) {
-              window.breakInterval = null;
-            }
-            if (window.breakInterval) {
-              clearInterval(window.breakInterval);
-            }
-
-            const updateBreakCountdown = () => {
-              const now2 = new Date();
-              const currentTotalSec = now2.getHours() * 3600 + now2.getMinutes() * 60 + now2.getSeconds();
-              const targetTotalSec = nextStartMinutes * 60;
-              let remaining = targetTotalSec - currentTotalSec;
-
-              if (remaining <= 0) {
-                clearInterval(window.breakInterval);
+              // Geri sayım interval'ı
+              if (!window.breakInterval) {
                 window.breakInterval = null;
-                // Ders başladı, içeriği tazele
-                updateContent();
-                return;
+              }
+              if (window.breakInterval) {
+                clearInterval(window.breakInterval);
               }
 
-              const mm = String(Math.floor(remaining / 60)).padStart(2, '0');
-              const ss = String(remaining % 60).padStart(2, '0');
-              const el = document.getElementById('break-countdown');
-              if (el) {
-                el.textContent = `${mm}:${ss}`;
-              }
-            };
+              const updateBreakCountdown = () => {
+                const now2 = new Date();
+                const currentTotalSec = now2.getHours() * 3600 + now2.getMinutes() * 60 + now2.getSeconds();
+                const targetTotalSec = nextStartMinutes * 60;
+                let remaining = targetTotalSec - currentTotalSec;
 
-            updateBreakCountdown();
-            window.breakInterval = setInterval(updateBreakCountdown, 1000);
-
-            // Sıradaki dersler slider'ı
-            if (!window.breakSliderState) window.breakSliderState = {};
-            if (window.breakSliderState.interval) clearInterval(window.breakSliderState.interval);
-
-            window.breakSliderState = {
-              currentSlide: 0,
-              totalSlides: breakSlides.length,
-              interval: null
-            };
-
-            if (breakSlides.length > 1) {
-              window.breakSliderState.interval = setInterval(() => {
-                const next = (window.breakSliderState.currentSlide + 1) % window.breakSliderState.totalSlides;
-
-                // Update slider position
-                window.breakSliderState.currentSlide = next;
-                const slider = document.querySelector('.break-lessons-slider');
-                if (slider) {
-                  const percent = next * (100 / window.breakSliderState.totalSlides);
-                  slider.style.transform = `translateX(-${percent}%)`;
+                if (remaining <= 0) {
+                  clearInterval(window.breakInterval);
+                  window.breakInterval = null;
+                  // Ders başladı, içeriği tazele
+                  updateContent();
+                  return;
                 }
 
-                // Update indicators
-                for (let i = 0; i < window.breakSliderState.totalSlides; i++) {
-                  const indicator = document.getElementById(`break-indicator-${i}`);
-                  if (indicator) {
-                    if (i === next) {
-                      indicator.classList.remove('bg-primary/30');
-                      indicator.classList.add('bg-primary', 'w-3');
-                    } else {
-                      indicator.classList.remove('bg-primary', 'w-3');
-                      indicator.classList.add('bg-primary/30');
+                const mm = String(Math.floor(remaining / 60)).padStart(2, '0');
+                const ss = String(remaining % 60).padStart(2, '0');
+                const el = document.getElementById('break-countdown');
+                if (el) {
+                  el.textContent = `${mm}:${ss}`;
+                }
+              };
+
+              updateBreakCountdown();
+              window.breakInterval = setInterval(updateBreakCountdown, 1000);
+
+              // Sıradaki dersler slider'ı
+              if (!window.breakSliderState) window.breakSliderState = {};
+              if (window.breakSliderState.interval) clearInterval(window.breakSliderState.interval);
+
+              window.breakSliderState = {
+                currentSlide: 0,
+                totalSlides: breakSlides.length,
+                interval: null
+              };
+
+              if (breakSlides.length > 1) {
+                window.breakSliderState.interval = setInterval(() => {
+                  const next = (window.breakSliderState.currentSlide + 1) % window.breakSliderState.totalSlides;
+
+                  // Update slider position
+                  window.breakSliderState.currentSlide = next;
+                  const slider = document.querySelector('.break-lessons-slider');
+                  if (slider) {
+                    const percent = next * (100 / window.breakSliderState.totalSlides);
+                    slider.style.transform = `translateX(-${percent}%)`;
+                  }
+
+                  // Update indicators
+                  for (let i = 0; i < window.breakSliderState.totalSlides; i++) {
+                    const indicator = document.getElementById(`break-indicator-${i}`);
+                    if (indicator) {
+                      if (i === next) {
+                        indicator.classList.remove('bg-primary/30');
+                        indicator.classList.add('bg-primary', 'w-3');
+                      } else {
+                        indicator.classList.remove('bg-primary', 'w-3');
+                        indicator.classList.add('bg-primary/30');
+                      }
                     }
                   }
-                }
-              }, 4000); // 4 saniyede bir değişsin
-            }
-          } else {
-            scheduleContainer.innerHTML = `
+                }, 4000); // 4 saniyede bir değişsin
+              }
+            } else {
+              scheduleContainer.innerHTML = `
               <div class="flex items-center justify-center h-full">
                 <p class="text-gray-500">Şu anda devam eden ders bulunmuyor.</p>
               </div>
             `;
+            }
+            return;
           }
-          return;
-        }
 
-        // 3'erli gruplara böl (slaytlar)
-        const chunkSize = 3;
-        const slides = [];
-        for (let i = 0; i < scheduleItems.length; i += chunkSize) {
-          slides.push(scheduleItems.slice(i, i + chunkSize));
-        }
-
-        // Dersin bitiş saatini bul (en son bitiş saati)
-        let lessonEndTime = null;
-        if (scheduleItems.length > 0) {
-          const endTimes = scheduleItems
-            .map(item => {
-              if (item.time && item.time.includes('-')) {
-                const [, endStr] = item.time.split('-');
-                return toMinutes(endStr);
-              }
-              return -1;
-            })
-            .filter(t => t >= 0);
-
-          if (endTimes.length > 0) {
-            lessonEndTime = Math.max(...endTimes);
+          // 3'erli gruplara böl (slaytlar)
+          const chunkSize = 3;
+          const slides = [];
+          for (let i = 0; i < scheduleItems.length; i += chunkSize) {
+            slides.push(scheduleItems.slice(i, i + chunkSize));
           }
-        }
 
-        // Slider container'ı oluştur (geri sayım + dersler)
-        scheduleContainer.innerHTML = `
+          // Dersin bitiş saatini bul (en son bitiş saati)
+          let lessonEndTime = null;
+          if (scheduleItems.length > 0) {
+            const endTimes = scheduleItems
+              .map(item => {
+                if (item.time && item.time.includes('-')) {
+                  const [, endStr] = item.time.split('-');
+                  return toMinutes(endStr);
+                }
+                return -1;
+              })
+              .filter(t => t >= 0);
+
+            if (endTimes.length > 0) {
+              lessonEndTime = Math.max(...endTimes);
+            }
+          }
+
+          // Slider container'ı oluştur (geri sayım + dersler)
+          scheduleContainer.innerHTML = `
           <div class="flex flex-col h-full gap-3">
             ${lessonEndTime ? `
             <!-- Ders Geri Sayım -->
@@ -1211,352 +1379,352 @@
           </div>
         `;
 
-        // Ders geri sayımı için interval
-        if (lessonEndTime) {
-          if (!window.lessonInterval) {
-            window.lessonInterval = null;
-          }
-          if (window.lessonInterval) {
-            clearInterval(window.lessonInterval);
-          }
-
-          const updateLessonCountdown = () => {
-            const now2 = new Date();
-            const currentTotalSec = now2.getHours() * 3600 + now2.getMinutes() * 60 + now2.getSeconds();
-            const targetTotalSec = lessonEndTime * 60;
-            let remaining = targetTotalSec - currentTotalSec;
-
-            if (remaining <= 0) {
-              clearInterval(window.lessonInterval);
+          // Ders geri sayımı için interval
+          if (lessonEndTime) {
+            if (!window.lessonInterval) {
               window.lessonInterval = null;
-              // Ders bitti, içeriği tazele
-              updateContent();
-              return;
+            }
+            if (window.lessonInterval) {
+              clearInterval(window.lessonInterval);
             }
 
-            const mm = String(Math.floor(remaining / 60)).padStart(2, '0');
-            const ss = String(remaining % 60).padStart(2, '0');
-            const el = document.getElementById('lesson-countdown');
-            if (el) {
-              el.textContent = `${mm}:${ss}`;
-            }
+            const updateLessonCountdown = () => {
+              const now2 = new Date();
+              const currentTotalSec = now2.getHours() * 3600 + now2.getMinutes() * 60 + now2.getSeconds();
+              const targetTotalSec = lessonEndTime * 60;
+              let remaining = targetTotalSec - currentTotalSec;
+
+              if (remaining <= 0) {
+                clearInterval(window.lessonInterval);
+                window.lessonInterval = null;
+                // Ders bitti, içeriği tazele
+                updateContent();
+                return;
+              }
+
+              const mm = String(Math.floor(remaining / 60)).padStart(2, '0');
+              const ss = String(remaining % 60).padStart(2, '0');
+              const el = document.getElementById('lesson-countdown');
+              if (el) {
+                el.textContent = `${mm}:${ss}`;
+              }
+            };
+
+            updateLessonCountdown();
+            window.lessonInterval = setInterval(updateLessonCountdown, 1000);
+          }
+
+
+          // Slider state ve otomatik geçiş
+          if (!window.sliderState) window.sliderState = {};
+
+          if (window.sliderState.interval) clearInterval(window.sliderState.interval);
+
+          window.sliderState = {
+            currentSlide: 0,
+            totalSlides: slides.length,
+            interval: null
           };
 
-          updateLessonCountdown();
-          window.lessonInterval = setInterval(updateLessonCountdown, 1000);
-        }
-
-
-        // Slider state ve otomatik geçiş
-        if (!window.sliderState) window.sliderState = {};
-
-        if (window.sliderState.interval) clearInterval(window.sliderState.interval);
-
-        window.sliderState = {
-          currentSlide: 0,
-          totalSlides: slides.length,
-          interval: null
-        };
-
-        if (slides.length > 1) {
-          window.sliderState.interval = setInterval(() => {
-            const next = (window.sliderState.currentSlide + 1) % window.sliderState.totalSlides;
-            updateSlider(next);
-          }, 3000);
-        }
-
-        function updateSlider(index) {
-          window.sliderState.currentSlide = index;
-          const slider = document.querySelector('.schedule-slider');
-          if (slider) {
-            const percent = index * (100 / window.sliderState.totalSlides);
-            slider.style.transform = `translateX(-${percent}%)`;
+          if (slides.length > 1) {
+            window.sliderState.interval = setInterval(() => {
+              const next = (window.sliderState.currentSlide + 1) % window.sliderState.totalSlides;
+              updateSlider(next);
+            }, 3000);
           }
 
-          for (let i = 0; i < window.sliderState.totalSlides; i++) {
-            const indicator = document.getElementById(`indicator-${i}`);
-            if (indicator) {
-              if (i === index) {
-                indicator.classList.remove('bg-primary/30');
-                indicator.classList.add('bg-primary', 'w-3');
-              } else {
-                indicator.classList.remove('bg-primary', 'w-3');
-                indicator.classList.add('bg-primary/30');
+          function updateSlider(index) {
+            window.sliderState.currentSlide = index;
+            const slider = document.querySelector('.schedule-slider');
+            if (slider) {
+              const percent = index * (100 / window.sliderState.totalSlides);
+              slider.style.transform = `translateX(-${percent}%)`;
+            }
+
+            for (let i = 0; i < window.sliderState.totalSlides; i++) {
+              const indicator = document.getElementById(`indicator-${i}`);
+              if (indicator) {
+                if (i === index) {
+                  indicator.classList.remove('bg-primary/30');
+                  indicator.classList.add('bg-primary', 'w-3');
+                } else {
+                  indicator.classList.remove('bg-primary', 'w-3');
+                  indicator.classList.add('bg-primary/30');
+                }
               }
             }
           }
         }
       }
-    }
 
-    // Update time
-    function updateTime() {
-      const now = new Date();
-      const timeString = now.toLocaleTimeString('tr-TR', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
-      });
-      document.getElementById('current-time').textContent = timeString;
-    }
-
-    // Update date
-    function updateDate() {
-      const now = new Date();
-      const options = {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        weekday: 'long'
-      };
-      const dateString = now.toLocaleDateString('tr-TR', options);
-      document.getElementById('current-date').textContent = dateString.charAt(0).toUpperCase() + dateString.slice(1);
-    }
-
-    // REMOVED OLD FUNCTIONS (navigateSchedule, goToScheduleSlide, etc.) 
-    // as they are replaced by the internal logic above for better encapsulation
-
-
-    // Initialize
-    document.addEventListener('DOMContentLoaded', () => {
-      updateContent();
-      updateTime();
-      updateDate();
-      setInterval(updateTime, 1000);
-      setInterval(updateDate, 60000); // Update date every minute in case of day change
-      setInterval(() => updateContent(), 30000); // Update content (schedule) every 30 secs
-
-      // Listen for storage events to update content when data changes in another tab
-      window.addEventListener('storage', updateContent);
-    });
-
-    // ===== MEDIA CENTER FUNCTIONS =====
-    let slideshowInterval = null;
-    let currentSlideIndex = 0;
-
-    function updateMediaCenter(mediaData) {
-      if (!mediaData) {
-        // Show loading state if no media data
-        showMediaLoading();
-        return;
+      // Update time
+      function updateTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('tr-TR', {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false
+        });
+        document.getElementById('current-time').textContent = timeString;
       }
 
-      // Handle fullscreen mode
-      const isFullscreen = mediaData.fullscreen || false;
-      toggleFullscreenMode(isFullscreen);
+      // Update date
+      function updateDate() {
+        const now = new Date();
+        const options = {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          weekday: 'long'
+        };
+        const dateString = now.toLocaleDateString('tr-TR', options);
+        document.getElementById('current-date').textContent = dateString.charAt(0).toUpperCase() + dateString.slice(1);
+      }
 
-      // Hide all media types first
-      document.getElementById('media-slideshow').classList.add('hidden');
-      document.getElementById('media-video').classList.add('hidden');
-      document.getElementById('media-webpage').classList.add('hidden');
-      document.getElementById('media-loading').classList.add('hidden');
+      // REMOVED OLD FUNCTIONS (navigateSchedule, goToScheduleSlide, etc.) 
+      // as they are replaced by the internal logic above for better encapsulation
 
-      // Show appropriate media type
-      const mediaType = mediaData.type || 'slideshow';
 
-      switch (mediaType) {
-        case 'slideshow':
-          initSlideshow(mediaData.slideshow || {});
-          break;
-        case 'video':
-          initVideo(mediaData.video || {});
-          break;
-        case 'webpage':
-          initWebpage(mediaData.webpage || {});
-          break;
-        default:
+      // Initialize
+      document.addEventListener('DOMContentLoaded', () => {
+        updateContent();
+        updateTime();
+        updateDate();
+        setInterval(updateTime, 1000);
+        setInterval(updateDate, 60000); // Update date every minute in case of day change
+        setInterval(() => updateContent(), 30000); // Update content (schedule) every 30 secs
+
+        // Listen for storage events to update content when data changes in another tab
+        window.addEventListener('storage', updateContent);
+      });
+
+      // ===== MEDIA CENTER FUNCTIONS =====
+      let slideshowInterval = null;
+      let currentSlideIndex = 0;
+
+      function updateMediaCenter(mediaData) {
+        if (!mediaData) {
+          // Show loading state if no media data
           showMediaLoading();
-      }
-    }
-
-    function toggleFullscreenMode(isFullscreen) {
-      const leftColumn = document.getElementById('left-column');
-      const rightColumn = document.getElementById('right-column');
-      const centerColumn = document.getElementById('center-column');
-      const quoteCard = document.getElementById('card-quote');
-      const mainMediaCard = document.getElementById('card-main-media');
-
-      if (isFullscreen) {
-        // Tam ekran modu AÇ
-        if (leftColumn) leftColumn.classList.add('hidden');
-        if (rightColumn) rightColumn.classList.add('hidden');
-        if (centerColumn) {
-          centerColumn.classList.remove('col-span-6');
-          centerColumn.classList.add('col-span-12');
+          return;
         }
 
-        // Günün Sözü kartını gizle
-        if (quoteCard) {
-          quoteCard.classList.add('hidden');
-        }
+        // Handle fullscreen mode
+        const isFullscreen = mediaData.fullscreen || false;
+        toggleFullscreenMode(isFullscreen);
 
-        // Medya kartını tam ekran yap (padding ve border kaldır)
-        if (mainMediaCard) {
-          mainMediaCard.classList.remove('p-2', 'rounded-2xl', 'border', 'border-slate-100', 'shadow-sm', 'bg-white');
-          mainMediaCard.classList.add('p-0', 'rounded-none');
-        }
-      } else {
-        // Tam ekran modu KAPAT - normal görünüme dön
-        if (leftColumn) leftColumn.classList.remove('hidden');
-        if (rightColumn) rightColumn.classList.remove('hidden');
-        if (centerColumn) {
-          centerColumn.classList.remove('col-span-12');
-          centerColumn.classList.add('col-span-6');
-        }
+        // Hide all media types first
+        document.getElementById('media-slideshow').classList.add('hidden');
+        document.getElementById('media-video').classList.add('hidden');
+        document.getElementById('media-webpage').classList.add('hidden');
+        document.getElementById('media-loading').classList.add('hidden');
 
-        // Günün Sözü kartını göster
-        if (quoteCard) {
-          quoteCard.classList.remove('hidden');
-        }
+        // Show appropriate media type
+        const mediaType = mediaData.type || 'slideshow';
 
-        // Medya kartını normal haline döndür (TÜM sınıfları geri ekle)
-        if (mainMediaCard) {
-          mainMediaCard.classList.remove('p-0', 'rounded-none');
-          mainMediaCard.classList.add('p-2', 'rounded-2xl', 'border', 'border-slate-100', 'shadow-sm', 'bg-white');
+        switch (mediaType) {
+          case 'slideshow':
+            initSlideshow(mediaData.slideshow || {});
+            break;
+          case 'video':
+            initVideo(mediaData.video || {});
+            break;
+          case 'webpage':
+            initWebpage(mediaData.webpage || {});
+            break;
+          default:
+            showMediaLoading();
         }
       }
 
-      console.log('toggleFullscreenMode called:', isFullscreen ? 'FULLSCREEN' : 'NORMAL');
-    }
+      function toggleFullscreenMode(isFullscreen) {
+        const leftColumn = document.getElementById('left-column');
+        const rightColumn = document.getElementById('right-column');
+        const centerColumn = document.getElementById('center-column');
+        const quoteCard = document.getElementById('card-quote');
+        const mainMediaCard = document.getElementById('card-main-media');
 
-    function initSlideshow(slideshowData) {
-      console.log('initSlideshow called with:', slideshowData);
-      const images = slideshowData.images || [];
-      console.log('Images array:', images);
+        if (isFullscreen) {
+          // Tam ekran modu AÇ
+          if (leftColumn) leftColumn.classList.add('hidden');
+          if (rightColumn) rightColumn.classList.add('hidden');
+          if (centerColumn) {
+            centerColumn.classList.remove('col-span-6');
+            centerColumn.classList.add('col-span-12');
+          }
 
-      if (images.length === 0) {
-        console.warn('No images found, showing loading state');
-        showMediaLoading();
-        return;
+          // Günün Sözü kartını gizle
+          if (quoteCard) {
+            quoteCard.classList.add('hidden');
+          }
+
+          // Medya kartını tam ekran yap (padding ve border kaldır)
+          if (mainMediaCard) {
+            mainMediaCard.classList.remove('p-2', 'rounded-2xl', 'border', 'border-slate-100', 'shadow-sm', 'bg-white');
+            mainMediaCard.classList.add('p-0', 'rounded-none');
+          }
+        } else {
+          // Tam ekran modu KAPAT - normal görünüme dön
+          if (leftColumn) leftColumn.classList.remove('hidden');
+          if (rightColumn) rightColumn.classList.remove('hidden');
+          if (centerColumn) {
+            centerColumn.classList.remove('col-span-12');
+            centerColumn.classList.add('col-span-6');
+          }
+
+          // Günün Sözü kartını göster
+          if (quoteCard) {
+            quoteCard.classList.remove('hidden');
+          }
+
+          // Medya kartını normal haline döndür (TÜM sınıfları geri ekle)
+          if (mainMediaCard) {
+            mainMediaCard.classList.remove('p-0', 'rounded-none');
+            mainMediaCard.classList.add('p-2', 'rounded-2xl', 'border', 'border-slate-100', 'shadow-sm', 'bg-white');
+          }
+        }
+
+        console.log('toggleFullscreenMode called:', isFullscreen ? 'FULLSCREEN' : 'NORMAL');
       }
 
-      const slideshowContainer = document.getElementById('media-slideshow');
-      const track = document.getElementById('slideshow-track');
-      const indicators = document.getElementById('slideshow-indicators');
-      const overlay = document.getElementById('slideshow-overlay');
+      function initSlideshow(slideshowData) {
+        console.log('initSlideshow called with:', slideshowData);
+        const images = slideshowData.images || [];
+        console.log('Images array:', images);
 
-      console.log('Elements found:', {
-        slideshowContainer: !!slideshowContainer,
-        track: !!track,
-        indicators: !!indicators,
-        overlay: !!overlay
-      });
+        if (images.length === 0) {
+          console.warn('No images found, showing loading state');
+          showMediaLoading();
+          return;
+        }
 
-      // Clear previous interval
-      if (slideshowInterval) {
-        clearInterval(slideshowInterval);
-      }
+        const slideshowContainer = document.getElementById('media-slideshow');
+        const track = document.getElementById('slideshow-track');
+        const indicators = document.getElementById('slideshow-indicators');
+        const overlay = document.getElementById('slideshow-overlay');
 
-      // Clear track
-      track.innerHTML = '';
-      indicators.innerHTML = '';
+        console.log('Elements found:', {
+          slideshowContainer: !!slideshowContainer,
+          track: !!track,
+          indicators: !!indicators,
+          overlay: !!overlay
+        });
 
-      // Create slides
-      console.log('Starting forEach with', images.length, 'images');
-      images.forEach((img, index) => {
-        console.log(`Creating slide ${index} with path:`, img.path);
-        const slide = document.createElement('div');
-        slide.className = `absolute inset-0 transition-opacity duration-1000 ${index === 0 ? 'opacity-100' : 'opacity-0'}`;
-        slide.innerHTML = `
+        // Clear previous interval
+        if (slideshowInterval) {
+          clearInterval(slideshowInterval);
+        }
+
+        // Clear track
+        track.innerHTML = '';
+        indicators.innerHTML = '';
+
+        // Create slides
+        console.log('Starting forEach with', images.length, 'images');
+        images.forEach((img, index) => {
+          console.log(`Creating slide ${index} with path:`, img.path);
+          const slide = document.createElement('div');
+          slide.className = `absolute inset-0 transition-opacity duration-1000 ${index === 0 ? 'opacity-100' : 'opacity-0'}`;
+          slide.innerHTML = `
           <img src="${img.path}" alt="${img.alt || 'Slayt resmi'}" 
             class="w-full h-full object-contain bg-slate-900">
         `;
-        console.log('Appending slide to track...');
-        track.appendChild(slide);
-        console.log('Slide appended, track children count:', track.children.length);
+          console.log('Appending slide to track...');
+          track.appendChild(slide);
+          console.log('Slide appended, track children count:', track.children.length);
 
-        // Create indicator
-        const dot = document.createElement('div');
-        dot.className = `w-2 h-2 rounded-full transition-all duration-300 ${index === 0 ? 'bg-white w-4' : 'bg-white/50'}`;
-        dot.id = `slide-indicator-${index}`;
-        indicators.appendChild(dot);
-      });
+          // Create indicator
+          const dot = document.createElement('div');
+          dot.className = `w-2 h-2 rounded-full transition-all duration-300 ${index === 0 ? 'bg-white w-4' : 'bg-white/50'}`;
+          dot.id = `slide-indicator-${index}`;
+          indicators.appendChild(dot);
+        });
 
-      // Function to update overlay for current slide
-      function updateOverlay(index) {
-        const currentImage = images[index];
+        // Function to update overlay for current slide
+        function updateOverlay(index) {
+          const currentImage = images[index];
 
-        if (currentImage && currentImage.showOverlay) {
-          overlay.classList.remove('hidden');
-          document.getElementById('slideshow-badge').textContent = currentImage.tag || '';
-          document.getElementById('slideshow-title').textContent = currentImage.title || '';
-          document.getElementById('slideshow-desc').textContent = currentImage.desc || '';
-        } else {
-          overlay.classList.add('hidden');
+          if (currentImage && currentImage.showOverlay) {
+            overlay.classList.remove('hidden');
+            document.getElementById('slideshow-badge').textContent = currentImage.tag || '';
+            document.getElementById('slideshow-title').textContent = currentImage.title || '';
+            document.getElementById('slideshow-desc').textContent = currentImage.desc || '';
+          } else {
+            overlay.classList.add('hidden');
+          }
+        }
+
+        // Show overlay for first slide
+        updateOverlay(0);
+
+        // Show slideshow
+        console.log('Making slideshow visible...');
+        slideshowContainer.classList.remove('hidden');
+
+        // Explicitly hide loading state
+        const loadingElement = document.getElementById('media-loading');
+        if (loadingElement) {
+          loadingElement.classList.add('hidden');
+          console.log('Loading element hidden');
+        }
+
+        console.log('Slideshow should now be visible!');
+
+        // Auto-advance slides
+        if (images.length > 1) {
+          const speed = (slideshowData.speed || 5) * 1000; // Convert to milliseconds
+          currentSlideIndex = 0;
+
+          slideshowInterval = setInterval(() => {
+            const slides = track.children;
+            const dots = indicators.children;
+
+            // Hide current slide
+            slides[currentSlideIndex].classList.remove('opacity-100');
+            slides[currentSlideIndex].classList.add('opacity-0');
+            dots[currentSlideIndex].classList.remove('bg-white', 'w-4');
+            dots[currentSlideIndex].classList.add('bg-white/50');
+
+            // Move to next slide
+            currentSlideIndex = (currentSlideIndex + 1) % images.length;
+
+            // Show next slide
+            slides[currentSlideIndex].classList.remove('opacity-0');
+            slides[currentSlideIndex].classList.add('opacity-100');
+            dots[currentSlideIndex].classList.remove('bg-white/50');
+            dots[currentSlideIndex].classList.add('bg-white', 'w-4');
+
+            // Update overlay for new slide
+            updateOverlay(currentSlideIndex);
+          }, speed);
         }
       }
 
-      // Show overlay for first slide
-      updateOverlay(0);
+      function initVideo(videoData) {
+        const videoUrl = videoData.url || '';
 
-      // Show slideshow
-      console.log('Making slideshow visible...');
-      slideshowContainer.classList.remove('hidden');
+        if (!videoUrl) {
+          showMediaLoading();
+          return;
+        }
 
-      // Explicitly hide loading state
-      const loadingElement = document.getElementById('media-loading');
-      if (loadingElement) {
-        loadingElement.classList.add('hidden');
-        console.log('Loading element hidden');
-      }
+        const videoContainer = document.getElementById('media-video');
+        const playerContainer = document.getElementById('video-player-container');
 
-      console.log('Slideshow should now be visible!');
+        // Clear previous content
+        playerContainer.innerHTML = '';
 
-      // Auto-advance slides
-      if (images.length > 1) {
-        const speed = (slideshowData.speed || 5) * 1000; // Convert to milliseconds
-        currentSlideIndex = 0;
+        // Detect video type and create appropriate player
+        if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+          // YouTube video
+          const videoId = extractYouTubeId(videoUrl);
+          if (videoId) {
+            const autoplay = videoData.autoplay ? '1' : '0';
+            const loop = videoData.loop ? '1' : '0';
+            const muted = videoData.muted ? '1' : '0';
 
-        slideshowInterval = setInterval(() => {
-          const slides = track.children;
-          const dots = indicators.children;
-
-          // Hide current slide
-          slides[currentSlideIndex].classList.remove('opacity-100');
-          slides[currentSlideIndex].classList.add('opacity-0');
-          dots[currentSlideIndex].classList.remove('bg-white', 'w-4');
-          dots[currentSlideIndex].classList.add('bg-white/50');
-
-          // Move to next slide
-          currentSlideIndex = (currentSlideIndex + 1) % images.length;
-
-          // Show next slide
-          slides[currentSlideIndex].classList.remove('opacity-0');
-          slides[currentSlideIndex].classList.add('opacity-100');
-          dots[currentSlideIndex].classList.remove('bg-white/50');
-          dots[currentSlideIndex].classList.add('bg-white', 'w-4');
-
-          // Update overlay for new slide
-          updateOverlay(currentSlideIndex);
-        }, speed);
-      }
-    }
-
-    function initVideo(videoData) {
-      const videoUrl = videoData.url || '';
-
-      if (!videoUrl) {
-        showMediaLoading();
-        return;
-      }
-
-      const videoContainer = document.getElementById('media-video');
-      const playerContainer = document.getElementById('video-player-container');
-
-      // Clear previous content
-      playerContainer.innerHTML = '';
-
-      // Detect video type and create appropriate player
-      if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
-        // YouTube video
-        const videoId = extractYouTubeId(videoUrl);
-        if (videoId) {
-          const autoplay = videoData.autoplay ? '1' : '0';
-          const loop = videoData.loop ? '1' : '0';
-          const muted = videoData.muted ? '1' : '0';
-
-          playerContainer.innerHTML = `
+            playerContainer.innerHTML = `
             <iframe 
               width="100%" 
               height="100%" 
@@ -1567,16 +1735,16 @@
               class="w-full h-full">
             </iframe>
           `;
-        }
-      } else if (videoUrl.includes('vimeo.com')) {
-        // Vimeo video
-        const videoId = extractVimeoId(videoUrl);
-        if (videoId) {
-          const autoplay = videoData.autoplay ? '1' : '0';
-          const loop = videoData.loop ? '1' : '0';
-          const muted = videoData.muted ? '1' : '0';
+          }
+        } else if (videoUrl.includes('vimeo.com')) {
+          // Vimeo video
+          const videoId = extractVimeoId(videoUrl);
+          if (videoId) {
+            const autoplay = videoData.autoplay ? '1' : '0';
+            const loop = videoData.loop ? '1' : '0';
+            const muted = videoData.muted ? '1' : '0';
 
-          playerContainer.innerHTML = `
+            playerContainer.innerHTML = `
             <iframe 
               src="https://player.vimeo.com/video/${videoId}?autoplay=${autoplay}&loop=${loop}&muted=${muted}" 
               width="100%" 
@@ -1587,14 +1755,14 @@
               class="w-full h-full">
             </iframe>
           `;
-        }
-      } else {
-        // Direct video file
-        const autoplayAttr = videoData.autoplay ? 'autoplay' : '';
-        const loopAttr = videoData.loop ? 'loop' : '';
-        const mutedAttr = videoData.muted ? 'muted' : '';
+          }
+        } else {
+          // Direct video file
+          const autoplayAttr = videoData.autoplay ? 'autoplay' : '';
+          const loopAttr = videoData.loop ? 'loop' : '';
+          const mutedAttr = videoData.muted ? 'muted' : '';
 
-        playerContainer.innerHTML = `
+          playerContainer.innerHTML = `
           <video 
             ${autoplayAttr} 
             ${loopAttr} 
@@ -1605,98 +1773,100 @@
             Tarayıcınız video oynatmayı desteklemiyor.
           </video>
         `;
+        }
+
+        videoContainer.classList.remove('hidden');
       }
 
-      videoContainer.classList.remove('hidden');
-    }
+      function initWebpage(webpageData) {
+        const webpageUrl = webpageData.url || '';
 
-    function initWebpage(webpageData) {
-      const webpageUrl = webpageData.url || '';
+        if (!webpageUrl) {
+          showMediaLoading();
+          return;
+        }
 
-      if (!webpageUrl) {
-        showMediaLoading();
-        return;
+        const webpageContainer = document.getElementById('media-webpage');
+        const iframe = document.getElementById('webpage-iframe');
+
+        iframe.src = webpageUrl;
+        webpageContainer.classList.remove('hidden');
       }
 
-      const webpageContainer = document.getElementById('media-webpage');
-      const iframe = document.getElementById('webpage-iframe');
+      function showMediaLoading() {
+        document.getElementById('media-loading').classList.remove('hidden');
+      }
 
-      iframe.src = webpageUrl;
-      webpageContainer.classList.remove('hidden');
-    }
+      // Helper functions
+      function extractYouTubeId(url) {
+        const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[7].length === 11) ? match[7] : null;
+      }
 
-    function showMediaLoading() {
-      document.getElementById('media-loading').classList.remove('hidden');
-    }
+      function extractVimeoId(url) {
+        const regExp = /vimeo.*\/(\d+)/i;
+        const match = url.match(regExp);
+        return match ? match[1] : null;
+      }
+    </script>
 
-    // Helper functions
-    function extractYouTubeId(url) {
-      const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-      const match = url.match(regExp);
-      return (match && match[7].length === 11) ? match[7] : null;
-    }
+  </div> <!-- End of pano-wrapper -->
 
-    function extractVimeoId(url) {
-      const regExp = /vimeo.*\/(\d+)/i;
-      const match = url.match(regExp);
-      return match ? match[1] : null;
-    }
-  </script>
-
-  <!-- TV SCREEN AUTO-FIT SCRIPT -->
+  <!-- RESPONSIVE VIEWPORT SCALING SCRIPT -->
   <script>
-    function fitDashboardToScreen() {
-      const mainGrid = document.getElementById('main-content-grid');
-      const header = document.querySelector('header');
-      const footer = document.querySelector('footer');
-      if (!mainGrid || !header || !footer) return;
+    (function () {
+      // Design base dimensions (the layout was designed for this)
+      const BASE_WIDTH = 1920;
+      const BASE_HEIGHT = 1080;
 
-      // 1. Reset transform temporarily to measure natural dimensions
-      // We only reset if we suspect we need to remeasure, or we can just calculate based on scrollHeight/scale
-      // But resetting might cause flickering.
-      // Instead, we can calculate the "natural" height by dividing current scrollHeight by current scale? No.
-      // Best way: check if scrollHeight > clientHeight (overflowing).
+      function scaleDashboard() {
+        const wrapper = document.getElementById('pano-wrapper');
+        if (!wrapper) return;
 
-      const availableHeight = window.innerHeight - header.offsetHeight - footer.offsetHeight;
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
 
-      // Check columns for overflow
-      const cols = ['left-column', 'center-column', 'right-column'];
-      let maxContent = 0;
+        // Calculate scale based on both width and height
+        const scaleX = viewportWidth / BASE_WIDTH;
+        const scaleY = viewportHeight / BASE_HEIGHT;
 
-      cols.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-          // If already scaled, scrollHeight is in scaled pixels? No, DOM pixels.
-          // If we scaled the PARENT (mainGrid), the children dimensions are affected visually but DOM properties...
-          // getBoundingClientRect returns scaled values. scrollHeight returns unscaled (layout) values.
-          maxContent = Math.max(maxContent, el.scrollHeight);
-        }
-      });
+        // Use the smaller scale to ensure everything fits
+        const scale = Math.min(scaleX, scaleY);
 
-      // Add padding
-      const contentHeight = maxContent + 32; // 32px padding
+        // Apply scale
+        document.documentElement.style.setProperty('--scale-factor', scale);
 
-      // If content is significantly larger than available space, scale down
-      if (contentHeight > availableHeight + 5) { // 5px tolerance
-        const scale = availableHeight / contentHeight;
-        mainGrid.style.transformOrigin = 'top center';
-        mainGrid.style.transform = `scale(${scale})`;
-        mainGrid.style.width = `${100 / scale}%`; // Expand width to fill space
-      } else {
-        // Clear if fits
-        // But only clear if we are sure it fits naturally. 
-        // If we clear transform, and it overflows, loop?
-        // Let's only clear if space is plentiful.
-        if (contentHeight < availableHeight - 50) {
-          mainGrid.style.transform = 'none';
-          mainGrid.style.width = 'auto';
-        }
+        // Adjust wrapper size to fill viewport after scaling
+        wrapper.style.width = (BASE_WIDTH) + 'px';
+        wrapper.style.height = (BASE_HEIGHT) + 'px';
+        wrapper.style.transform = `scale(${scale})`;
+        wrapper.style.transformOrigin = 'top left';
+
+        // Center if there's extra space
+        const scaledWidth = BASE_WIDTH * scale;
+        const scaledHeight = BASE_HEIGHT * scale;
+        const offsetX = Math.max(0, (viewportWidth - scaledWidth) / 2);
+        const offsetY = Math.max(0, (viewportHeight - scaledHeight) / 2);
+
+        wrapper.style.marginLeft = offsetX + 'px';
+        wrapper.style.marginTop = offsetY + 'px';
+
+        console.log(`📺 Screen: ${viewportWidth}x${viewportHeight}, Scale: ${scale.toFixed(3)}, Offset: ${offsetX.toFixed(0)}x${offsetY.toFixed(0)}`);
       }
-    }
 
-    // Run periodically to handle dynamic content changes
-    setInterval(fitDashboardToScreen, 2000);
-    window.addEventListener('resize', fitDashboardToScreen);
+      // Initial scale
+      scaleDashboard();
+
+      // Re-scale on resize
+      window.addEventListener('resize', scaleDashboard);
+
+      // Also scale after content loads
+      window.addEventListener('load', scaleDashboard);
+
+      // Re-scale periodically for dynamic content
+      setInterval(scaleDashboard, 3000);
+    })();
   </script>
 </body>
 

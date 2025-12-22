@@ -1643,6 +1643,61 @@
     }
   </script>
 
+  <!-- TV SCREEN AUTO-FIT SCRIPT -->
+  <script>
+    function fitDashboardToScreen() {
+      const mainGrid = document.getElementById('main-content-grid');
+      const header = document.querySelector('header');
+      const footer = document.querySelector('footer');
+      if (!mainGrid || !header || !footer) return;
+
+      // 1. Reset transform temporarily to measure natural dimensions
+      // We only reset if we suspect we need to remeasure, or we can just calculate based on scrollHeight/scale
+      // But resetting might cause flickering.
+      // Instead, we can calculate the "natural" height by dividing current scrollHeight by current scale? No.
+      // Best way: check if scrollHeight > clientHeight (overflowing).
+
+      const availableHeight = window.innerHeight - header.offsetHeight - footer.offsetHeight;
+
+      // Check columns for overflow
+      const cols = ['left-column', 'center-column', 'right-column'];
+      let maxContent = 0;
+
+      cols.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          // If already scaled, scrollHeight is in scaled pixels? No, DOM pixels.
+          // If we scaled the PARENT (mainGrid), the children dimensions are affected visually but DOM properties...
+          // getBoundingClientRect returns scaled values. scrollHeight returns unscaled (layout) values.
+          maxContent = Math.max(maxContent, el.scrollHeight);
+        }
+      });
+
+      // Add padding
+      const contentHeight = maxContent + 32; // 32px padding
+
+      // If content is significantly larger than available space, scale down
+      if (contentHeight > availableHeight + 5) { // 5px tolerance
+        const scale = availableHeight / contentHeight;
+        mainGrid.style.transformOrigin = 'top center';
+        mainGrid.style.transform = `scale(${scale})`;
+        mainGrid.style.width = `${100 / scale}%`; // Expand width to fill space
+      } else {
+        // Clear if fits
+        // But only clear if we are sure it fits naturally. 
+        // If we clear transform, and it overflows, loop?
+        // Let's only clear if space is plentiful.
+        if (contentHeight < availableHeight - 50) {
+          mainGrid.style.transform = 'none';
+          mainGrid.style.width = 'auto';
+        }
+      }
+    }
+
+    // Run periodically to handle dynamic content changes
+    setInterval(fitDashboardToScreen, 2000);
+    window.addEventListener('resize', fitDashboardToScreen);
+  </script>
 </body>
 
 </html>

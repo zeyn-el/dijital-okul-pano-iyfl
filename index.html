@@ -114,7 +114,19 @@
 </head>
 
 <body class="bg-background-light text-text-dark font-display overflow-hidden">
-  <div id="pano-wrapper">
+  <!-- Oturum Kontrolü -->
+  <script>
+      // Sayfa yüklenmeden önce oturum kontrolü yap
+      (function () {
+        const session = sessionStorage.getItem('adminSession');
+        if (!session) {
+          // Oturum yoksa login sayfasına yönlendir
+          window.location.href = 'login.html';
+        }
+      })();
+  </script>
+
+  <div id="pano-wrapper" style="display: none;">
 
     <!-- Header -->
     <header
@@ -130,7 +142,7 @@
       <!-- Center: School Name -->
       <div class="flex items-center gap-4">
         <img src="images/school-logo.jpg" alt="Okul Logosu" class="w-14 h-14 rounded-lg object-cover">
-        <h1 class="text-2xl font-bold text-text-dark tracking-tight uppercase"
+        <h1 class="text-3xl font-bold text-text-dark tracking-tight uppercase"
           style="font-family: 'Helvetica Neue Condensed', 'Helvetica Neue', 'Arial Narrow', 'Arial', sans-serif;">İsmet
           Yılmaz Fen Lisesi | Şarkışla</h1>
       </div>
@@ -146,6 +158,11 @@
           class="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors">
           <span class="material-symbols-outlined">settings</span>
         </a>
+        <!-- Çıkış Butonu -->
+        <button onclick="logout()" title="Çıkış Yap"
+          class="flex items-center justify-center w-12 h-12 rounded-full bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-colors">
+          <span class="material-symbols-outlined">logout</span>
+        </button>
       </div>
     </header>
 
@@ -343,6 +360,12 @@
     </footer>
 
     <script>
+      // Çıkış fonksiyonu
+      function logout() {
+        sessionStorage.removeItem('adminSession');
+        window.location.href = 'login.html';
+      }
+
       // Load data from Firebase (async)
       async function loadData() {
         return await FirebaseStorage.loadData();
@@ -1699,6 +1722,9 @@
       function scaleDashboard() {
         const wrapper = document.getElementById('pano-wrapper');
         if (!wrapper) return;
+
+        // Oturum doğrulandıysa panoyu görünür yap
+        wrapper.style.display = 'flex';
 
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;

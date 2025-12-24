@@ -157,12 +157,12 @@
         }
     </style>
 
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
-<!-- Firebase Config -->
-<script src="firebase-config.js"></script>
+    <!-- Firebase Config -->
+    <script src="firebase-config.js"></script>
 </head>
 
 <body>
@@ -174,8 +174,8 @@
                     class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary to-primary-dark rounded-2xl mb-4 shadow-lg">
                     <span class="material-symbols-outlined text-white text-5xl">school</span>
                 </div>
-                <h1 class="text-3xl font-bold text-gray-800 mb-2">Admin Paneli</h1>
-                <p class="text-gray-600">Dijital Pano Yönetimi</p>
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">Dijital Pano</h1>
+                <p class="text-gray-600">Güvenli Giriş Sistemi</p>
             </div>
 
             <!-- Error Message -->
@@ -210,8 +210,8 @@
 
             <!-- Info -->
             <div class="mt-6 text-center text-sm text-gray-500">
-                <p>🔒 Güvenli giriş sistemi</p>
-                <p class="mt-2">Varsayılan: <strong>admin</strong> / <strong>admin123</strong></p>
+                <p>🔒 Okul dijital panosuna erişim için giriş yapınız</p>
+                <p class="mt-2 text-xs text-gray-400">Şifrenizi unuttaysanız yöneticinize başvurun</p>
             </div>
         </div>
     </div>
@@ -256,8 +256,8 @@
 
                 sessionStorage.setItem('adminSession', JSON.stringify(session));
 
-                // Admin paneline yönlendir
-                window.location.href = 'admin.html';
+                // Ana panoya yönlendir
+                window.location.href = 'index.html';
             } else {
                 // Hatalı giriş
                 errorMessage.classList.add('show');
@@ -275,7 +275,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             const session = sessionStorage.getItem('adminSession');
             if (session) {
-                window.location.href = 'admin.html';
+                window.location.href = 'index.html';
             }
         });
     </script>

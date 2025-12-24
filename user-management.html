@@ -79,6 +79,13 @@
                 const session = sessionStorage.getItem('adminSession');
                 if (!session) {
                     window.location.href = 'login.html';
+                } else {
+                    // Öğrenci rolü kontrolü - kullanıcı yönetimine erişim yok
+                    const user = JSON.parse(session);
+                    if (user.role === 'Öğrenci') {
+                        alert('⚠️ Öğrenci hesabıyla bu sayfaya erişim izniniz bulunmuyor.');
+                        window.location.href = 'index.html';
+                    }
                 }
             })();
     </script>
@@ -121,7 +128,14 @@
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Rol</label>
-                    <input type="text" id="newRole" class="input-field" placeholder="Örn: Öğretmen">
+                    <select id="newRole" class="input-field">
+                        <option value="">Rol Seçin</option>
+                        <option value="Yönetici">Yönetici</option>
+                        <option value="Öğretmen">Öğretmen</option>
+                        <option value="Rehber Öğretmen">Rehber Öğretmen</option>
+                        <option value="İdare">İdare</option>
+                        <option value="Öğrenci">Öğrenci</option>
+                    </select>
                 </div>
             </div>
 

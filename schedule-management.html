@@ -64,6 +64,13 @@
             const session = sessionStorage.getItem('adminSession');
             if (!session) {
                 window.location.href = 'login.html';
+            } else {
+                // Öğrenci rolü kontrolü - ders programı yönetimine erişim yok
+                const user = JSON.parse(session);
+                if (user.role === 'Öğrenci') {
+                    alert('⚠️ Öğrenci hesabıyla bu sayfaya erişim izniniz bulunmuyor.');
+                    window.location.href = 'index.html';
+                }
             }
         })();
 

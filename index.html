@@ -122,6 +122,18 @@
         if (!session) {
           // Oturum yoksa login sayfasına yönlendir
           window.location.href = 'login.html';
+        } else {
+          // Öğrenci rolü kontrolü - sayfa yüklendikten sonra ayarlar butonunu gizle
+          const user = JSON.parse(session);
+          if (user.role === 'Öğrenci') {
+            // DOM hazır olduğunda ayarlar butonunu gizle
+            document.addEventListener('DOMContentLoaded', function () {
+              const settingsBtn = document.getElementById('settingsBtn');
+              if (settingsBtn) {
+                settingsBtn.style.display = 'none';
+              }
+            });
+          }
         }
       })();
   </script>
@@ -153,8 +165,8 @@
           <span class="material-symbols-outlined mr-2 text-2xl">calendar_month</span>
           <span id="current-date" class="text-xl font-bold">9 Aralık 2025 Salı</span>
         </div>
-        <!-- Ayarlar Butonu (Admin sayfasına geçiş) -->
-        <a href="admin.html" title="Ayarlar"
+        <!-- Ayarlar Butonu (Admin sayfasına geçiş) - Öğrenci rolü için gizli -->
+        <a href="admin.html" id="settingsBtn" title="Ayarlar"
           class="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors">
           <span class="material-symbols-outlined">settings</span>
         </a>

@@ -361,6 +361,13 @@
       if (!session) {
         // Giriş yapılmamış, login sayfasına yönlendir
         window.location.href = 'login.html';
+      } else {
+        // Öğrenci rolü kontrolü - admin paneline erişim yok
+        const user = JSON.parse(session);
+        if (user.role === 'Öğrenci') {
+          alert('⚠️ Öğrenci hesabıyla admin paneline erişim izniniz bulunmuyor.');
+          window.location.href = 'index.html';
+        }
       }
     })();
 
